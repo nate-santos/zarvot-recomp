@@ -60,6 +60,10 @@ immediately; Z10 is the later optimization phase, not permission to defer sound.
 
 ### Z01 — Establish representative tests
 
+- E003 now provides opening combat observations: roughly 60 FPS between brief
+  severe stalls, with 57.4–57.9 FPS run means. Next prioritize a moving route
+  and per-frame capture around hit/respawn effects; average GPU use alone
+  does not identify the stall cause. Keep this baseline as the control.
 - Record title/menu, a repeatable early story segment, a combat-heavy segment,
   a scene transition and a longer music loop. Add versus/arcade later.
 - Keep focus/visibility, charger state, Windows power mode, display refresh,

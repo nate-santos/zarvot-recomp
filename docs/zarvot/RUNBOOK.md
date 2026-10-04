@@ -23,7 +23,67 @@ workspace/
 
 Current keyboard mapping: Switch A = C, B = X, Plus = M; left stick = WASD.
 Click the game area first. A first key press can be consumed by focus changes.
-The game has reached the main menu with these controls.
+Opening Story movement, directional firing and the pause menu are confirmed.
+Face buttons are mapped A=C, B=X, X=V, Y=Z. Short automated taps can miss input;
+use the runtime's TAS feature for held/repeatable controller commands.
+
+## Gameplay sampling and controller playback
+
+Last session left the game paused in the opening jar `Pew Pew` combat tutorial.
+TAS is enabled, loop is off and playback is stopped. M opens/closes pause;
+the pause menu has resume, restart level, pair controllers and exit to main menu.
+Original pre-test save backup: workspace `reports/z01-save-before-gameplay/`.
+Original pre-TAS settings: `reports/z01-config-before-tas.ini`. Do not restore
+these over later user progress. Current game/profile data stay local.
+
+Run the following from workspace root. First resume via the pause menu; then
+inspect the actual scene. These tools neither launch a game nor select a save.
+
+```powershell
+# Send a controller button held for 30 input ticks, then release it.
+.\source\scripts\zarvot-input.ps1 `
+  -TasDirectory .\runtime\suyu-v0.0.12\user\tas `
+  -ConfigPath .\runtime\suyu-v0.0.12\user\config\qt-config.ini `
+  -Buttons KEY_A -Frames 30
+
+# Sample gameplay while keeping the game visible and foreground.
+.\source\scripts\zarvot-sample.ps1 `
+  -Scene 'Describe exact scene, route, settings and run number' `
+  -EmulatorPath .\runtime\suyu-v0.0.12\suyu.exe `
+  -OutputPath .\reports\my-gameplay-run.json -Seconds 60 -IncludeGpuCounters
+```
+
+The input helper validates the selected TAS directory, enabled/non-looping
+settings and idle playback/recording state, backs up the previous script, and
+uses `tas_reset` / `tas_start_stop`. `-Pulses` and `-GapFrames` send repeated
+presses; `-LeftX`, `-LeftY`, `-RightX`, `-RightY` specify signed stick values
+from -32767 to 32767. Separate simultaneous buttons with semicolons and quote
+the string. A fixture ends with neutral input. `Frames` are TAS input ticks,
+not captured presentation frames; this experimental playback is not guaranteed
+to reproduce identical enemy/physics phases.
+
+E003 held A for 15000 ticks per 60-second run (long enough to cover sampling)
+and stopped playback afterward with this local RPC call:
+
+```powershell
+.\source\scripts\zarvot-rpc.ps1 -Tool trigger_ui_action `
+  -ArgumentsJson '{"action":"tas_start_stop"}'
+```
+
+This action toggles playback: check `tas_running` before using it to stop.
+Always stop a long fixture after measurement or a failure, and verify input
+is released before pausing/leaving the session. Avoid thread diagnostics,
+exports or other intrusive operations during a timed run.
+
+The sampler checks the executable path and requires exactly one matching
+process. It records interval rendered FPS, VBlanks/s, reported frame time,
+emulation speed, shader/TAS state, process CPU/memory and optional Windows GPU
+engine utilization. Actual sampling intervals are recorded (about 1.05 s in
+E003). Focus must be maintained by the caller. The GPU counter interval follows
+the FPS poll, so the observations are not simultaneous. The sampler does not
+compute frame percentiles or 1% lows. Aggregate CPU use does not prove which
+thread limits frame time. Power, temperature and scene phase need separate
+control. See EXPERIMENTS.md for results and caveats.
 
 ## Start/resume
 

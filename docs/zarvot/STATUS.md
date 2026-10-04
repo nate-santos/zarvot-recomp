@@ -4,9 +4,12 @@ Updated: 2026-10-04. Read this first when changing models.
 
 ## Outcome so far
 
-Zarvot 1.0.0 boots and renders its title screen and main menu on the laptop
-using Dynarmic JIT + Vulkan. Foreground readings reach approximately 60 FPS.
-Gameplay performance, audio fidelity and AOT performance are not yet validated.
+Zarvot 1.0.0 runs controllable opening Story gameplay on the laptop using
+Dynarmic JIT + Vulkan at handheld 1x/HIGH. Movement, shooting, pause and level
+restart work. Three 60-second combat observations had medians near 60 FPS and
+means of 57.4–57.9 FPS, with recurring brief severe stalls. Gameplay baseline
+evidence and reusable tools exist; stall causes, later levels, audio fidelity
+and AOT performance remain unverified. See E003 in EXPERIMENTS.md.
 
 GitHub fork: https://github.com/nate-santos/zarvot-recomp
 
@@ -18,7 +21,7 @@ The repository has `origin` (our fork) and `upstream` (mk8-recomp).
 | ID | Status | Evidence / next condition |
 |---|---|---|
 | Z00 | Complete | Fork, branch, roadmap, handoff, source ignore rules and runtime identity recorded; use Git history for commit/sync state |
-| Z01 | In progress | AArch64 loader, title/menu rendering and keyboard input confirmed; representative gameplay/audio next |
+| Z01 | In progress | Opening combat measured three times; moving/heavier fixture and per-frame stall diagnosis next; audio deferred this session |
 | Z02 | Ready after controlled baseline | Focus affects observed FPS; repeated play-time path errors; audit logging flags |
 | Z03 | Ready after scene fixture | 1x vs lower-scale A/B to classify GPU pressure |
 | Z04 | Planned | Resolve runtime/source revision mismatch before core changes |
@@ -31,11 +34,15 @@ The repository has `origin` (our fork) and `upstream` (mk8-recomp).
 
 1. Check current process/UI rather than assuming the game is still running.
 2. Check `git status` and branch ahead/behind state; preserve any later user edits.
-3. From the main menu, enter Story and establish a repeatable early gameplay
-   route. Do not overwrite an existing save slot without checking it.
-4. Capture baseline foreground timings and audio. Keep settings unchanged.
-5. Investigate Z02 low-cost issues, then the Z03 resolution experiment before
-   assuming CPU recompilation will improve this iGPU laptop.
+3. Last state is paused in the opening jar combat tutorial with TAS stopped.
+   Resume, or use Story > Continue after a restart. The original pre-test save
+   and pre-TAS config are backed up locally; preserve subsequent user progress.
+4. Establish a moving combat route that avoids repeated hits/respawns, then
+   capture a real per-frame presentation trace. Compare with the stationary
+   tutorial to locate the brief 0–12 FPS / zero-VBlank stalls. Keep the 1x/HIGH
+   control; do not infer intended Switch behavior from the speed counter.
+5. Use an equivalent scene for Z02/Z03 A/B tests (logging/path diagnostics,
+   then resolution sensitivity). Identify the bottleneck before CPU/AOT work.
 6. Update this file and append an experiment after each meaningful result.
 
 ## Facts and open issues
@@ -51,9 +58,15 @@ The repository has `origin` (our fork) and `upstream` (mk8-recomp).
   is an environment hypothesis, not a measured optimization win.
 - Fifteen foreground main-menu polling samples averaged 59.999 FPS; reported
   samples ranged 59.945–60.080. No per-frame latency distribution was captured.
-- Last verified screen is the main menu with Story selected. Entering Story
-  was not confirmed. A later input attempt was stopped by the computer-use
-  tool because user input was detected; re-observe before sending more input.
+- Last verified screen is the in-game pause menu at the opening tutorial.
+  Frame-based input playback solved unreliable short automated key taps;
+  TAS is enabled, loop disabled, playback stopped. See the input helper.
+- E003 is actual gameplay, but its repeated stationary-fire observations have
+  uncontrolled enemy/respawn phases. A stronger moving/heavy combat fixture
+  and genuine per-frame trace are still needed for optimization comparisons.
+- Opening combat GPU 3D activity averaged 49–53%, observed peak 62.6%; emulator
+  CPU use averaged about 2.5 logical cores and working set peaked at 6.16 GiB.
+  No proven CPU/GPU bottleneck; aggregate utilization can hide critical stalls.
 - Music fidelity is unverified. A 48 kHz stereo output stream initialized;
   neither a hardware-reference comparison nor a listening test has been done.
 - Repeated play-time database write errors need diagnosis. Do not create a
