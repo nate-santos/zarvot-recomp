@@ -1,3 +1,15 @@
+# Zarvot recompilation experiments
+
+This fork investigates Zarvot performance on a Windows Ryzen laptop. Start with
+the [current status](docs/zarvot/STATUS.md), [optimization roadmap](docs/zarvot/PLAN.md),
+[experiment ledger](docs/zarvot/EXPERIMENTS.md), and [local runbook](docs/zarvot/RUNBOOK.md).
+
+Zarvot currently reaches its title screen and main menu through the JIT backend.
+A native/AOT performance improvement and original-hardware audio fidelity have
+not been demonstrated. Game files, keys and generated game code remain local.
+
+The original upstream project documentation follows.
+
 # mk8-recomp
 
 [**suyu v0.0.11**](https://github.com/dougchansan/suyu-v0.0.4/releases/tag/v0.0.11)

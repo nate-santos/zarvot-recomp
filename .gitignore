@@ -41,3 +41,9 @@ __pycache__/
 
 # Local orchestration state
 .omx/
+
+# Zarvot local runtime, measurements, and alternate key filenames.
+*.keys
+runtime/
+downloads/
+reports/
