@@ -1,8 +1,8 @@
 # Zarvot development
 
 Read `docs/zarvot/STATUS.md`, `PLAN.md`, `EXPERIMENTS.md`, and `RUNBOOK.md`
-before changing this fork. The upstream README describes MK8 research; the
-Zarvot documents describe this project's actual state.
+before changing this fork. The README summarizes measured Zarvot results;
+inherited upstream research is context, not Zarvot validation.
 
 Keep stable task IDs and update evidence, decisions and the next action after
 each meaningful experiment. Never claim gameplay/audio fidelity from a title
@@ -22,3 +22,5 @@ Prefer one variable per performance experiment, repeatable foreground scenes,
 warm and cold cache results kept separate, and rollback to a saved configuration.
 Do not silently enable inaccurate CPU/GPU options to improve a benchmark.
 
+The user handles gameplay testing. Do not automate play or change controller
+state unless the user requests it again. Prepare recording and analyze evidence.

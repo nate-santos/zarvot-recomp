@@ -102,6 +102,42 @@ Raw files remain local. Sanitized summaries can be committed.
 - Handoff: game left paused at the opening tutorial, TAS stopped, loop off.
   Resume via M or the pause menu. See RUNBOOK.md for repeatable tool commands.
 
+## E004 — Measurement preparation and manual-playtest handoff (2026-10-04)
+
+- Task: Z01; refresh the measurement workflow and remove unrelated MK8 README
+  content. User subsequently chose to perform playtesting later and end session.
+- Control: same executable SHA-256 and 1x/HIGH JIT profile as E003. Verified AC
+  online and Windows Balanced scheme. Save and profile backed up locally to
+  `reports/e004-save-before-test/` and `reports/e004-config-before.ini`.
+- A hand-authored movement/fire route completed a 10.533-second sampler smoke
+  check: 10 polls, mean 53.900 FPS, median 59.997, minimum 0, one poll below 55.
+  This is a short functional check, not a representative benchmark or speedup.
+  Raw evidence: `reports/e004-moving-warmup.json`. Opening encounter completion
+  was not verified; user clarified that pursuers must be shot to progress.
+- PresentMon 2.6.0 portable executable verified against its GitHub release SHA:
+  `b2a706bc6ad475749e3b7e3409263aa1e6906d45bdcf993f6dbc0f660188f1af`.
+  Its five-second ETW capture attempt failed with Windows access denied and
+  produced no trace. No per-frame percentile or 1% low is available. No Windows
+  group/security changes were made. [Tool source](https://github.com/GameTechDev/PresentMon/releases/tag/v2.6.0).
+- User-directed change: stop automated gameplay; prepare recording for their
+  later test. New `zarvot-benchmark.ps1` wraps interval sampling with a countdown,
+  saved-setting/hash metadata and manual scene notes. It sends no inputs and
+  rejects a paused game or active TAS at start. Sampler records emulation-thread
+  state and counts stopped-thread/TAS-active polls without filtering FPS drops.
+- README now presents the real E003 results, method and limitations. No fresh
+  full-length representative run was completed this session. Keep tutorial
+  observations distinct from the pending manual-playtest baseline.
+- Prototype movement/restart fixtures and extended input helper were archived
+  locally under `reports/`; the tracked input helper remains its prior version.
+- Verification: all four Zarvot PowerShell scripts parsed; README local links
+  and Git whitespace checks passed. Live paused-game guard rejected capture,
+  wrote no benchmark and left emulation/TAS stopped. A full manual-wrapper run
+  remains untested until the user plays.
+- Decision: defer further measurements until the user returns. Last RPC state
+  was paused with TAS stopped; no further control commands were sent.
+- Next: user's three matched 60-second gameplay runs, then review scene/focus,
+  pauses, stalls and counters before Z02/Z03 changes. Music fidelity still open.
+
 ## Template for the next experiment
 
 - ID / task / date:

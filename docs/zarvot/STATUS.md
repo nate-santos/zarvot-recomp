@@ -2,6 +2,11 @@
 
 Updated: 2026-10-04. Read this first when changing models.
 
+Session stopped at the user's request. The user will perform gameplay testing
+later; do not resume automated play. README now contains the real E003 opening
+tutorial measurements. A manual recorder is prepared; a representative fresh
+manual benchmark is pending. See E004 for the latest limits and local evidence.
+
 ## Outcome so far
 
 Zarvot 1.0.0 runs controllable opening Story gameplay on the laptop using
@@ -21,7 +26,7 @@ The repository has `origin` (our fork) and `upstream` (mk8-recomp).
 | ID | Status | Evidence / next condition |
 |---|---|---|
 | Z00 | Complete | Fork, branch, roadmap, handoff, source ignore rules and runtime identity recorded; use Git history for commit/sync state |
-| Z01 | In progress | Opening combat measured three times; moving/heavier fixture and per-frame stall diagnosis next; audio deferred this session |
+| Z01 | In progress | E003 opening tutorial measured; manual recorder prepared; user's later moving/heavier playtest and per-frame stall diagnosis next |
 | Z02 | Ready after controlled baseline | Focus affects observed FPS; repeated play-time path errors; audit logging flags |
 | Z03 | Ready after scene fixture | 1x vs lower-scale A/B to classify GPU pressure |
 | Z04 | Planned | Resolve runtime/source revision mismatch before core changes |
@@ -34,13 +39,14 @@ The repository has `origin` (our fork) and `upstream` (mk8-recomp).
 
 1. Check current process/UI rather than assuming the game is still running.
 2. Check `git status` and branch ahead/behind state; preserve any later user edits.
-3. Last state is paused in the opening jar combat tutorial with TAS stopped.
-   Resume, or use Story > Continue after a restart. The original pre-test save
-   and pre-TAS config are backed up locally; preserve subsequent user progress.
-4. Establish a moving combat route that avoids repeated hits/respawns, then
-   capture a real per-frame presentation trace. Compare with the stationary
-   tutorial to locate the brief 0–12 FPS / zero-VBlank stalls. Keep the 1x/HIGH
-   control; do not infer intended Switch behavior from the speed counter.
+3. Last RPC observation: game loaded but emulation thread stopped (paused), TAS
+   playback/recording off. Leave control with the user; preserve subsequent
+   progress. The original and E004 pre-test saves/configs are backed up locally.
+4. When the user is ready, record three matched moving/combat routes with the
+   manual recorder in RUNBOOK. Do not drive, restart or overwrite their save.
+   Compare with E003 to investigate the brief 0–12 FPS / zero-VBlank stalls.
+   PresentMon 2.6.0 could not start ETW capture (Windows access denied); genuine
+   per-frame timings remain pending. Keep 1x/HIGH as the control.
 5. Use an equivalent scene for Z02/Z03 A/B tests (logging/path diagnostics,
    then resolution sensitivity). Identify the bottleneck before CPU/AOT work.
 6. Update this file and append an experiment after each meaningful result.
@@ -58,9 +64,9 @@ The repository has `origin` (our fork) and `upstream` (mk8-recomp).
   is an environment hypothesis, not a measured optimization win.
 - Fifteen foreground main-menu polling samples averaged 59.999 FPS; reported
   samples ranged 59.945–60.080. No per-frame latency distribution was captured.
-- Last verified screen is the in-game pause menu at the opening tutorial.
-  Frame-based input playback solved unreliable short automated key taps;
-  TAS is enabled, loop disabled, playback stopped. See the input helper.
+- TAS is enabled, loop disabled, playback stopped. Manual playtesting is the
+  user's preference; prepared recorder sends no controller input. Earlier
+  automated attempts did not verify clearing the opening encounter.
 - E003 is actual gameplay, but its repeated stationary-fire observations have
   uncontrolled enemy/respawn phases. A stronger moving/heavy combat fixture
   and genuine per-frame trace are still needed for optimization comparisons.

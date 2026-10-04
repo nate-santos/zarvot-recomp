@@ -23,13 +23,47 @@ workspace/
 
 Current keyboard mapping: Switch A = C, B = X, Plus = M; left stick = WASD.
 Click the game area first. A first key press can be consumed by focus changes.
-Opening Story movement, directional firing and the pause menu are confirmed.
+Opening Story movement, shooting effects and the pause menu are confirmed;
+the exact aiming controls and clearing the encounter were not verified.
 Face buttons are mapped A=C, B=X, X=V, Y=Z. Short automated taps can miss input;
 use the runtime's TAS feature for held/repeatable controller commands.
 
-## Gameplay sampling and controller playback
+## Manual gameplay recording
 
-Last session left the game paused in the opening jar `Pew Pew` combat tutorial.
+The user will playtest later. Do not automate gameplay unless requested again.
+Last observed state was paused with TAS playback/recording stopped. The recorder
+below sends no input, changes no settings and leaves control with the player.
+Run from workspace root; it provides ten seconds to resume and focus the game:
+
+```powershell
+.\source\scripts\zarvot-benchmark.ps1 `
+  -ConfigPath .\runtime\suyu-v0.0.12\user\config\qt-config.ini `
+  -EmulatorPath .\runtime\suyu-v0.0.12\suyu.exe `
+  -Scene 'Opening combat, manual route, run 1' `
+  -OutputPath .\reports\manual-run1.json `
+  -Seconds 60 -IncludeGpuCounters
+```
+
+Use distinct run filenames. Warm up first and repeat the same route three times,
+keeping 1x/HIGH, power and foreground state consistent. Record level/route and
+any deaths, pauses or transitions in `-Scene` / optional `-Notes`. A stopped
+emulation thread or active TAS at the start rejects recording; later stopped
+thread/TAS-active polls are counted in the output and FPS drops are retained.
+Review these flags before using results as a gameplay comparison. No tool can
+confirm whether the player actually followed the described route.
+
+The wrapper records executable identity, saved-profile settings and before/after
+config hashes. These do not continuously verify in-memory settings or focus.
+Runtime config and saves stay local. The underlying sampler was live-validated
+in E003 and E004; full manual-wrapper capture awaits the user's later playtest.
+
+PresentMon 2.6.0 is available locally under `downloads/`. Its ETW trace attempt
+failed with Windows access denied; no per-frame capture is available. Continue
+with accurately labeled interval polls. Do not invent 1% lows/p99 from them.
+
+## Earlier controller-playback workflow (reference)
+
+E003 left the game paused in the opening jar `Pew Pew` combat tutorial.
 TAS is enabled, loop is off and playback is stopped. M opens/closes pause;
 the pause menu has resume, restart level, pair controllers and exit to main menu.
 Original pre-test save backup: workspace `reports/z01-save-before-gameplay/`.

@@ -58,6 +58,7 @@ while ($clock.Elapsed.TotalSeconds -lt $Seconds) {
         ReportedFrameMs=$state.frame_ms
         EmulationSpeed=$state.emulation_speed
         GameRunning=$state.game_running
+        EmulationThreadRunning=$state.emulation_thread_running
         ShadersBuilding=$state.shaders_building
         StaticBackendActive=$state.static_backend_active
         TasFrame=$state.tas_frame
@@ -87,6 +88,8 @@ $summary = [pscustomobject]@{
     SampledFpsMin=$stats.Minimum
     SampledFpsMax=$stats.Maximum
     SamplesBelow55=@($fps | Where-Object { $_ -lt 55 }).Count
+    SamplesWithEmulationStopped=@($samples | Where-Object { -not $_.EmulationThreadRunning }).Count
+    SamplesWithTasActive=@($samples | Where-Object { $_.TasRunning }).Count
     CpuCoreEquivalentsMean=($samples | Measure-Object CpuCoreEquivalents -Average).Average
     WorkingSetPeakBytes=($samples | Measure-Object WorkingSetBytes -Maximum).Maximum
 }
