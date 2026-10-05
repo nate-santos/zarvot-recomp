@@ -1,6 +1,6 @@
 # Zarvot recomp handoff
 
-Updated: 2026-10-05. Scope reset by the user; see E006.
+Updated: 2026-10-05. Recomp plan committed as 5c6156a; R00 in progress (E007).
 
 ## Objective and next action
 
@@ -8,8 +8,9 @@ Work only on the recomp: build, coverage, correctness and execution improvements
 Reuse the compatibility stack. Do not resume general emulator performance,
 settings or GPU tuning. JIT is a reference and temporary hybrid fallback.
 
-**Next: R00 — initialize/inspect the pinned source and establish a matching
-exporter/runtime/toolchain build.** A fresh JIT gameplay benchmark is not a
+**Next: R00 — finish the matching exporter/runtime build already underway.**
+Inspect build processes and reports/r00-build.log before resuming; source and
+local Qt/glslang dependencies are initialized. A fresh JIT gameplay benchmark is not a
 prerequisite. After that export Zarvot, compile its modules and prove AOT execution.
 
 ## Verified progress
@@ -29,7 +30,7 @@ prerequisite. After that export Zarvot, compile its modules and prove AOT execut
 
 | ID | State | Evidence / next condition |
 |---|---|---|
-| R00 | Ready — first task | Toolchain smoke passed; submodule directory observed empty during review; runtime/source mismatch unresolved |
+| R00 | In progress | Pinned source initialized; local Qt/glslang prepared; matching host/exporter configuration/build underway; no success claimed yet |
 | R01 | Pending R00 | Inventory modules/build IDs and generate local AOT source |
 | R02 | Pending R01 | Compile/load modules and prove advancing AOT execution counters |
 | R03 | Pending R02 | User-led hybrid correctness checks and categorized fallback evidence |
@@ -46,9 +47,8 @@ A/B and logging/cache tuning are no longer next actions.
 ## Resume procedure
 
 1. Read PLAN and latest ledger entry; check actual Git state and processes.
-2. Preserve pre-existing local edits. The review observed branch zarvot-support
-   at 764aee3 with local E005 additions to STATUS/EXPERIMENTS. This rewrite
-   preserves E005's toolchain result. Check current ahead/behind state afresh.
+2. Recomp roadmap, README, instructions and E005/E006 are committed in 5c6156a.
+   Preserve subsequent changes and check current ahead/behind state afresh.
 3. Inspect/initialize source/third_party/suyu at the pinned revision and resolve
    exporter/runtime identity. Record exact build commands and failures.
 4. Proceed through R00-R02 without waiting for manual JIT performance tests.
@@ -82,4 +82,5 @@ valuable even without an FPS gain, but does not itself prove speed or fidelity.
 Do not stop recomp work because JIT is fast enough. Keep graphics/audio support
 and original gameplay/music behavior. Fix source in the appropriate recomp
 components; current upstream features must be inspected before reimplementation.
-This session changes documentation only; no build or gameplay was performed.
+Source/build dependency setup has started; no Zarvot export or gameplay was
+performed. R00 completion requires a successful matching host/exporter build.

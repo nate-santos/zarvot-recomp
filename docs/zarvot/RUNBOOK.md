@@ -189,7 +189,7 @@ edit the active config while suyu is running: shutdown may overwrite it.
 
 - Wrapper base: `db36cf53606e67977a26d6758215dfc89fa24724`.
 - Pinned emulator submodule: `5949cab3ba93233ddd1c319bfc6f010f6cfa910a`.
-- The submodule has not been initialized/built locally.
+- The pinned submodule is initialized; matching source build is in progress (E007).
 - Downloaded Windows release asset v0.0.12 SHA-256:
   `415e68c9aaf5374dd7f4864c8f267ce4833e13a2cbb2cc9cdf299ed06634ff2a`.
 - Installed suyu.exe SHA-256:
@@ -220,3 +220,26 @@ work. Never recreate a fork merely because a browser check was interrupted.
 
 Stage explicit paths and review `git diff --cached --stat` and the full diff.
 Raw logs can contain game addresses and local paths; publish sanitized summaries.
+
+## R00 build preparation (2026-10-05)
+
+The recomp-only roadmap and handoff are committed in 5c6156a. Pinned source
+5949cab3ba93233ddd1c319bfc6f010f6cfa910a is checked out unchanged. This tree uses
+its declared CPM dependencies and an in-tree Dynarmic; recursively fetching every
+legacy .gitmodules entry is not the default build procedure.
+
+Local dependencies: aqtinstall 3.3.0 in local/tools/python, Qt 6.9.3
+win64_msvc2022_64 (including qtcharts and qtsvg) under local/tools/Qt, and Khronos
+glslang 16.5.0 under local/tools/glslang. CMake/MSVC/Ninja are from E005.
+Set the local Python Scripts directory, CMake and Git tools on the process PATH.
+The initial build command from the workspace root is:
+
+```powershell
+.\source\scripts\build-suyu.ps1 -Configure -ParallelJobs 2
+```
+
+The helper defaults to two parallel compiler jobs for the laptop and builds
+both suyu and suyu-cmd. Raw configure/build evidence stays in reports/r00-build.log.
+This command is underway, not yet a verified successful build. Check running
+build processes and the log before starting another one. Source export and
+module compilation commands remain unverified for Zarvot.

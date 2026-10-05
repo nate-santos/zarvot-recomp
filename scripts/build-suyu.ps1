@@ -1,16 +1,16 @@
-# Builds the pinned Suyu v0.0.4 checkout out-of-tree.
+# Builds the pinned recomp host/exporter checkout out-of-tree.
 #
 # The Qt frontend target (suyu) is required: the AOT export pipeline is a Qt
 # dialog and has no CLI. suyu-cmd is the runtime an export is packaged around.
 #
-# Qt is not installed on this machine; YUZU_USE_BUNDLED_QT defaults ON under
-# MSVC and downloads a Qt binary drop. Vulkan headers come from
-# externals/Vulkan-Headers, so no Vulkan SDK install is needed.
+# Uses workspace-local Qt and glslang prepared by bootstrap.ps1. The pinned
+# source fetches its declared dependencies during configuration.
 
 [CmdletBinding()]
 param(
     [string]$Root      = $env:MK8R_ROOT,
     [string]$BuildType = 'Release',
+    [ValidateRange(1, 64)][int]$ParallelJobs = 2,
     [switch]$Configure,
     [switch]$Clean,
     [switch]$NoJit
@@ -19,6 +19,7 @@ param(
 # $PSScriptRoot is not populated while parameter defaults are bound under
 # -File, so the fallback lives here rather than in the param block.
 if (-not $Root) { $Root = Split-Path -Parent $PSScriptRoot }
+$Root = [IO.Path]::GetFullPath($Root)
 
 $ErrorActionPreference = 'Stop'
 
@@ -41,6 +42,11 @@ if (-not (Test-Path -LiteralPath (Join-Path $SuyuSrc 'CMakeLists.txt'))) {
 if (-not (Test-Path -LiteralPath $Glslang)) { throw "glslang not found at $Glslang - see scripts/bootstrap.ps1" }
 
 if ($Clean -and (Test-Path -LiteralPath $BuildDir)) {
+    $resolvedBuild = [IO.Path]::GetFullPath($BuildDir)
+    $allowedBuildRoot = [IO.Path]::GetFullPath((Join-Path $Root 'build')) + [IO.Path]::DirectorySeparatorChar
+    if (-not $resolvedBuild.StartsWith($allowedBuildRoot, [StringComparison]::OrdinalIgnoreCase)) {
+        throw 'Build directory resolved outside the workspace build root'
+    }
     Remove-Item -LiteralPath $BuildDir -Recurse -Force
 }
 New-Item -ItemType Directory -Force -Path $BuildDir | Out-Null
@@ -65,7 +71,7 @@ $cmakeArgs = @(
     # official Qt built for MSVC 2022 instead - it also actually ships Svg.
     '-DYUZU_USE_BUNDLED_QT=OFF'
     "-DQt6_DIR=`"$QtDir`""
-    "-DCMAKE_PREFIX_PATH=`"$QtDir`"" 
+    "-DCMAKE_PREFIX_PATH=`"$QtDir`""
     '-DYUZU_CMD=ON'
     '-DYUZU_TESTS=OFF'
     '-DENABLE_WEB_SERVICE=OFF'
@@ -78,7 +84,7 @@ $cmakeArgs = @(
     # name. Without a debugger on this machine it is the only way to identify
     # where suyu is crashing.
     '-DCMAKE_EXE_LINKER_FLAGS=/MAP'
-    '-DCMAKE_SHARED_LINKER_FLAGS=/MAP' 
+    '-DCMAKE_SHARED_LINKER_FLAGS=/MAP'
     $(if ($NoJit) { '-DSUYU_NO_JIT=ON' } else { '-DSUYU_NO_JIT=OFF' })
 ) -join ' '
 
@@ -89,7 +95,7 @@ if ($Configure -or -not (Test-Path -LiteralPath (Join-Path $BuildDir 'build.ninj
 
 Write-Host '=== build: suyu suyu-cmd ===' -ForegroundColor Cyan
 $sw = [Diagnostics.Stopwatch]::StartNew()
-Invoke-InVsEnv "cmake --build `"$BuildDir`" --target suyu suyu-cmd"
+Invoke-InVsEnv "cmake --build `"$BuildDir`" --target suyu suyu-cmd --parallel $ParallelJobs"
 $sw.Stop()
 
 Write-Host ("=== built in {0:n1} min ===" -f $sw.Elapsed.TotalMinutes) -ForegroundColor Green

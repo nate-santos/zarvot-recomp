@@ -189,6 +189,25 @@ statements remain historical and do not override the current STATUS queue.
   checks only. No source build, export, runtime control or gameplay test occurred.
 - Next: R00. The user still handles gameplay; no automated play authorized.
 
+## E007 — Matching recomp host/exporter build preparation (2026-10-05)
+
+- Task: R00. Recomp plan and agent handoff committed as 5c6156a on zarvot-support.
+- Initialized pinned suyu source 5949cab3ba93233ddd1c319bfc6f010f6cfa910a.
+  Inspecting current source confirms export RPC and AOT execution telemetry,
+  plus ABI 6 memory, generation-guard and exact FP support. No core edits made.
+- Prepared workspace-local Python venv/aqtinstall 3.3.0, Qt 6.9.3 with charts/Svg,
+  and glslang 16.5.0. MSVC/CMake detected correctly during configuration.
+- Git submodule initialization failed in the restricted shell (missing shell
+  utilities), then succeeded in the desktop environment. Commit identity used
+  the same author as prior Zarvot commits, through per-command configuration.
+- Build helper now bounds compilation to two jobs by default and validates its
+  build-root boundary before optional cleanup. No cleanup was performed.
+- Initial configuration was interrupted to apply bounded parallelism, then
+  restarted using cached dependencies. Configuration/build is currently active;
+  success and exact final failure, if any, will be recorded before handoff.
+- Evidence: reports/r00-build.log and ignored source/build and local/tools trees.
+- Limits: no Zarvot AOT export, module compilation, execution or gameplay test.
+- Next: finish R00, then inventory/export and compile Zarvot (R01/R02).
 ## Template for the next experiment
 
 - ID / R task / date:
