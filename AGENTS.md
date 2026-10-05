@@ -4,6 +4,11 @@ Read `docs/zarvot/STATUS.md`, `PLAN.md`, `EXPERIMENTS.md`, and `RUNBOOK.md`
 before changing this fork. The README summarizes measured Zarvot results;
 inherited upstream research is context, not Zarvot validation.
 
+Scope is recomp builds, coverage, correctness and execution improvements only.
+JIT is a reference and temporary fallback. General emulator performance tuning
+is outside scope. Follow the R task queue; historical Z tasks are retired.
+Do not gate export/build work on fresh JIT benchmarks or stop at JIT performance.
+
 Keep stable task IDs and update evidence, decisions and the next action after
 each meaningful experiment. Never claim gameplay/audio fidelity from a title
 screen or an initialized audio device. Do not infer a speedup from AOT coverage.

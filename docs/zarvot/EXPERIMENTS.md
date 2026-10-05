@@ -3,6 +3,10 @@
 Append results; do not rewrite an unsuccessful experiment as a success.
 Raw files remain local. Sanitized summaries can be committed.
 
+E001-E005 are historical JIT/setup records under the retired Z roadmap.
+E006 resets scope; subsequent work uses PLAN.md R milestones. Old next-action
+statements remain historical and do not override the current STATUS queue.
+
 ## E001 — Initial JIT boot (2026-10-04)
 
 - Task: Z01; check whether the existing runtime can load the supplied game.
@@ -138,15 +142,65 @@ Raw files remain local. Sanitized summaries can be committed.
 - Next: user's three matched 60-second gameplay runs, then review scene/focus,
   pauses, stalls and counters before Z02/Z03 changes. Music fidelity still open.
 
+## E005 — User-requested Windows build tool installation (2026-10-04)
+
+- Task: install CMake and a C compiler; prerequisite setup for future Z04/Z05.
+- Before: neither CMake nor a registered MSVC toolchain was installed. Historical
+  comments in inherited build scripts described another machine and were not
+  evidence of this host's tool availability.
+- Installed through Windows Package Manager's verified packages: Kitware.CMake
+  4.4.3 and Microsoft.VisualStudio.2022.BuildTools 17.14.41, with the VCTools
+  workload and recommended components (C/C++, Windows SDK and bundled Ninja).
+- Verification: installer returned success; vswhere reports a complete,
+  launchable Build Tools installation with no reboot required. CMake identified
+  both C and C++ compilers as MSVC 19.44.35229.0. Project find-vcvars.ps1 located
+  the installed environment. A Release/Ninja smoke project configured, compiled
+  and linked both languages; both executable tests passed (2/2).
+- Local smoke source/build evidence: workspace reports/toolchain-smoke/.
+- CMake is on the machine PATH for newly opened terminals. MSVC and bundled
+  Ninja are available through the x64 developer environment used by the build
+  scripts; no manual global compiler PATH changes were made.
+- Limits: this verifies a working host toolchain only. No emulator source build,
+  hybrid export, gameplay performance or audio fidelity claim follows.
+- Decision: keep tools installed. Preserve the pending user-led manual playtest;
+  emulator sessions, saves and configuration were not changed.
+
+## E006 — Recomp-only scope and roadmap reset (2026-10-05)
+
+- Type: user-directed planning decision, not a performance experiment.
+- Request: work only on recomp improvements, coverage and correctness; replace
+  the emulator optimization plan and progress tracking.
+- Review: local inherited history through db36cf5, static campaign/rendering
+  findings and current Zarvot docs. Many core commits are submodule pointers;
+  the suyu working directory was empty, so implementation was not inspected.
+- Upstream leads: actual AOT dispatch (687e4ac), added instruction/target coverage,
+  branch chaining/dispatch (432a706), correctness fixes, then compiler, fast
+  memory, generation guards and native exact FP improvements (db36cf5).
+  Upstream performance reports are not locally reproduced Zarvot results.
+- Decision: retire Z optimization queue; introduce R00-R08 with independent
+  build, coverage, correctness and performance acceptance. Start R00 source/
+  exporter/runtime alignment, then export/compile/prove Zarvot AOT execution.
+  Fresh JIT benchmarks and GPU bottleneck classification are not prerequisites.
+- Updated PLAN, STATUS, README, RUNBOOK, project index and handoff instructions.
+  E001-E005 and E005's pre-existing uncommitted toolchain findings are preserved.
+- Scope excludes general emulator settings/performance work. Existing HLE/GPU/
+  audio remains support infrastructure; recomp integration changes are in scope.
+- Validation: documentation consistency, local Markdown links and Git whitespace
+  checks only. No source build, export, runtime control or gameplay test occurred.
+- Next: R00. The user still handles gameplay; no automated play authorized.
+
 ## Template for the next experiment
 
-- ID / task / date:
+- ID / R task / date:
 - Hypothesis and expected bottleneck:
-- Runtime commit + executable hash / game version / backend:
+- Source/exporter/runtime hashes / image ABI/features / compiler flags:
+- Game/module build IDs / generated image hashes / backend:
 - Scene, exact input route, duration, focus, power, cache and settings:
 - Control / candidate (one changed variable):
 - Raw local evidence paths:
-- Results and run-to-run spread:
+- Build and AOT execution evidence / fallback counts and reasons:
+- Coverage and correctness scope / untested routes:
+- Recomp performance results and run-to-run spread (if measured):
 - Visual, input, save and audio checks:
 - Limitations / unverified claims:
 - Decision: keep / revert / inconclusive / defer:

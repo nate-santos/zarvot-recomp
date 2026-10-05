@@ -1,93 +1,85 @@
-# Zarvot handoff — current state
+# Zarvot recomp handoff
 
-Updated: 2026-10-04. Read this first when changing models.
+Updated: 2026-10-05. Scope reset by the user; see E006.
 
-Session stopped at the user's request. The user will perform gameplay testing
-later; do not resume automated play. README now contains the real E003 opening
-tutorial measurements. A manual recorder is prepared; a representative fresh
-manual benchmark is pending. See E004 for the latest limits and local evidence.
+## Objective and next action
 
-## Outcome so far
+Work only on the recomp: build, coverage, correctness and execution improvements.
+Reuse the compatibility stack. Do not resume general emulator performance,
+settings or GPU tuning. JIT is a reference and temporary hybrid fallback.
 
-Zarvot 1.0.0 runs controllable opening Story gameplay on the laptop using
-Dynarmic JIT + Vulkan at handheld 1x/HIGH. Movement, shooting, pause and level
-restart work. Three 60-second combat observations had medians near 60 FPS and
-means of 57.4–57.9 FPS, with recurring brief severe stalls. Gameplay baseline
-evidence and reusable tools exist; stall causes, later levels, audio fidelity
-and AOT performance remain unverified. See E003 in EXPERIMENTS.md.
+**Next: R00 — initialize/inspect the pinned source and establish a matching
+exporter/runtime/toolchain build.** A fresh JIT gameplay benchmark is not a
+prerequisite. After that export Zarvot, compile its modules and prove AOT execution.
 
-GitHub fork: https://github.com/nate-santos/zarvot-recomp
+## Verified progress
 
-Branch: `zarvot-support`, with local checkout under workspace `source/`.
-The repository has `origin` (our fork) and `upstream` (mk8-recomp).
+- Zarvot 1.0.0 is AArch64, title ID `0100E7900C4C0000`; base metadata version 0.
+- E001-E004 establish JIT boot and controllable opening Story gameplay only.
+  Movement, shooting, pause and restart worked. No recomp gameplay was tested.
+- E003 interval measurements averaged 57.4-57.9 FPS with brief stalls. They are
+  historical reference, not a recomp result; per-frame timings remain absent.
+- E005 installed CMake 4.4.3, VS Build Tools 2022 17.14.41, MSVC 19.44.35229.0,
+  Windows SDK and bundled Ninja. C/C++ smoke builds/execution passed (2/2).
+- No source host build, Zarvot AOT export, compiled module set, AOT execution,
+  strict-static result or no-JIT validation has been established.
+- Later levels, full playthrough and original music fidelity remain unverified.
 
-## Task state
+## Active task state
 
-| ID | Status | Evidence / next condition |
+| ID | State | Evidence / next condition |
 |---|---|---|
-| Z00 | Complete | Fork, branch, roadmap, handoff, source ignore rules and runtime identity recorded; use Git history for commit/sync state |
-| Z01 | In progress | E003 opening tutorial measured; manual recorder prepared; user's later moving/heavier playtest and per-frame stall diagnosis next |
-| Z02 | Ready after controlled baseline | Focus affects observed FPS; repeated play-time path errors; audit logging flags |
-| Z03 | Ready after scene fixture | 1x vs lower-scale A/B to classify GPU pressure |
-| Z04 | Planned | Resolve runtime/source revision mismatch before core changes |
-| Z05 | Planned | AArch64 eligible; no hybrid export/build/run yet |
-| Z06–Z10 | Conditional | Choose based on measured bottlenecks and correctness evidence |
-| Z11 | Planned | Launcher, save checks, endurance and reproducibility |
-| Z12 | Deferred | Full port only if profiling and maintainability justify it |
+| R00 | Ready — first task | Toolchain smoke passed; submodule directory observed empty during review; runtime/source mismatch unresolved |
+| R01 | Pending R00 | Inventory modules/build IDs and generate local AOT source |
+| R02 | Pending R01 | Compile/load modules and prove advancing AOT execution counters |
+| R03 | Pending R02 | User-led hybrid correctness checks and categorized fallback evidence |
+| R04 | Pending R03 | Iterative coverage/translation fixes with focused tests |
+| R05 | Pending validated routes | Strict-static zero-fallback tests, then separate no-JIT verification |
+| R06 | Pending R03 evidence | Profile and improve generated code/AOT runtime; preserve correctness |
+| R07 | Pending R05 | Reproducible recomp package and endurance checks |
+| R08 | Pending R05 routes | Expand later-level/mode coverage; track full playthrough separately |
 
-## Next session sequence
+The old Z queue is retired; PLAN.md maps it to this queue. E001-E005 retain
+their original IDs and observations. General emulator stall diagnosis, resolution
+A/B and logging/cache tuning are no longer next actions.
 
-1. Check current process/UI rather than assuming the game is still running.
-2. Check `git status` and branch ahead/behind state; preserve any later user edits.
-3. Last RPC observation: game loaded but emulation thread stopped (paused), TAS
-   playback/recording off. Leave control with the user; preserve subsequent
-   progress. The original and E004 pre-test saves/configs are backed up locally.
-4. When the user is ready, record three matched moving/combat routes with the
-   manual recorder in RUNBOOK. Do not drive, restart or overwrite their save.
-   Compare with E003 to investigate the brief 0–12 FPS / zero-VBlank stalls.
-   PresentMon 2.6.0 could not start ETW capture (Windows access denied); genuine
-   per-frame timings remain pending. Keep 1x/HIGH as the control.
-5. Use an equivalent scene for Z02/Z03 A/B tests (logging/path diagnostics,
-   then resolution sensitivity). Identify the bottleneck before CPU/AOT work.
-6. Update this file and append an experiment after each meaningful result.
+## Resume procedure
 
-## Facts and open issues
+1. Read PLAN and latest ledger entry; check actual Git state and processes.
+2. Preserve pre-existing local edits. The review observed branch zarvot-support
+   at 764aee3 with local E005 additions to STATUS/EXPERIMENTS. This rewrite
+   preserves E005's toolchain result. Check current ahead/behind state afresh.
+3. Inspect/initialize source/third_party/suyu at the pinned revision and resolve
+   exporter/runtime identity. Record exact build commands and failures.
+4. Proceed through R00-R02 without waiting for manual JIT performance tests.
+   Inspect current project sessions before launching or stopping anything.
+5. The user handles gameplay. Last historical RPC state was paused with TAS
+   playback/recording off; it was not rechecked during this documentation task.
+   Do not automate play, restart a route or overwrite their save.
+6. Append evidence and update the relevant R row after each meaningful result.
 
-- Title ID `0100E7900C4C0000`; NSP 1,706,554,634 bytes; base metadata version 0;
-  running game identifies as 1.0.0; loader confirms 64-bit ARM.
-- Local key files were supplied and installed. Never include contents in chat,
-  logs or Git. No further acquisition/dumping work is requested.
-- Host Ryzen 7 5825U / AMD integrated graphics. Runtime reports 13.85 GiB host
-  RAM and 2.00 GiB dedicated GPU budget; shared graphics memory is separate.
-- Title/menu images are in workspace `reports/`; see experiment ledger.
-- Earlier 33 FPS readings became ~60 after foreground activation/focus. This
-  is an environment hypothesis, not a measured optimization win.
-- Fifteen foreground main-menu polling samples averaged 59.999 FPS; reported
-  samples ranged 59.945–60.080. No per-frame latency distribution was captured.
-- TAS is enabled, loop disabled, playback stopped. Manual playtesting is the
-  user's preference; prepared recorder sends no controller input. Earlier
-  automated attempts did not verify clearing the opening encounter.
-- E003 is actual gameplay, but its repeated stationary-fire observations have
-  uncontrolled enemy/respawn phases. A stronger moving/heavy combat fixture
-  and genuine per-frame trace are still needed for optimization comparisons.
-- Opening combat GPU 3D activity averaged 49–53%, observed peak 62.6%; emulator
-  CPU use averaged about 2.5 logical cores and working set peaked at 6.16 GiB.
-  No proven CPU/GPU bottleneck; aggregate utilization can hide critical stalls.
-- Music fidelity is unverified. A 48 kHz stereo output stream initialized;
-  neither a hardware-reference comparison nor a listening test has been done.
-- Repeated play-time database write errors need diagnosis. Do not create a
-  directory based solely on a possibly rewritten user path in a log.
-- Runtime asset tag differs from its embedded version string and from the
-  wrapper's pinned emulator commit. Exact identities are in RUNBOOK.md.
-- No source emulator build or static/hybrid Zarvot export exists yet.
-- RPC launch timeout did not imply boot failure; state and rendering later
-  confirmed success. Avoid duplicate launches after timeouts.
+## Identities and preserved local evidence
+
+- Checkout: source/; branch: zarvot-support; origin: nate-santos/zarvot-recomp;
+  upstream: dougchansan/mk8-recomp. Workspace root is not a Git repository.
+- Wrapper base db36cf5; pinned suyu 5949cab3ba93233ddd1c319bfc6f010f6cfa910a.
+- Installed asset labeled v0.0.12 reports v0.0.11 / HEAD-40aeb31824-HEAD.
+  Exact hashes and paths are in RUNBOOK; labels alone do not establish ABI match.
+- Host: Ryzen 7 5825U / integrated AMD Radeon, 16 GiB installed RAM.
+- Preserve portable JIT profile (Vulkan, handheld 1x/HIGH, original timing),
+  saves and E004 backups. Use separate recomp output/profile as needed.
+- Local keys already supplied; do not print contents or request acquisition.
+- Raw evidence is in reports/; generated code/assets remain ignored and local.
+- Existing manual recorder sends no controller input. PresentMon ETW capture
+  failed with access denied; no frame-percentile claims follow from old polls.
+- RPC launch timeout previously did not imply boot failure. Inspect state before
+  retrying. Play-time path errors are historical, not an active tuning task.
 
 ## Decisions to preserve
 
-- Baseline and fallback is JIT; native coverage is not the optimization goal.
-- Prioritize easy measured wins and the iGPU bottleneck test before deep AOT.
-- Preserve original music assets, playback logic and timing throughout.
-- Canonical plan is PLAN.md, current state is this file, results append to
-  EXPERIMENTS.md. Root PROJECT_PLAN.md only points here; avoid duplicate plans.
-- Share source and sanitized evidence. Raw game/code/keys/captures stay local.
+Coverage, correctness and recomp efficiency are separate goals. AOT coverage is
+valuable even without an FPS gain, but does not itself prove speed or fidelity.
+Do not stop recomp work because JIT is fast enough. Keep graphics/audio support
+and original gameplay/music behavior. Fix source in the appropriate recomp
+components; current upstream features must be inspected before reimplementation.
+This session changes documentation only; no build or gameplay was performed.

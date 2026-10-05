@@ -1,4 +1,35 @@
-# Zarvot local runbook
+# Zarvot recomp runbook
+
+Updated scope: 2026-10-05. Follow the R task queue in STATUS and PLAN.
+The runtime commands below preserve historical reference/validation procedures;
+they are not a general emulator optimization queue.
+
+## Recomp build workflow — next work
+
+No Zarvot source build or export command sequence has been validated yet.
+Record exact successful commands here as R00-R02 progress; do not present
+inherited MK8 scripts as already tested for Zarvot.
+
+1. Check the source branch, changes and existing project processes. Initialize
+   the pinned third_party/suyu submodule if missing; inspect current build docs.
+2. Establish matching exporter/runtime source and generated-image ABI/features.
+   Verify the E005 toolchain; inspect clang-cl availability and exporter support.
+3. Build the host/exporter and inventory Zarvot modules/build IDs. Export source
+   into ignored generated/ or local/ output using the matching exporter.
+   The inherited scripts/export-recomp.py accepts --rom and --out; inspect the
+   actual exporter RPC schema and script before use with the selected build.
+4. Build modules, validate manifest/image identities and load the matching bundle.
+   Record compiler/options, source hashes, module hashes, build duration and errors.
+5. Prove the AOT backend executes: capture advancing static-block counters and
+   fallback attempts/reasons. Add recomp-specific telemetry if existing manual
+   sampling lacks it; ordinary FPS output cannot establish AOT coverage.
+6. User-led hybrid validation supplies routes and gap evidence. Iterate fixes,
+   re-export/rebuild, then validate strict static and a separate no-JIT host.
+   Preserve the user's session, profile and saves throughout.
+
+Use the existing JIT runtime only as a reference when needed. Keep graphics,
+audio and original timing fixed during recomp comparisons. Manual gameplay
+validation does not block build, export or synthetic correctness work.
 
 ## Layout
 
