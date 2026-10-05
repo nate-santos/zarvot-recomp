@@ -203,8 +203,8 @@ statements remain historical and do not override the current STATUS queue.
 - Build helper now bounds compilation to two jobs by default and validates its
   build-root boundary before optional cleanup. No cleanup was performed.
 - Initial configuration was interrupted to apply bounded parallelism, then
-  restarted using cached dependencies. Configuration/build is currently active;
-  success and exact final failure, if any, will be recorded before handoff.
+  restarted using cached dependencies. Configuration/build started here;
+  E010 records successful completion after an incremental four-job resume.
 - Evidence: reports/r00-build.log and ignored source/build and local/tools trees.
 - Synthetic checks: inherited shifted-register, translation and side-entry tests
   passed against the pinned emitter. The side-entry suite built/loaded generated
@@ -242,6 +242,48 @@ statements remain historical and do not override the current STATUS queue.
 - Validation: PowerShell syntax passed. Live AOT capture remains untested until
   compiled Zarvot modules exist. Recorder still sends no control commands.
 - Next: complete R00/R01, load built modules and collect execution evidence.
+## E010 — Matching host build, Hybrid export and first compiled module (2026-10-05)
+
+- Tasks: R00 completed, R01 completed for fixed modules, R02 started.
+- Source: pinned suyu 5949cab3ba93233ddd1c319bfc6f010f6cfa910a, unchanged.
+  Release/MSVC 19.44.35229.0, Qt 6.9.3, CMake 4.4.3, glslang 16.5.0.
+- Host build: both suyu and suyu-cmd linked. Started at two compiler jobs, then
+  resumed incrementally at four after checking available memory; resume took
+  18.7 minutes. No exact combined duration recorded. suyu-cmd --version launched
+  and exited 0; Windows subsystem produced no captured version text.
+- Matching GUI host started with a separate portable user profile and RPC port
+  9743. Copied supplied keys locally; original player profile/saves untouched.
+  Export RPC accepted the explicit Hybrid request and later reported done=true,
+  success=true. No controller input or automated gameplay occurred.
+- Export: ABI 6, features 7 (FM1/GG1/FPX1), translate_all=true, fallback=true,
+  requires_runtime_codegen=false. Main/rtld/sdk/subsdk0 build IDs are in the local
+  manifest. Fixed-module export does not establish runtime-loaded-code coverage.
+- Manifest reports 2,560,754 analyzed blocks and 10,826,444 instructions. Emission
+  logs use separate counts; do not equate analyzed blocks with executed blocks.
+  Emitted unhandled counts: main 15,687 (0.18%), rtld 9 (0.57%), sdk 3,400 (0.27%),
+  subsdk0 741 (0.09%). Mostly reported reserved/unallocated signatures; whether
+  any execute remains unknown. These are not runtime coverage percentages.
+- Generated C units/source size: main 112 / 3,080.6 MiB, rtld 2 / 0.4 MiB,
+  sdk 16 / 334.8 MiB, subsdk0 12 / 216.2 MiB. Main build scale is a concrete
+  compiler/resource concern, not a measured runtime-performance defect.
+- rtld: MSVC DLL build succeeded (150,016 bytes). Generated CMake selected one
+  concurrent compile on this RAM configuration. Build helper now permits bounded
+  parallelism and checks source/build roots before reuse/cleanup. No cleanup used.
+- Partial loading check: one compiled module loaded, ABI 6 fastmem negotiated.
+  Boot RPC timed out. Later state reported game_running=false, static backend
+  inactive, static_blocks=0 and jit_transitions=0. This proves loading only.
+  Current source opens a firmware preflight dialog in the fresh profile, which
+  has no firmware: leading startup explanation, not visually confirmed.
+  Computer-use window inspection timed out awaiting app approval; no dialog or
+  controller input was sent. Owned smoke host stopped; final process check found
+  no suyu process. No gameplay, advancing AOT, strict-static or no-JIT claim.
+- Evidence: reports/r00-build*.log, r00-emitter-tests.log, r01-exporter.log,
+  r01-export-status.json, r02-rtld-build.log and r02-partial-*; ignored generated/
+  and build/ artifacts. Executable/DLL hashes and commands are in RUNBOOK.
+- Decision: retain matching build and generated source. Next R02: compile remaining
+  modules, resolve startup preflight through the supported interface, and record
+  advancing compiled execution. User still handles gameplay tests. General
+  emulator performance tuning remains outside scope.
 ## Template for the next experiment
 
 - ID / R task / date:

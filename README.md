@@ -8,14 +8,15 @@ tuning is outside the project scope.
 
 ## Current state
 
-Zarvot is verified AArch64. The existing JIT runtime reaches controllable opening
-Story gameplay, and the Windows C/C++ toolchain passed smoke tests. No Zarvot
-AOT export, compiled module set or actual AOT execution has been verified yet.
+Zarvot is verified AArch64. The matching source host/exporter builds, and a Hybrid
+ABI 6 source export contains main, rtld, sdk and subsdk0. The rtld DLL compiled
+and loaded; remaining modules and actual AOT execution are not yet verified.
+The existing JIT runtime reaches controllable opening Story gameplay.
 Later levels, full-game correctness and music fidelity remain unverified.
 
-**Next: align and build the source/exporter/runtime, export Zarvot, compile its
-modules and verify advancing static execution counters.** Further JIT performance
-benchmarking is not a prerequisite.
+**Next: compile the remaining modules and verify advancing static execution
+counters.** The main export contains about 3 GB of generated C; build cost and
+compiler choice need attention. See E010 for the unverified partial boot test.
 
 ## Development sequence
 

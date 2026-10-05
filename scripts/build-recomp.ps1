@@ -1,9 +1,8 @@
 # Build one generated recompiled module into a Windows DLL.
 #
-# The exporter's own Build mode is not usable here: it shells out to vcvars64.bat
-# at a hardcoded VS2022 *Community* path (game_export.cpp:1929-1954) and then
-# relinks suyu itself. This machine has VS2026 Community and VS2022 Build Tools.
-# So we drive the generated CMake directly.
+# Drives generated CMake directly, so module compilation and its evidence stay
+# separate from export/packaging. Historical exporter limitations must be
+# checked against current source rather than assumed to apply.
 #
 # Target `recompiled_<module>` is the SHARED build, which exports
 # recomp_image_lookup / recomp_image_set_base - the two symbols suyu resolves
@@ -18,12 +17,14 @@ param(
     [Parameter(Mandatory)]
     [string]$Module,
     [string]$BuildType = 'Release',
+    [ValidateRange(1, 64)][int]$ParallelJobs = 2,
     [switch]$ForceRebuild
 )
 
 # $PSScriptRoot is not populated while parameter defaults are bound under
 # -File, so the fallback lives here rather than in the param block.
 if (-not $Root) { $Root = Split-Path -Parent $PSScriptRoot }
+$Root = [IO.Path]::GetFullPath($Root)
 
 $ErrorActionPreference = 'Stop'
 
@@ -32,6 +33,14 @@ $Src    = Join-Path $Root "generated\$Target\$Package\aot_cache\exefs\$Module"
 # reused for another game's sources, and a stale DLL from a previous target is
 # worse than no DLL at all: it loads, and it executes.
 $Build  = Join-Path $Root "build\recomp\$Target\$Module"
+$allowedBuildRoot = [IO.Path]::GetFullPath((Join-Path $Root 'build\recomp')) + [IO.Path]::DirectorySeparatorChar
+$allowedSourceRoot = [IO.Path]::GetFullPath((Join-Path $Root 'generated')) + [IO.Path]::DirectorySeparatorChar
+$Build = [IO.Path]::GetFullPath($Build)
+$Src = [IO.Path]::GetFullPath($Src)
+if (-not $Build.StartsWith($allowedBuildRoot, [StringComparison]::OrdinalIgnoreCase) -or
+    -not $Src.StartsWith($allowedSourceRoot, [StringComparison]::OrdinalIgnoreCase)) {
+    throw 'Module source/build resolved outside the workspace generated/build roots'
+}
 $VcVars = & (Join-Path $PSScriptRoot 'find-vcvars.ps1')
 
 if (-not (Test-Path -LiteralPath $Src))    { throw "No generated project at $Src" }
@@ -76,7 +85,7 @@ $CMakeTarget = if ($Module -eq 'main') { 'recompiled_image' } else { "recompiled
 
 $sw = [Diagnostics.Stopwatch]::StartNew()
 $clean = if ($ForceRebuild) { ' --clean-first' } else { '' }
-Invoke-InVsEnv "cmake --build `"$Build`" --target $CMakeTarget$clean"
+Invoke-InVsEnv "cmake --build `"$Build`" --target $CMakeTarget$clean --parallel $ParallelJobs"
 $sw.Stop()
 
 Write-Host ("built in {0:n1} min" -f $sw.Elapsed.TotalMinutes) -ForegroundColor Green

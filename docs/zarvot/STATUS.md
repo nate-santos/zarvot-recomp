@@ -1,6 +1,6 @@
 # Zarvot recomp handoff
 
-Updated: 2026-10-05. Recomp plan committed as 5c6156a; R00 in progress (E007).
+Updated: 2026-10-05. Recomp plan committed as 5c6156a; R00/R01 complete; R02 in progress (E010).
 
 ## Objective and next action
 
@@ -8,10 +8,12 @@ Work only on the recomp: build, coverage, correctness and execution improvements
 Reuse the compatibility stack. Do not resume general emulator performance,
 settings or GPU tuning. JIT is a reference and temporary hybrid fallback.
 
-**Next: R00 — finish the matching exporter/runtime build already underway.**
-Inspect build processes and reports/r00-build.log before resuming; source and
-local Qt/glslang dependencies are initialized. A fresh JIT gameplay benchmark is not a
-prerequisite. After that export Zarvot, compile its modules and prove AOT execution.
+**Next: R02 — compile the remaining main/sdk/subsdk0 modules and prove compiled
+execution.** The matching host/exporter and Hybrid source export are complete;
+rtld compiled and loaded, but boot observations showed zero executed AOT blocks.
+Main contains about 3 GB of generated C: review compiler availability and the
+generated compile pool before starting a large build. Build/export commands and
+artifact identities are recorded in RUNBOOK. Do not repeat R00/R01 unnecessarily.
 
 ## Verified progress
 
@@ -22,17 +24,19 @@ prerequisite. After that export Zarvot, compile its modules and prove AOT execut
   historical reference, not a recomp result; per-frame timings remain absent.
 - E005 installed CMake 4.4.3, VS Build Tools 2022 17.14.41, MSVC 19.44.35229.0,
   Windows SDK and bundled Ninja. C/C++ smoke builds/execution passed (2/2).
-- No source host build, Zarvot AOT export, compiled module set, AOT execution,
-  strict-static result or no-JIT validation has been established.
+- R00/R01: matching source host/exporter built; Hybrid ABI 6 export completed
+  for main/rtld/sdk/subsdk0. Feature bits 7; translate_all enabled.
+- R02: rtld compiled and loaded; main/sdk/subsdk0 are not compiled. No advancing
+  AOT execution, strict-static or no-JIT result has been established.
 - Later levels, full playthrough and original music fidelity remain unverified.
 
 ## Active task state
 
 | ID | State | Evidence / next condition |
 |---|---|---|
-| R00 | In progress | Pinned source initialized; local Qt/glslang prepared; matching host/exporter configuration/build underway; no success claimed yet |
-| R01 | Pending R00 | Inventory modules/build IDs and generate local AOT source |
-| R02 | Pending R01 | Compile/load modules and prove advancing AOT execution counters |
+| R00 | Complete | Pinned source built suyu/suyu-cmd; command-line host smoke exited 0; exporter RPC worked (E010) |
+| R01 | Complete for fixed exported modules | Four-module Hybrid ABI 6 source/manifest exported successfully; late-loaded/generated code remains unverified |
+| R02 | In progress | rtld DLL compiled/loaded; main/sdk/subsdk0 builds and actual execution proof pending |
 | R03 | Pending R02 | User-led hybrid correctness checks and categorized fallback evidence |
 | R04 | Pending R03 | Iterative coverage/translation fixes with focused tests |
 | R05 | Pending validated routes | Strict-static zero-fallback tests, then separate no-JIT verification |
@@ -49,13 +53,14 @@ A/B and logging/cache tuning are no longer next actions.
 1. Read PLAN and latest ledger entry; check actual Git state and processes.
 2. Recomp roadmap, README, instructions and E005/E006 are committed in 5c6156a.
    Preserve subsequent changes and check current ahead/behind state afresh.
-3. Inspect/initialize source/third_party/suyu at the pinned revision and resolve
-   exporter/runtime identity. Record exact build commands and failures.
-4. Proceed through R00-R02 without waiting for manual JIT performance tests.
-   Inspect current project sessions before launching or stopping anything.
-5. The user handles gameplay. Last historical RPC state was paused with TAS
-   playback/recording off; it was not rechecked during this documentation task.
-   Do not automate play, restart a route or overwrite their save.
+3. Inspect existing generated export and build artifacts at the identities in
+   RUNBOOK. Resume R02; source remains unchanged at its pinned revision.
+4. Continue R02 without waiting for manual JIT performance tests. Inspect
+   current project sessions before launching or stopping anything.
+5. The user handles gameplay. The separate recomp smoke host was stopped after
+   an unverified boot; no controller inputs were sent. No suyu process remained
+   in the final desktop process check. Recheck actual state before launching.
+   Preserve the original player profile/saves; do not automate play.
 6. Append evidence and update the relevant R row after each meaningful result.
 
 ## Identities and preserved local evidence
@@ -82,5 +87,9 @@ valuable even without an FPS gain, but does not itself prove speed or fidelity.
 Do not stop recomp work because JIT is fast enough. Keep graphics/audio support
 and original gameplay/music behavior. Fix source in the appropriate recomp
 components; current upstream features must be inspected before reimplementation.
-Source/build dependency setup has started; no Zarvot export or gameplay was
-performed. R00 completion requires a successful matching host/exporter build.
+R00/R01 are complete; keep building toward the eventual optimized Zarvot recomp.
+The first module-loading smoke test stalled before AOT execution. Current source
+requires a firmware preflight dialog in this empty firmware profile; that is the
+leading explanation, not a visually verified diagnosis. Computer-use inspection
+timed out awaiting app approval. The test host was stopped; next work can compile
+remaining modules independently. No gameplay/coverage claim follows.

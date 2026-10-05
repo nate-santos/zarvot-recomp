@@ -6,9 +6,10 @@ they are not a general emulator optimization queue.
 
 ## Recomp build workflow — next work
 
-No Zarvot source build or export command sequence has been validated yet.
-Record exact successful commands here as R00-R02 progress; do not present
-inherited MK8 scripts as already tested for Zarvot.
+R00 host/exporter build and R01 Hybrid source export succeeded (E010).
+R02 rtld compilation/loading succeeded; remaining modules and execution are open.
+Use the verified commands and identities below. Other inherited MK8 workflows
+remain unverified for Zarvot.
 
 1. Check the source branch, changes and existing project processes. Initialize
    the pinned third_party/suyu submodule if missing; inspect current build docs.
@@ -189,7 +190,7 @@ edit the active config while suyu is running: shutdown may overwrite it.
 
 - Wrapper base: `db36cf53606e67977a26d6758215dfc89fa24724`.
 - Pinned emulator submodule: `5949cab3ba93233ddd1c319bfc6f010f6cfa910a`.
-- The pinned submodule is initialized; matching source build is in progress (E007).
+- The pinned submodule is initialized; matching source build succeeded (E010).
 - Downloaded Windows release asset v0.0.12 SHA-256:
   `415e68c9aaf5374dd7f4864c8f267ce4833e13a2cbb2cc9cdf299ed06634ff2a`.
 - Installed suyu.exe SHA-256:
@@ -240,18 +241,18 @@ The initial build command from the workspace root is:
 
 The helper defaults to two parallel compiler jobs for the laptop and builds
 both suyu and suyu-cmd. Raw configure/build evidence stays in reports/r00-build.log.
-This command is underway, not yet a verified successful build. Check running
-build processes and the log before starting another one. Source export and
-module compilation commands remain unverified for Zarvot.
+This command configured successfully. An incremental four-job resume completed
+both host targets; see E010 and reports/r00-build-resume.log. Inspect actual
+processes/artifacts before resuming a build.
 
-## Planned first hybrid export
+## First Hybrid export — verified
 
-After the matching exporter is built and its separate local configuration is
-prepared, open its export dialog through the RPC driver. This command has offline
-argument/reply checks but remains unverified with Zarvot. From the source root,
+The matching exporter completed this command with Zarvot. It used its own
+portable bin/user profile, supplied keys and RPC port 9743. From the source root,
 with local Python on PATH and the exporter already running:
 
 ```powershell
+$env:SUYU_MCP_PORT = '9743'
 python scripts/export-recomp.py --rom ..\Zarvot.nsp --out generated\zarvot\out --backend hybrid source
 python scripts/mcp-call.py get_aot_export_status
 ```
@@ -261,3 +262,38 @@ The driver's zero exit means the request was accepted; it does not mean export
 finished. Keep the exporter separate from any player session and verify ownership
 before opening the dialog. The inherited automated export/build runner remains
 unverified for Zarvot and must be reviewed before use.
+
+## E010 artifacts and next build
+
+Source stays at 5949cab3ba93233ddd1c319bfc6f010f6cfa910a. Release host hashes:
+
+- suyu.exe: `63e3da41e1fb4f7f52a0d85d901acffd164dd677d47b355da44ecae9465cc3fc`
+- suyu-cmd.exe: `43ae62506a513097acbc0a39f3af3891b103fd159bc67686027311a6833f0e5f`
+- rtld DLL: `0ffb63fdbe3e7e454d2e0192b338cbb926169c87ee119b5745f3aa47a9912c5c`
+
+GUI startup used the local Qt bin directory on PATH and Qt plugins through
+QT_PLUGIN_PATH, SUYU_MCP_PORT=9743, and SUYU_AOT_TRANSLATE_ALL=1. Create bin/user
+before launch for portable isolation; the keys are local, never tracked.
+Use -hacker for the exporter. Inspect current processes before starting one.
+
+Successful rtld build from the workspace root:
+
+```powershell
+.\source\scripts\build-recomp.ps1 -Target zarvot -Package 'out\Zarvot - Hybrid AOT + JIT' -Module rtld -ParallelJobs 2
+```
+
+The same module helper is the candidate for main/sdk/subsdk0, which are not yet
+built. It uses MSVC currently. Main has 112 generated C units totaling about
+3 GB. The generated project selected a one-compile pool for rtld on this host;
+--parallel alone does not override that pool. Review current generated CMake
+and compiler support before a large main build; do not silently disable guards
+or change arithmetic semantics to reduce compilation cost.
+
+The partial test used SUYU_RECOMP_DIR=source/build/recomp/zarvot (absolute at
+launch), with only rtld present. Loading and fastmem negotiation succeeded.
+Boot remained unverified with zero AOT counts; firmware preflight in the fresh
+profile is the leading explanation. Desktop inspection timed out awaiting app
+approval. The owned test process was stopped; no controller input was sent.
+Do not run inherited run-hybrid.ps1 unchanged: it broadly stops suyu processes
+and edits global settings. Use a project-owned, separate profile and retain
+original speed/graphics/audio settings for comparisons.
