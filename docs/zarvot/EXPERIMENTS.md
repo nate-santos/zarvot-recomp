@@ -206,8 +206,27 @@ statements remain historical and do not override the current STATUS queue.
   restarted using cached dependencies. Configuration/build is currently active;
   success and exact final failure, if any, will be recorded before handoff.
 - Evidence: reports/r00-build.log and ignored source/build and local/tools trees.
+- Synthetic checks: inherited shifted-register, translation and side-entry tests
+  passed against the pinned emitter. The side-entry suite built/loaded generated
+  synthetic C and verified a mutated instruction was refused by guard-v2.
 - Limits: no Zarvot AOT export, module compilation, execution or gameplay test.
 - Next: finish R00, then inventory/export and compile Zarvot (R01/R02).
+## E008 — Explicit export backend and rejected-request checks (2026-10-05)
+
+- Task: R01 preparation while the R00 host build runs.
+- Observed current source: aot_test_export accepts a backend and returns action
+  acceptance before scheduling export; export completion is a separate status.
+- Export driver now accepts --backend hybrid/static/dynarmic and validates local
+  input paths. Existing callers can retain the dialog setting by omitting it.
+- Rejected/malformed RPC replies, connection resets and export-action timeouts
+  no longer masquerade as success. Only the modal dialog-open timeout is allowed.
+  The status hint now points to the existing mcp-call.py tool.
+- Validation: six offline tests passed, covering explicit hybrid forwarding,
+  accepted-but-pending status, missing dialog, protocol/unknown replies, timeout
+  boundaries and connection reset. --help parsed successfully.
+- Limits: no live export yet. Acceptance is not artifact/build/execution proof.
+- Next: after R00 succeeds, use an explicit hybrid export and check final status,
+  generated manifest and matching module build; then prove AOT execution (R02).
 ## Template for the next experiment
 
 - ID / R task / date:

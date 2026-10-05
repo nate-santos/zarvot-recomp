@@ -243,3 +243,21 @@ both suyu and suyu-cmd. Raw configure/build evidence stays in reports/r00-build.
 This command is underway, not yet a verified successful build. Check running
 build processes and the log before starting another one. Source export and
 module compilation commands remain unverified for Zarvot.
+
+## Planned first hybrid export
+
+After the matching exporter is built and its separate local configuration is
+prepared, open its export dialog through the RPC driver. This command has offline
+argument/reply checks but remains unverified with Zarvot. From the source root,
+with local Python on PATH and the exporter already running:
+
+```powershell
+python scripts/export-recomp.py --rom ..\Zarvot.nsp --out generated\zarvot\out --backend hybrid source
+python scripts/mcp-call.py get_aot_export_status
+```
+
+Wait for done=true and success=true, then inspect the AOT manifest and modules.
+The driver's zero exit means the request was accepted; it does not mean export
+finished. Keep the exporter separate from any player session and verify ownership
+before opening the dialog. The inherited automated export/build runner remains
+unverified for Zarvot and must be reviewed before use.
