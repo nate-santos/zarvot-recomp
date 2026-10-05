@@ -61,6 +61,10 @@ while ($clock.Elapsed.TotalSeconds -lt $Seconds) {
         EmulationThreadRunning=$state.emulation_thread_running
         ShadersBuilding=$state.shaders_building
         StaticBackendActive=$state.static_backend_active
+        StaticBlocks=$state.static_blocks
+        JitTransitions=$state.jit_transitions
+        JitAvailable=$state.jit_available
+        CodeGuardReady=$state.guard_v2_ready
         TasFrame=$state.tas_frame
         TasRunning=$state.tas_running
         TasCompletionGeneration=$state.tas_completion_generation

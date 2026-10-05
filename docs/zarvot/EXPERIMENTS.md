@@ -211,6 +211,7 @@ statements remain historical and do not override the current STATUS queue.
   synthetic C and verified a mutated instruction was refused by guard-v2.
 - Limits: no Zarvot AOT export, module compilation, execution or gameplay test.
 - Next: finish R00, then inventory/export and compile Zarvot (R01/R02).
+
 ## E008 — Explicit export backend and rejected-request checks (2026-10-05)
 
 - Task: R01 preparation while the R00 host build runs.
@@ -227,6 +228,20 @@ statements remain historical and do not override the current STATUS queue.
 - Limits: no live export yet. Acceptance is not artifact/build/execution proof.
 - Next: after R00 succeeds, use an explicit hybrid export and check final status,
   generated manifest and matching module build; then prove AOT execution (R02).
+
+## E009 — Recomp counters in manual observation tooling (2026-10-05)
+
+- Task: R02 evidence preparation while R00 compiles.
+- The read-only Zarvot sampler previously retained static_backend_active but
+  omitted execution counts. It now also retains static_blocks, jit_transitions,
+  jit_available and guard_v2_ready in every observation. Missing fields remain
+  unknown rather than being converted into zero/false.
+- These raw counters support later execution/coverage review; FPS or backend
+  selection alone is not proof. Compare increasing counts within one session
+  and inspect fallbacks. No automated correctness verdict is introduced.
+- Validation: PowerShell syntax passed. Live AOT capture remains untested until
+  compiled Zarvot modules exist. Recorder still sends no control commands.
+- Next: complete R00/R01, load built modules and collect execution evidence.
 ## Template for the next experiment
 
 - ID / R task / date:
