@@ -315,6 +315,26 @@ statements remain historical and do not override the current STATUS queue.
   collect advancing AOT counts and categorized fallbacks with the matching host.
   Gameplay stays user-led; no emulator-performance work or speedup claim.
 
+## E012 — Third compiled module; main build left active (2026-10-05)
+
+- Task: R02, continuation of E011. The live sequential runner completed subsdk0
+  without errors: helper reported 2.8 minutes; runner recorded 173.48 seconds
+  including configure/artifact recording. DLL is 67,680,768 bytes, SHA-256
+  3f1d06e16fd61446d11d838e7c7bc0c04dc35f886fa5f1d7356ace47c3010ec8.
+- Main configured with MSVC and the same one-compile pool, then began its 115
+  build steps. Compiler activity and new object/log progress confirmed a healthy
+  ongoing build; no build error observed. It is left active with no timeout.
+  Main DLL completion remains unverified: inspect live build-status.json and
+  processes rather than assuming this handoff still describes current state.
+- No game session started, no controller input sent and no settings tuned.
+  Three completed DLLs establish build progress only; AOT execution, hybrid
+  correctness, strict-static and no-JIT validation remain pending.
+- Tooling/slow-build handoff commit 4be4b13 pushed to origin/zarvot-support.
+  Raw progress and module hashes remain in the E011 evidence locations.
+- Next: let main finish, verify the complete module set, then boot the matching
+  host in a separate profile and retain increasing AOT counts plus fallback
+  evidence. CLI requires the full module set because of the E011 mapping finding.
+
 ## Template for the next experiment
 
 - ID / R task / date:

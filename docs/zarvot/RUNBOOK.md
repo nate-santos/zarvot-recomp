@@ -320,3 +320,23 @@ processes and the status timestamp: an old building status can outlive a stopped
 process. Allow an active compiler time to finish even if it emits no new lines.
 Record real errors/resource exhaustion separately from elapsed time. Preserve
 the existing build trees; no forced clean is needed for an ordinary resume.
+
+E011/E012 completed SDK and subsdk0; main is building. Additional DLL hashes:
+
+- SDK: `da0fb0ddb7496dc61f84a04459e3023e3712ba6d6137f87d0431c938f393bf45`
+- subsdk0: `3f1d06e16fd61446d11d838e7c7bc0c04dc35f886fa5f1d7356ace47c3010ec8`
+
+After the runner completes, verify all four recorded DLL hashes and manifest
+identity before launching. The ordinary CLI loads DLLs beside suyu-cmd.exe;
+SUYU_RECOMP_DIR is the GUI loader's directory override. Use a separate portable
+profile/staging directory for a CLI smoke check. Do not stage a partial CLI set:
+its current load-index mapping can give a later DLL the wrong base address when
+a middle module is absent. The GUI supports subsets through its separate mapping.
+
+The current CPU runtime periodically writes execution/fallback counters to
+SUYU_RECOMP_COVERAGE_PATH, or user/log/recomp_coverage.txt by default. Preserve
+multiple timestamped readings from one owned process; increasing static blocks
+prove ongoing compiled execution. File updates are tied to compiled dispatch
+counts, so a missing or unchanged file alone does not diagnose a stopped host.
+Check process/log/state too. Positive counts alone do not establish gameplay
+correctness, strict-static/no-JIT execution or a speedup.
