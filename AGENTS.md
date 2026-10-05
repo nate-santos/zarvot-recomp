@@ -9,6 +9,14 @@ JIT is a reference and temporary fallback. General emulator performance tuning
 is outside scope. Follow the R task queue; historical Z tasks are retired.
 Do not gate export/build work on fresh JIT benchmarks or stop at JIT performance.
 
+This laptop builds slowly. Allow healthy builds to finish; elapsed time or a
+quiet compiler alone is not failure. Keep generated CMake's memory-aware job
+pool, build modules sequentially and check compiler activity/object progress.
+Resume existing build trees incrementally. Check processes and
+`build/recomp/zarvot/build-status.json` before starting a second build; a status
+marked building is not proof its process is still alive. Stop only on an actual
+error, demonstrated resource failure or an explicit user request.
+
 Keep stable task IDs and update evidence, decisions and the next action after
 each meaningful experiment. Never claim gameplay/audio fidelity from a title
 screen or an initialized audio device. Do not infer a speedup from AOT coverage.

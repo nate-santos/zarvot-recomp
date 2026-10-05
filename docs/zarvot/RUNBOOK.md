@@ -297,3 +297,26 @@ approval. The owned test process was stopped; no controller input was sent.
 Do not run inherited run-hybrid.ps1 unchanged: it broadly stops suyu processes
 and edits global settings. Use a project-owned, separate profile and retain
 original speed/graphics/audio settings for comparisons.
+
+## Slow-laptop module builds
+
+Build the four exported modules sequentially from the workspace root:
+
+```powershell
+.\source\scripts\build-zarvot.ps1 -ParallelJobs 2
+```
+
+The runner uses the existing per-module helper and incremental Ninja trees;
+completed objects are reused. It validates the four-module ABI 6 manifest,
+records its hash and each completed DLL's size/hash, and stops on a build error.
+Local state is in source/build/recomp/zarvot/build-status.json; raw console output
+should stay in reports/. It has no overall timeout. The current generated
+projects use MSVC /O2 /bigobj /fp:precise and select RECOMP_JOBS=1 on this laptop.
+ParallelJobs caps Ninja activity; it does not enlarge the generated compile pool.
+
+Do not launch this runner alongside a manually started module build. Its lock
+prevents duplicate runners only. Before resuming, inspect runner/compiler/Ninja
+processes and the status timestamp: an old building status can outlive a stopped
+process. Allow an active compiler time to finish even if it emits no new lines.
+Record real errors/resource exhaustion separately from elapsed time. Preserve
+the existing build trees; no forced clean is needed for an ordinary resume.

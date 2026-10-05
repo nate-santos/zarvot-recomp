@@ -284,6 +284,37 @@ statements remain historical and do not override the current STATUS queue.
   modules, resolve startup preflight through the supported interface, and record
   advancing compiled execution. User still handles gameplay tests. General
   emulator performance tuning remains outside scope.
+## E011 — Push recomp history and continue sequential module builds (2026-10-05)
+
+- Task: R02. User authorized pushing commits and emphasized allowing slow builds
+  time to finish. Commits 5c6156a through 07ec10f pushed to origin/zarvot-support;
+  initial GitHub sign-in wait resolved after the user signed in.
+- SDK build succeeded with the existing MSVC 19.44 toolchain: 7.0 minutes,
+  110,612,992-byte DLL. SHA-256:
+  da0fb0ddb7496dc61f84a04459e3023e3712ba6d6137f87d0431c938f393bf45.
+  Generated units use /O2 /bigobj /fp:precise with /we4293 retained. No compiler
+  flags, correctness guards or game settings changed. clang-cl was not found.
+- Added scripts/build-zarvot.ps1: sequential rtld/sdk/subsdk0/main builds,
+  incremental reuse, four-module ABI 6 manifest validation and hash, per-module
+  completion/DLL hash evidence, fail-stop behavior and an exclusive runner lock.
+  No overall build timeout. Lock covers this runner, not direct helper invocations.
+- Validation: PowerShell syntax and Git whitespace checks passed. Synthetic local
+  fixtures verified completion hashes, compiler-failure stop/status, duplicate
+  runner rejection and changed-export rejection. No fixture contains game code.
+- Live runner reused rtld/sdk with Ninja reporting no work, then started subsdk0;
+  main is queued next. Build completion and execution are still unverified for
+  these remaining modules. Active state is local build/recomp/zarvot/build-status.json;
+  raw evidence reports/r02-sdk-build.log, r02-module-set-build.log and
+  r02-build-runner-tests.log. Inspect processes before resuming an active build.
+- Source review: GUI maps loaded images by module/name/load order, while the
+  current CLI maps a compact vector of present DLLs by load index. A missing
+  middle image can misbase later CLI images. Do not use the CLI for partial sets;
+  wait for all four fixed modules. No core change or runtime proof made here.
+- Decision: retain sequential memory-aware builds and explicitly preserve the
+  user's slow-build instruction in the tracked handoff/plan. Continue R02, then
+  collect advancing AOT counts and categorized fallbacks with the matching host.
+  Gameplay stays user-led; no emulator-performance work or speedup claim.
+
 ## Template for the next experiment
 
 - ID / R task / date:

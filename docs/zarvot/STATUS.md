@@ -1,6 +1,6 @@
 # Zarvot recomp handoff
 
-Updated: 2026-10-05. Recomp plan committed as 5c6156a; R00/R01 complete; R02 in progress (E010).
+Updated: 2026-10-05. R00/R01 complete; R02 in progress (E011). Recomp commits through 07ec10f pushed to origin.
 
 ## Objective and next action
 
@@ -8,12 +8,15 @@ Work only on the recomp: build, coverage, correctness and execution improvements
 Reuse the compatibility stack. Do not resume general emulator performance,
 settings or GPU tuning. JIT is a reference and temporary hybrid fallback.
 
-**Next: R02 — compile the remaining main/sdk/subsdk0 modules and prove compiled
+**Next: R02 — finish the module build queue and prove compiled
 execution.** The matching host/exporter and Hybrid source export are complete;
-rtld compiled and loaded, but boot observations showed zero executed AOT blocks.
-Main contains about 3 GB of generated C: review compiler availability and the
-generated compile pool before starting a large build. Build/export commands and
-artifact identities are recorded in RUNBOOK. Do not repeat R00/R01 unnecessarily.
+rtld and sdk compiled, but prior boot observations showed zero executed AOT blocks.
+The sequential build runner is compiling subsdk0, then main (about 3 GB of C).
+Inspect actual processes and build/recomp/zarvot/build-status.json before resuming;
+do not start a second build or stop a healthy compiler because it is slow.
+MSVC is installed; clang-cl was not found. The generated memory-aware compile
+pool stays at one. Commands and artifact identities are recorded in RUNBOOK.
+Do not repeat R00/R01 unnecessarily.
 
 ## Verified progress
 
@@ -26,7 +29,8 @@ artifact identities are recorded in RUNBOOK. Do not repeat R00/R01 unnecessarily
   Windows SDK and bundled Ninja. C/C++ smoke builds/execution passed (2/2).
 - R00/R01: matching source host/exporter built; Hybrid ABI 6 export completed
   for main/rtld/sdk/subsdk0. Feature bits 7; translate_all enabled.
-- R02: rtld compiled and loaded; main/sdk/subsdk0 are not compiled. No advancing
+- R02: rtld compiled and loaded; sdk compiled (7.0 minutes, 110,612,992 bytes).
+  The subsdk0/main build queue is running. No advancing
   AOT execution, strict-static or no-JIT result has been established.
 - Later levels, full playthrough and original music fidelity remain unverified.
 
@@ -36,7 +40,7 @@ artifact identities are recorded in RUNBOOK. Do not repeat R00/R01 unnecessarily
 |---|---|---|
 | R00 | Complete | Pinned source built suyu/suyu-cmd; command-line host smoke exited 0; exporter RPC worked (E010) |
 | R01 | Complete for fixed exported modules | Four-module Hybrid ABI 6 source/manifest exported successfully; late-loaded/generated code remains unverified |
-| R02 | In progress | rtld DLL compiled/loaded; main/sdk/subsdk0 builds and actual execution proof pending |
+| R02 | In progress | rtld/sdk DLLs compiled; sequential subsdk0/main builds running; execution proof pending |
 | R03 | Pending R02 | User-led hybrid correctness checks and categorized fallback evidence |
 | R04 | Pending R03 | Iterative coverage/translation fixes with focused tests |
 | R05 | Pending validated routes | Strict-static zero-fallback tests, then separate no-JIT verification |
@@ -55,6 +59,9 @@ A/B and logging/cache tuning are no longer next actions.
    Preserve subsequent changes and check current ahead/behind state afresh.
 3. Inspect existing generated export and build artifacts at the identities in
    RUNBOOK. Resume R02; source remains unchanged at its pinned revision.
+   The sequential runner records its PID and module completion/hash evidence in
+   build/recomp/zarvot/build-status.json. Check that process and compiler activity
+   before restarting; reports/r02-module-set-build.log holds raw progress.
 4. Continue R02 without waiting for manual JIT performance tests. Inspect
    current project sessions before launching or stopping anything.
 5. The user handles gameplay. The separate recomp smoke host was stopped after

@@ -61,6 +61,13 @@ known recomp defects or improving a validated compiled path.
 6. Record exact commands, identities, output locations and build failures in
    RUNBOOK/STATUS and the ledger. Keep generated game code and assets local.
 
+The development laptop is slow: give healthy builds enough time to complete.
+Use sequential module builds and retain the generated memory-aware compile pool.
+A long or quiet compilation is not a failure; inspect compiler CPU activity and
+completed objects/log progress before diagnosing a stall. Incremental resumes
+retain completed work. Do not start duplicate builds or use an arbitrary overall
+timeout; stop for actual errors/resource failures or at the user's request.
+
 ## R03-R05: coverage and correctness
 
 Record misses by module, PC, instruction and reason: unsupported instruction,
