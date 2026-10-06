@@ -413,6 +413,51 @@ statements remain historical and do not override the current STATUS queue.
   the user's named Story route and observations, inspect its coverage/failures,
   then fix concrete recomp gaps. Leave the session open for the user.
 
+## E015 — Diagnose reported combat stalls and fallback discrepancy (2026-10-05)
+
+- Tasks: R03 diagnosis; R06 profiling preparation. The user reported severe
+  frame-rate drops during combat, especially shot hit effects, and noticed JIT
+  transitions. Exact mode/level and individual hit timestamps were not supplied.
+  Inspected the E014 session without stopping it, changing settings or sending
+  input. Executable/PID/start time still matched its launch record.
+- The ten-minute recorder completed without error: 299 complete reports,
+  503,045,903 -> 20,196,871,790 AOT blocks, zero observed lookup/opcode transitions
+  and unresolved import traps. No observed counter regressions. Later coverage
+  and the live window counter also showed zero transitions. The persisted gaps
+  file was empty; no missing-PC/unhandled-opcode fallback log messages found.
+- Source review: native window status and FormatRecompCoverage both read
+  fallback_from_miss + fallback_from_unhandled. These count attempts including
+  rejected strict fallbacks; no reset found. The user's observed transitions
+  conflict with this recorded evidence. Keep the discrepancy open rather than
+  declaring the observation mistaken or inventing a missing translation.
+- The performance log confirms severe drops. Its 170-240s window contained 63
+  interval samples spanning 1.0-16.0 FPS, including sustained 5-7 FPS readings.
+  At 177.666s it reported 6483.369ms frametime; at 362.759s, 0.0 FPS and
+  2429.148ms. These are reported interval statistics, not a per-frame trace.
+- Pipeline activity coincided with multiple hitches: 35 creation messages in
+  the 170-240s window and 32 in 355-366s. Source logs this on entry to pipeline
+  creation, so these counts do not measure shader-build durations or prove
+  causation. Cold graphics work is a lead; sustained combat CPU/GPU cost remains
+  unattributed. No generic emulator/GPU settings tuning follows from this result.
+- Inspected captures of a black transition, an arena with effects, combat with
+  shots/score, and a pause menu over another scene. Gameplay clearly rendered,
+  but movement/restart/death/save/audio correctness is not established. Updated
+  PLAYTEST with partial observations, not passes. Strict/no-JIT still unverified.
+- Added opt-in -SamplePc/-SampleAfterSeconds to the isolated launcher. It enables
+  the existing runtime sampler after a boot delay and records its block interval
+  and delay in launch metadata; no re-export/main build needed. Defaults remain
+  unchanged. PowerShell syntax check passed; live sampling remains untested.
+  PC counts rank executed locations, not wall-clock cost; sampling has overhead.
+- Local evidence: E014 run's analysis/20261006-022157 holds preserved log,
+  coverage/observation/gap copies, interval CSV, summary.json and REPORT.md.
+  Performance-log snapshot ends at 489.829s; coverage recording continued longer.
+  Raw evidence stays local. Original saves and current test session preserved.
+- Next: name/repeat the combat section, collect compiled-PC plus native duration
+  evidence, separate initial pipeline activity from recurring recomp cost, and
+  reconcile any future nonzero transition with timestamp/PC/reason evidence.
+  Fix measured generated-code/runtime costs or actual coverage gaps; do not
+  claim a speedup, full correctness, or a fallback cause from these observations.
+
 ## Template for the next experiment
 
 - ID / R task / date:

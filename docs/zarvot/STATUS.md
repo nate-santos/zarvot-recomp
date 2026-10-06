@@ -1,6 +1,6 @@
 # Zarvot recomp handoff
 
-Updated: 2026-10-05. R00/R01/R02 complete (E013). R03 playtest started (E014).
+Updated: 2026-10-05. R00/R01/R02 complete. R03 combat diagnosis recorded (E015).
 
 ## Objective and next action
 
@@ -9,14 +9,20 @@ Reuse the compatibility stack. Do not resume general emulator performance,
 settings or GPU tuning. JIT is a reference and temporary hybrid fallback.
 
 **Active: R03 — user-led recomp gameplay checks and coverage/correctness
-diagnosis.** E014 opened a visible isolated Hybrid session at the user's request,
-with a ten-minute coverage recorder and continuing runtime captures. Check the
+diagnosis.** E015 confirms severe combat slowdowns reported around shot hit
+effects. All 299 complete recorder reports show zero lookup/opcode transitions;
+the user's observed JIT transitions remain an unresolved discrepancy. Several
+hitches coincide with graphics-pipeline creation, but compiled CPU cost is not
+yet attributed. Next: profile compiled PCs/runtime helpers on the same combat
+route; finish behavioral checks separately. The launcher now supports an opt-in
+-SamplePc mode without rebuilding; live sampling remains untested. Check the
 active run pointer in workspace reports/r03-active-run.json and actual processes
-before launching another session. Gameplay/audio results remain pending.
+before another launch. The ten-minute recorder finished; preserve the session.
 All four DLLs built, matched their recorded hashes, loaded with
 ABI 6/guard/fastmem/FPX1 negotiation, and executed compiled game code. The title
 screen rendered; boot/title observations showed advancing AOT counts and zero
-fallback transitions. Follow PLAYTEST.md; gameplay and audio remain untested.
+fallback transitions. Combat and a pause menu rendered in E015; gameplay
+correctness and audio checks remain incomplete. Follow PLAYTEST.md.
 Use the isolated launcher and CLI coverage recorder in RUNBOOK. Do not repeat
 the 3.5-hour main build or export unless a source/export change requires it.
 
@@ -39,6 +45,10 @@ the 3.5-hour main build or export unless a source/export change requires it.
   Title-screen captures visually inspected. Both were hybrid-policy, JIT-capable
   runs; strict-static and no-JIT execution have not been established.
 - Later levels, full playthrough and original music fidelity remain unverified.
+- E015: user reported combat hit-effect slowdown; logged intervals reached 5-7
+  FPS, with isolated 0-1 FPS samples. Recorder advanced 503,045,903 ->
+  20,196,871,790 AOT blocks; no observed fallback/import traps. No per-frame or
+  CPU/GPU duration trace; pipeline activity is a correlation, not attribution.
 
 ## Active task state
 
@@ -47,10 +57,10 @@ the 3.5-hour main build or export unless a source/export change requires it.
 | R00 | Complete | Pinned source built suyu/suyu-cmd; command-line host smoke exited 0; exporter RPC worked (E010) |
 | R01 | Complete for fixed exported modules | Four-module Hybrid ABI 6 source/manifest exported successfully; late-loaded/generated code remains unverified |
 | R02 | Complete | Four DLLs/hash evidence; matching host handshakes; advancing AOT counts; rendered title (E013) |
-| R03 | Playtest started; feedback pending | E014 recording active; PLAYTEST.md tracks user-led checks and categorized gaps |
+| R03 | In progress; combat issue diagnosed provisionally | E015 logs/captures; reported JIT transitions conflict with saved counters; correctness checks still open |
 | R04 | Pending R03 | Iterative coverage/translation fixes with focused tests |
 | R05 | Pending validated routes | Strict-static zero-fallback tests, then separate no-JIT verification |
-| R06 | Pending R03 evidence | Profile and improve generated code/AOT runtime; preserve correctness |
+| R06 | Ready for combat profiling | E015 slowdown recorded; generated-code/runtime cost unmeasured; preserve correctness |
 | R07 | Pending R05 | Reproducible recomp package and endurance checks |
 | R08 | Pending R05 routes | Expand later-level/mode coverage; track full playthrough separately |
 
@@ -76,8 +86,9 @@ A/B and logging/cache tuning are no longer next actions.
    the original player profile/saves. Inspect actual process state before
    launching; do not automate play. The launcher refuses a concurrent session.
    Both E013 smoke hosts closed gracefully. The user subsequently requested
-   playtesting; E014 starts a separate visible session and recorder. Check the
-   active pointer and PID/path/start time; preserve that session and test saves.
+   playtesting; E014 started a separate visible session and recorder. E015
+   analyzed it without stopping or sending input; bounded recorder completed.
+   Check the active pointer and PID/path/start time; preserve the session and saves.
    Collect the user's observations before marking any gameplay/audio check passed.
 6. Append evidence and update the relevant R row after each meaningful result.
 

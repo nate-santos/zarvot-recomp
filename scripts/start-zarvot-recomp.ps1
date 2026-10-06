@@ -6,6 +6,8 @@ param(
     [switch]$Strict,
     [switch]$Capture,
     [switch]$Visible,
+    [switch]$SamplePc,
+    [ValidateRange(0, 86400)][int]$SampleAfterSeconds = 120,
     [switch]$StageOnly
 )
 
@@ -105,6 +107,9 @@ $launch = [ordered]@{
     modules = $build.modules
     strict_requested = [bool]$Strict
     visible_requested = [bool]$Visible
+    pc_sampling_requested = [bool]$SamplePc
+    pc_sample_after_seconds = if ($SamplePc) { $SampleAfterSeconds } else { $null }
+    pc_sample_shift = if ($SamplePc) { 18 } else { $null }
     jit_unavailable_proven = $false
     controller_input_sent = $false
     state = 'staged'
@@ -121,6 +126,11 @@ if (-not $StageOnly) {
         $env:SUYU_RECOMP_STRICT = if ($Strict) { '1' } else { '0' }
         $env:SUYU_RECOMP_COVERAGE_PATH = Join-Path $runRoot 'coverage.txt'
         $env:SUYU_CMD_PERF_SAMPLE = '1'
+        if ($SamplePc) {
+            $env:SUYU_RECOMP_SAMPLE_PC = '1'
+            $env:SUYU_RECOMP_SAMPLE_AFTER_SEC = [string]$SampleAfterSeconds
+            $env:SUYU_RECOMP_SAMPLE_SHIFT = '18'
+        }
         if ($Capture) {
             $env:SUYU_CMD_CAPTURE_DIR = Join-Path $runRoot 'captures'
             $env:SUYU_CMD_CAPTURE_FIRST_SEC = '10'

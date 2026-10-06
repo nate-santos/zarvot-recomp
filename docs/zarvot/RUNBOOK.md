@@ -390,3 +390,37 @@ Follow PLAYTEST.md for the opening Story route. For save/relaunch checks reuse
 the same staged executable/config/profile. Launch metadata records local ROM
 and host paths; normal fresh launcher calls deliberately create a new profile.
 Inspect process ownership before closing a test; preserve user-owned sessions.
+
+## Combat slowdown diagnosis and compiled-PC sampling (E015)
+
+The E014 run retains user/log/suyu_log.txt (one-second PERF readings and
+graphics-pipeline creation messages), coverage.txt, user/log/recomp_gaps.json,
+and observations/*/observation.json plus raw coverage snapshots. E015 preserves
+review copies, an interval CSV, summary.json and REPORT.md under that run's
+analysis/20261006-022157 directory. Do not commit these raw files.
+
+All 299 complete recorder reports had zero fallback/import traps despite the
+user noticing JIT transitions. The window and coverage use the same cumulative
+lookup-miss/unhandled-opcode counters; no counter reset found in source. Keep
+the discrepancy open. Several stalls coincide with pipeline creation, which
+does not establish CPU/GPU cost or justify settings changes. These interval
+readings cannot establish per-frame percentiles or a recomp speedup.
+
+For the next user-led diagnostic launch, after preserving the existing session:
+
+```powershell
+$run = .\source\scripts\start-zarvot-recomp.ps1 -Capture -Visible -SamplePc -SampleAfterSeconds 120
+```
+
+This opt-in enables the pinned runtime's existing compiled-PC sampling after
+the stated boot delay, every 2^18 retired blocks, and records the parameters in
+launch.json. It requires no re-export or module rebuild. The launcher otherwise
+clears inherited diagnostic overrides, so setting those variables externally
+does not enable sampling. Default playtests keep sampling disabled. Syntax
+checked; live sampling output is not yet validated.
+
+Sampled PCs identify frequently executed compiled locations, not time spent in
+them. Use a native duration profile for CPU/helper cost before optimizing. Name
+the combat route and repeat it within the same profile/settings to separate
+initial pipeline work from recurring cost. Diagnostic sampling has overhead;
+do not treat its FPS as a matched performance comparison with E014.

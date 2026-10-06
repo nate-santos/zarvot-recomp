@@ -16,7 +16,12 @@ correctness, full-game coverage, strict-static/no-JIT execution or a speedup.
 The existing JIT runtime reaches controllable opening Story gameplay.
 Later levels, full-game correctness and music fidelity remain unverified.
 
-**Next: user-led recomp gameplay checks and coverage/correctness diagnosis.**
+User-led recomp combat rendered, but severe slowdowns around hit effects were
+reported. All 299 complete recorder reports showed zero fallback transitions;
+reported visible transitions remain unresolved. Some hitches coincided with
+graphics-pipeline creation; compiled CPU cost remains unprofiled (E015).
+
+**Next: profile the compiled combat path and finish gameplay correctness checks.**
 The main MSVC build took 210.9 minutes and produced a roughly 1.5 GB DLL.
 Build cost and generated-code efficiency remain recomp work. See E013 for
 execution evidence and the [gameplay checklist](docs/zarvot/PLAYTEST.md).

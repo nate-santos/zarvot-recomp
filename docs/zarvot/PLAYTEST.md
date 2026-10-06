@@ -7,15 +7,17 @@ remain separate. A visible title and zero fallbacks establish only that route.
 | Check | Current state | Required observation |
 |---|---|---|
 | P00: boot/title | Complete for E013 smoke scope | Four matching images; advancing AOT counts; visible title |
-| P01: menus / Story entry | Untested in recomp | Buttons respond; menus/text render; opening Story loads |
-| P02: opening movement / shooting | Untested in recomp | Movement and shots behave correctly; no stuck input or visual corruption |
-| P03: pause / restart / death | Untested in recomp | Pause/resume and restart/death flow behave correctly |
-| P04: next scene / level | Untested in recomp | Transition/load completes with correct visuals/input |
+| P01: menus / Story entry | Menu/arena rendered (E015); exact route and correctness pending | Buttons respond; menus/text render; opening Story loads |
+| P02: opening movement / shooting | Combat captured; severe hit-effect slowdown reported (E015); correctness pending | Movement and shots behave correctly; no stuck input or visual corruption |
+| P03: pause / restart / death | Pause menu rendered (E015); resume/restart/death pending | Pause/resume and restart/death flow behave correctly |
+| P04: next scene / level | Different scene rendered (E015); transition correctness pending | Transition/load completes with correct visuals/input |
 | P05: save / exit / relaunch | Untested in recomp | Reuse the same test profile; expected progress persists |
 | P06: music / effects | Untested in recomp | Audible/stable audio, pitch/loops/transitions; original-hardware fidelity remains separate |
 | P07: later levels / modes / full game | Untested | Name each route and its evidence; track separately under R08 |
 
-E014 opens the user playtest with recording; behavioral results are pending.
+E014 opened the user playtest; E015 records combat performance issues. The user
+also noticed JIT transitions, but all 299 complete recorder reports showed zero
+lookup/opcode transitions. Keep this discrepancy open; no gap PC is established.
 Inspect the active run and process before launching another session.
 
 Launch a fresh isolated Hybrid run using scripts/start-zarvot-recomp.ps1 -Visible;
