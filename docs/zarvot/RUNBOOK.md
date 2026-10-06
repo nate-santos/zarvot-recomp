@@ -417,10 +417,53 @@ the stated boot delay, every 2^18 retired blocks, and records the parameters in
 launch.json. It requires no re-export or module rebuild. The launcher otherwise
 clears inherited diagnostic overrides, so setting those variables externally
 does not enable sampling. Default playtests keep sampling disabled. Syntax
-checked; live sampling output is not yet validated.
+checked; E016 subsequently validated live sampling output.
 
 Sampled PCs identify frequently executed compiled locations, not time spent in
 them. Use a native duration profile for CPU/helper cost before optimizing. Name
 the combat route and repeat it within the same profile/settings to separate
 initial pipeline work from recurring cost. Diagnostic sampling has overhead;
 do not treat its FPS as a matched performance comparison with E014.
+
+## Lifetime UI/coverage diagnostics and profile reuse (E016)
+
+The user's earlier recollection of possibly six UI transitions is now uncertain.
+They observed none in E016 and confirmed no combat during that run. The E014
+collector did not save caption text and stopped after ten minutes; file evidence
+alone does not settle what the user observed. The new recorder polls the owned
+process's exact MainWindowTitle plus coverage independently every two seconds.
+It retains UI/file counts, shader-building text, report age, source disagreements,
+counter regressions and incomplete reports. Disagreement can be ordinary snapshot
+lag, so it is evidence to investigate, not automatically a runtime defect.
+
+With a closed recorded test profile and no emulator running:
+
+```powershell
+$run = .\source\scripts\start-zarvot-recomp.ps1 -Capture -Visible -SamplePc -ProfileFromRun $previousRun
+.\source\scripts\measure-zarvot-coverage.ps1 -RunRoot $run.RunRoot -UntilExit
+```
+
+-ProfileFromRun accepts only a recorded, closed profile under build/zarvot-runs
+with matching host/export/module identities. It clones NAND/saves, controls and
+settings, available caches and relevant data into a new directory, rebasing
+storage paths. Empty native storage settings retain portable defaults. Foreign
+storage paths are rejected. The source profile/raw evidence is preserved; no
+original player profile is used. File-copy checks do not establish save semantics.
+
+-UntilExit has no ten-minute cutoff and sends no input. Process exit ends it;
+identity changes/errors stop it with a reason. Samples append to samples.jsonl;
+observation.json retains the last 300 samples and summary totals/maxima over the
+whole recording, updated every ten seconds. Read JSONL for the full timeline.
+Changed raw reports are archived, including partial writes. A bounded -Seconds
+recording remains available. Missing data stays unknown, never zero.
+
+E016's three synthetic test scripts cover parsing/partial reports, profile
+rebasing/defaults and a UI=6/file=0 recording through simulated process exit.
+Live recording matched the returned native window caption; compiled-PC histograms
+appeared after the 120-second boot delay. E016 ended normally on process exit:
+146 complete samples, advancing AOT counts, zero UI/file fallbacks/import traps,
+no disagreements or regressions. Final coverage contains 1,222 distinct sampled
+PCs. Captures show a Story room/dialogue; combat cost/correctness remains open.
+Local run: build/zarvot-runs/20261006-035803-2d087b29; final analysis is under
+analysis/20261006-040756. Game and recorder are closed. Inspect the active pointer
+and actual processes before relaunch; preserve the profiles and evidence.

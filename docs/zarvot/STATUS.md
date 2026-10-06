@@ -1,6 +1,6 @@
 # Zarvot recomp handoff
 
-Updated: 2026-10-05. R00/R01/R02 complete. R03 combat diagnosis recorded (E015).
+Updated: 2026-10-06. R00/R01/R02 complete. R03 lifetime diagnostics validated (E016).
 
 ## Objective and next action
 
@@ -9,15 +9,19 @@ Reuse the compatibility stack. Do not resume general emulator performance,
 settings or GPU tuning. JIT is a reference and temporary hybrid fallback.
 
 **Active: R03 — user-led recomp gameplay checks and coverage/correctness
-diagnosis.** E015 confirms severe combat slowdowns reported around shot hit
-effects. All 299 complete recorder reports show zero lookup/opcode transitions;
-the user's observed JIT transitions remain an unresolved discrepancy. Several
-hitches coincide with graphics-pipeline creation, but compiled CPU cost is not
-yet attributed. Next: profile compiled PCs/runtime helpers on the same combat
-route; finish behavioral checks separately. The launcher now supports an opt-in
--SamplePc mode without rebuilding; live sampling remains untested. Check the
-active run pointer in workspace reports/r03-active-run.json and actual processes
-before another launch. The ten-minute recorder finished; preserve the session.
+diagnosis.** E016 finished normally on process exit: all 146 UI/file samples
+showed zero fallback transitions, with advancing AOT counts and no disagreements
+or regressions. The user noticed no transitions and clarified that this run
+contained no combat; captures show a Story room/dialogue. Their earlier possible
+count of six is now uncertain, with no corroborated fallback or gap PC.
+The recorder now preserves exact captions and coverage independently until exit;
+compiled-PC sampling produced module-relative locations. Next: record a named
+user-led combat route, obtain native compiled-code/helper duration evidence,
+then fix measured recomp costs or actual gaps and finish behavioral checks.
+E015's pipeline activity is a correlation; compiled CPU cost remains unattributed.
+E016 used a verified clone of the prior test saves/settings/caches. Game and
+recorder have exited. Check workspace reports/r03-active-run.json and actual
+processes before another launch; preserve both test profiles and evidence.
 All four DLLs built, matched their recorded hashes, loaded with
 ABI 6/guard/fastmem/FPX1 negotiation, and executed compiled game code. The title
 screen rendered; boot/title observations showed advancing AOT counts and zero
@@ -49,6 +53,12 @@ the 3.5-hour main build or export unless a source/export change requires it.
   FPS, with isolated 0-1 FPS samples. Recorder advanced 503,045,903 ->
   20,196,871,790 AOT blocks; no observed fallback/import traps. No per-frame or
   CPU/GPU duration trace; pipeline activity is a correlation, not attribution.
+- E016: 146 complete UI/file samples over 291.604 seconds; AOT blocks advanced
+  180,881,897 -> 13,386,471,882. Zero observed fallback/import traps, disagreements
+  or regressions. Final report contains 1,222 distinct sampled PCs. Story room
+  and dialogue rendered; user confirmed no combat. Prior UI count uncertain.
+  Profile clone's six NAND files matched hashes; source unchanged. Three synthetic
+  diagnostic tests passed, including independent UI=6/file=0 and normal exit.
 
 ## Active task state
 
@@ -57,10 +67,10 @@ the 3.5-hour main build or export unless a source/export change requires it.
 | R00 | Complete | Pinned source built suyu/suyu-cmd; command-line host smoke exited 0; exporter RPC worked (E010) |
 | R01 | Complete for fixed exported modules | Four-module Hybrid ABI 6 source/manifest exported successfully; late-loaded/generated code remains unverified |
 | R02 | Complete | Four DLLs/hash evidence; matching host handshakes; advancing AOT counts; rendered title (E013) |
-| R03 | In progress; combat issue diagnosed provisionally | E015 logs/captures; reported JIT transitions conflict with saved counters; correctness checks still open |
+| R03 | In progress; lifetime diagnostics validated | E016 zero observed fallbacks on noncombat scenes; named combat/correctness checks pending |
 | R04 | Pending R03 | Iterative coverage/translation fixes with focused tests |
 | R05 | Pending validated routes | Strict-static zero-fallback tests, then separate no-JIT verification |
-| R06 | Ready for combat profiling | E015 slowdown recorded; generated-code/runtime cost unmeasured; preserve correctness |
+| R06 | Compiled-PC sampling validated | E016 histogram populated; combat and native duration profile pending |
 | R07 | Pending R05 | Reproducible recomp package and endurance checks |
 | R08 | Pending R05 routes | Expand later-level/mode coverage; track full playthrough separately |
 
@@ -88,7 +98,10 @@ A/B and logging/cache tuning are no longer next actions.
    Both E013 smoke hosts closed gracefully. The user subsequently requested
    playtesting; E014 started a separate visible session and recorder. E015
    analyzed it without stopping or sending input; bounded recorder completed.
-   Check the active pointer and PID/path/start time; preserve the session and saves.
+   That host subsequently closed. E016 cloned its verified saves/settings into
+   a new isolated run with UntilExit recording and compiled-PC sampling. It
+   subsequently exited; recorder completed normally. Check the active pointer
+   and actual processes before relaunch; retain both profiles and saves.
    Collect the user's observations before marking any gameplay/audio check passed.
 6. Append evidence and update the relevant R row after each meaningful result.
 

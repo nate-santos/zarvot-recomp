@@ -458,6 +458,61 @@ statements remain historical and do not override the current STATUS queue.
   Fix measured generated-code/runtime costs or actual coverage gaps; do not
   claim a speedup, full correctness, or a fallback cause from these observations.
 
+## E016 — Capture UI counters independently and validate compiled-PC sampling (2026-10-06)
+
+- Tasks: R03 diagnostics; R06 sampling preparation. The user recalled a possible
+  UI count of six, then reported no transitions in this new run and said the
+  earlier observation may not have happened. They clarified there was no combat
+  in the new run. Treat the earlier count as uncertain; no fallback gap is
+  corroborated. E015's combat slowdown remains a separate open issue.
+- Reworked measure-zarvot-coverage.ps1 to poll the owned process's exact caption
+  independently of coverage. Retains timestamps, shader count, file age, partial
+  reports, UI/file disagreement and counter regression evidence. -UntilExit
+  removes the old ten-minute cutoff; full samples append to JSONL while the
+  summary keeps the last 300 and all-history totals/maxima. Missing telemetry
+  remains unknown. Normal exit and PID/path/start-time changes are distinguished.
+- Added opt-in closed-test-profile cloning to the launcher. It verifies matching
+  host/export/module identities, rebases isolated storage and preserves controls,
+  saves and available caches. Original player profile untouched. Empty native
+  storage defaults initially failed validation; corrected and regression-tested
+  before launch. Foreign storage remains rejected. Six copied NAND files matched
+  hashes and the source stayed unchanged; save-progress semantics remain untested.
+- Existing four modules and matching CLI reused, with ABI 6/guard-v2/fastmem/FPX1
+  handshakes observed again. Source, export and module hashes match E013; no
+  rebuild/re-export or emulator settings optimization. Hybrid policy remained
+  JIT-capable, with compiled-PC sampling every 2^18 blocks after 120 seconds.
+- Live native window inspection matched a persisted caption for the same owned
+  executable. All 146 samples had parsed UI counters and complete reports over
+  291.604 seconds: AOT blocks 180,881,897 -> 13,386,471,882; zero observed UI/file
+  transitions and import traps, no disagreements or regressions, no read error.
+  Maximum observed report age 1.235 seconds. Recorder ended normally on process
+  exit; subsequent process inspection confirmed game and recorder absent.
+- Final coverage advanced further to 13,413,039,263 AOT blocks, with zero
+  fallback/import traps and 1,222 distinct sampled PCs. Module-relative sampling
+  is validated, but counts rank execution frequency rather than CPU duration.
+  No native cost attribution, matched performance comparison or speedup claim.
+- Inspected Story bedroom, dialogue and black-transition captures. These extend
+  rendered-scene evidence beyond title; they do not establish movement, shooting,
+  combat hit effects, death/restart, expected save progress or audio fidelity.
+  User confirmed no combat. No gameplay input automated or process stopped.
+- Three synthetic scripts passed: exact JIT versus shader caption parsing,
+  large-counter precision and torn/inconsistent report rejection; storage
+  rebasing/defaults/foreign-path rejection; real recorder with mocked UI=6/file=0,
+  counter advancement, preserved JSONL and normal process exit. Script syntax
+  checks passed. These validate tooling, not game translation semantics.
+- Local evidence: build/zarvot-runs/20261006-035803-2d087b29; observations under
+  20261006-035825-88778d25; final analysis/20261006-040756 contains preserved
+  coverage/log/gaps, summary.json, timeline.csv and REPORT.md. Both test profiles,
+  saves and generated modules preserved. Raw evidence remains ignored/local.
+- Decision: retain the diagnostics and sampling preparation. Current evidence
+  supports zero observed fallbacks on this noncombat route only. Two-second UI
+  polls do not capture every instantaneous caption state; this run does not
+  settle full-game coverage, strict/no-JIT execution or the earlier recollection.
+- Next: named user-led combat capture with lifetime UI/file recording and PC
+  samples, followed by native compiled-code/helper duration evidence. Fix actual
+  recomp gaps or measured generated-code/runtime costs; finish behavioral/audio
+  checks separately. Keep general emulator/GPU tuning outside scope.
+
 ## Template for the next experiment
 
 - ID / R task / date:

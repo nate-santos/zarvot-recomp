@@ -8,10 +8,12 @@ param(
     [switch]$Visible,
     [switch]$SamplePc,
     [ValidateRange(0, 86400)][int]$SampleAfterSeconds = 120,
+    [string]$ProfileFromRun,
     [switch]$StageOnly
 )
 
 $ErrorActionPreference = 'Stop'
+. (Join-Path $PSScriptRoot 'zarvot-profile.ps1')
 $root = Split-Path -Parent $PSScriptRoot
 if (-not $Rom) { $Rom = Join-Path (Split-Path -Parent $root) 'Zarvot.nsp' }
 $Rom = (Resolve-Path -LiteralPath $Rom).Path
@@ -48,6 +50,36 @@ if (-not $StageOnly -and @(Get-Process suyu,suyu-cmd -ErrorAction SilentlyContin
     throw 'An emulator session is already running; preserve it before starting a separate test'
 }
 
+# Clone only a closed, recorded test profile; preserve its saves and raw evidence.
+$profileRoot = $null
+$profileConfig = $null
+if ($ProfileFromRun) {
+    $profileRoot = (Resolve-Path -LiteralPath $ProfileFromRun).Path.TrimEnd('\')
+    $runsRoot = [IO.Path]::GetFullPath((Join-Path $root 'build\zarvot-runs')).TrimEnd('\')
+    if ((Split-Path -Parent $profileRoot) -ne $runsRoot) {
+        throw 'Profile source must be a direct child of this project''s zarvot-runs directory'
+    }
+    $oldLaunch = Get-Content -LiteralPath (Join-Path $profileRoot 'launch.json') -Raw | ConvertFrom-Json
+    if ($oldLaunch.run_root -ne $profileRoot -or $oldLaunch.host_sha256 -ne $hostHash -or
+        $oldLaunch.export_manifest_sha256 -ne $manifestHash) {
+        throw 'Profile source does not match the recorded runtime/export identity'
+    }
+    foreach ($module in $build.modules) {
+        $oldModule = @($oldLaunch.modules | Where-Object name -eq $module.name)
+        if ($oldModule.Count -ne 1 -or $oldModule[0].sha256 -ne $module.sha256) {
+            throw 'Profile source used a different compiled module set'
+        }
+    }
+    if ($oldLaunch.pid) {
+        $oldProcess = Get-Process -Id $oldLaunch.pid -ErrorAction SilentlyContinue
+        if ($oldProcess -and $oldProcess.Path -eq (Join-Path $profileRoot 'suyu-cmd.exe')) {
+            throw 'Close the source test session before cloning its profile'
+        }
+    }
+    $profileConfig = [IO.File]::ReadAllText((Join-Path $profileRoot 'user\config\sdl-config.ini'))
+    $profileConfig = ConvertTo-ZarvotProfileConfig $profileConfig $profileRoot $profileRoot
+}
+
 $runId = [DateTime]::UtcNow.ToString('yyyyMMdd-HHmmss') + '-' + [Guid]::NewGuid().ToString('N').Substring(0, 8)
 $runRoot = Join-Path $root "build\zarvot-runs\$runId"
 foreach ($dir in @('', 'user\keys', 'user\config', 'user\nand', 'user\sdmc', 'user\load', 'user\dump', 'user\tas', 'captures')) {
@@ -63,7 +95,7 @@ foreach ($name in @('prod.keys', 'title.keys')) {
     if (Test-Path -LiteralPath $keyPath) { Copy-Item -LiteralPath $keyPath -Destination (Join-Path $runRoot "user\keys\$name") }
 }
 # Fresh settings retain original timing and the recorded handheld 1x/HIGH setup.
-# No old config or saves are copied, so absolute NAND paths cannot escape isolation.
+# Default runs start fresh; explicit test-profile reuse is validated and rebased below.
 $config = @'
 [Core]
 use_speed_limit=true
@@ -95,6 +127,19 @@ foreach ($setting in @(@('nand_directory', 'nand'), @('save_directory', 'nand'),
 }
 $configPath = Join-Path $runRoot 'user\config\sdl-config.ini'
 [IO.File]::WriteAllText($configPath, $config, [Text.UTF8Encoding]::new($false))
+if ($profileRoot) {
+    foreach ($dir in @('nand', 'sdmc', 'cache', 'shader', 'load', 'system')) {
+        $source = Join-Path $profileRoot "user\$dir"
+        if (Test-Path -LiteralPath $source) {
+            $destination = Join-Path $runRoot "user\$dir"
+            [IO.Directory]::CreateDirectory($destination) | Out-Null
+            Get-ChildItem -LiteralPath $source -Force | Copy-Item -Destination $destination -Recurse -Force
+        }
+    }
+    # Retain the tested input/settings while rebasing its isolated storage paths.
+    $config = ConvertTo-ZarvotProfileConfig $profileConfig $profileRoot $runRoot
+    [IO.File]::WriteAllText($configPath, $config, [Text.UTF8Encoding]::new($false))
+}
 Copy-Item -LiteralPath $manifestPath -Destination (Join-Path $runRoot 'aot_manifest.json')
 $launch = [ordered]@{
     started_utc = [DateTime]::UtcNow.ToString('o')
@@ -110,6 +155,7 @@ $launch = [ordered]@{
     pc_sampling_requested = [bool]$SamplePc
     pc_sample_after_seconds = if ($SamplePc) { $SampleAfterSeconds } else { $null }
     pc_sample_shift = if ($SamplePc) { 18 } else { $null }
+    profile_source_run_id = if ($profileRoot) { Split-Path -Leaf $profileRoot } else { $null }
     jit_unavailable_proven = $false
     controller_input_sent = $false
     state = 'staged'

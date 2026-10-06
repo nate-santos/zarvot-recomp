@@ -18,10 +18,14 @@ Later levels, full-game correctness and music fidelity remain unverified.
 
 User-led recomp combat rendered, but severe slowdowns around hit effects were
 reported. All 299 complete recorder reports showed zero fallback transitions;
-reported visible transitions remain unresolved. Some hitches coincided with
-graphics-pipeline creation; compiled CPU cost remains unprofiled (E015).
+the user's earlier visible-transition recollection is now uncertain. Some hitches
+coincided with graphics-pipeline creation; compiled CPU cost remains unprofiled (E015).
 
 **Next: profile the compiled combat path and finish gameplay correctness checks.**
+E016 adds process-lifetime recording of the actual window caption and coverage
+independently. All 146 samples showed zero transitions; compiled-PC sampling
+worked. Story room/dialogue rendered, but the user confirmed no combat in this
+run. Repeat combat before attributing its cost; no fallback gap is corroborated.
 The main MSVC build took 210.9 minutes and produced a roughly 1.5 GB DLL.
 Build cost and generated-code efficiency remain recomp work. See E013 for
 execution evidence and the [gameplay checklist](docs/zarvot/PLAYTEST.md).

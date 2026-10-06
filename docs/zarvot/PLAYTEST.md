@@ -7,7 +7,7 @@ remain separate. A visible title and zero fallbacks establish only that route.
 | Check | Current state | Required observation |
 |---|---|---|
 | P00: boot/title | Complete for E013 smoke scope | Four matching images; advancing AOT counts; visible title |
-| P01: menus / Story entry | Menu/arena rendered (E015); exact route and correctness pending | Buttons respond; menus/text render; opening Story loads |
+| P01: menus / Story entry | Menu/arena rendered (E015); Story room/dialogue rendered (E016); exact route and correctness pending | Buttons respond; menus/text render; opening Story loads |
 | P02: opening movement / shooting | Combat captured; severe hit-effect slowdown reported (E015); correctness pending | Movement and shots behave correctly; no stuck input or visual corruption |
 | P03: pause / restart / death | Pause menu rendered (E015); resume/restart/death pending | Pause/resume and restart/death flow behave correctly |
 | P04: next scene / level | Different scene rendered (E015); transition correctness pending | Transition/load completes with correct visuals/input |
@@ -16,9 +16,16 @@ remain separate. A visible title and zero fallbacks establish only that route.
 | P07: later levels / modes / full game | Untested | Name each route and its evidence; track separately under R08 |
 
 E014 opened the user playtest; E015 records combat performance issues. The user
-also noticed JIT transitions, but all 299 complete recorder reports showed zero
-lookup/opcode transitions. Keep this discrepancy open; no gap PC is established.
+initially noticed JIT transitions, but all 299 complete recorder reports showed
+zero lookup/opcode transitions. Their possible count of six is now uncertain;
+no gap PC is established.
 Inspect the active run and process before launching another session.
+E016 used UntilExit recording of both the actual caption and file counters.
+All 146 samples showed zero transitions; the user noticed none and confirmed no
+combat during this run. Captures show a Story room/dialogue. The run cloned the
+prior closed test profile; compiled-PC sampling worked. Both game and recorder
+have exited. Repeat combat and record its mode/level; E016 does not revalidate
+combat cost or correctness, or disprove a historical transient observation.
 
 Launch a fresh isolated Hybrid run using scripts/start-zarvot-recomp.ps1 -Visible;
 use scripts/measure-zarvot-coverage.ps1 against its returned run directory while the
