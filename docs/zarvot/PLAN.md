@@ -40,6 +40,9 @@ New R IDs avoid changing the meaning of historical Z IDs in the ledger.
 
 First deliverable: a compiled Zarvot module set whose execution is observable.
 Next: a correct hybrid gameplay route, then the same route in strict static.
+The first deliverable was achieved in E013: all four images loaded and AOT counts
+advanced during rendered boot/title tests. The active work is now R03; preserve
+the completed export/build and extend correctness/coverage evidence.
 Do not wait for general emulator bottleneck classification or a fresh JIT
 benchmark before R00-R02. Do not wait for a full playthrough before fixing
 known recomp defects or improving a validated compiled path.

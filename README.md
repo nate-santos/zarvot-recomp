@@ -8,15 +8,18 @@ tuning is outside the project scope.
 
 ## Current state
 
-Zarvot is verified AArch64. The matching source host/exporter builds, and a Hybrid
-ABI 6 source export contains main, rtld, sdk and subsdk0. The rtld DLL compiled
-and loaded; remaining modules and actual AOT execution are not yet verified.
+Zarvot is verified AArch64. All four Hybrid ABI 6 modules (main, rtld, sdk and
+subsdk0) compiled and loaded with the matching source host. AOT counters advanced
+during isolated boot/title tests with zero observed fallback transitions, and
+the title screen rendered. R02 is complete; this does not establish gameplay
+correctness, full-game coverage, strict-static/no-JIT execution or a speedup.
 The existing JIT runtime reaches controllable opening Story gameplay.
 Later levels, full-game correctness and music fidelity remain unverified.
 
-**Next: compile the remaining modules and verify advancing static execution
-counters.** The main export contains about 3 GB of generated C; build cost and
-compiler choice need attention. See E010 for the unverified partial boot test.
+**Next: user-led recomp gameplay checks and coverage/correctness diagnosis.**
+The main MSVC build took 210.9 minutes and produced a roughly 1.5 GB DLL.
+Build cost and generated-code efficiency remain recomp work. See E013 for
+execution evidence and the [gameplay checklist](docs/zarvot/PLAYTEST.md).
 
 ## Development sequence
 

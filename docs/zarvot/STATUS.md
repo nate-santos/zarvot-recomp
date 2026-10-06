@@ -1,6 +1,6 @@
 # Zarvot recomp handoff
 
-Updated: 2026-10-05. R00/R01 complete; R02 in progress (E012). Recomp history and sequential runner pushed to origin.
+Updated: 2026-10-05. R00/R01/R02 complete (E013). R03 is next.
 
 ## Objective and next action
 
@@ -8,15 +8,13 @@ Work only on the recomp: build, coverage, correctness and execution improvements
 Reuse the compatibility stack. Do not resume general emulator performance,
 settings or GPU tuning. JIT is a reference and temporary hybrid fallback.
 
-**Next: R02 — finish the module build queue and prove compiled
-execution.** The matching host/exporter and Hybrid source export are complete;
-rtld, sdk and subsdk0 compiled, but prior boot observations showed zero executed AOT blocks.
-The sequential build runner is compiling main (about 3 GB of C).
-Inspect actual processes and build/recomp/zarvot/build-status.json before resuming;
-do not start a second build or stop a healthy compiler because it is slow.
-MSVC is installed; clang-cl was not found. The generated memory-aware compile
-pool stays at one. Commands and artifact identities are recorded in RUNBOOK.
-Do not repeat R00/R01 unnecessarily.
+**Next: R03 — user-led recomp gameplay checks and coverage/correctness
+diagnosis.** All four DLLs built, matched their recorded hashes, loaded with
+ABI 6/guard/fastmem/FPX1 negotiation, and executed compiled game code. The title
+screen rendered; boot/title observations showed advancing AOT counts and zero
+fallback transitions. Follow PLAYTEST.md; gameplay and audio remain untested.
+Use the isolated launcher and CLI coverage recorder in RUNBOOK. Do not repeat
+the 3.5-hour main build or export unless a source/export change requires it.
 
 ## Verified progress
 
@@ -29,10 +27,13 @@ Do not repeat R00/R01 unnecessarily.
   Windows SDK and bundled Ninja. C/C++ smoke builds/execution passed (2/2).
 - R00/R01: matching source host/exporter built; Hybrid ABI 6 export completed
   for main/rtld/sdk/subsdk0. Feature bits 7; translate_all enabled.
-- R02: rtld compiled and loaded; sdk compiled (7.0 minutes, 110,612,992 bytes);
-  subsdk0 compiled (2.8 minutes, 67,680,768 bytes). Main is actively compiling.
-  No advancing
-  AOT execution, strict-static or no-JIT result has been established.
+- R02: all four modules compiled and loaded. Main finished in 210.9 minutes
+  (1,509,548,544-byte DLL); every image and export manifest hash verified.
+- Compiled execution: same-process AOT counts advanced 7,680,340,123 ->
+  7,951,582,393 in the first observation and 7,312,156,998 -> 8,419,406,636
+  in the handheld repeat, with zero observed lookup/opcode fallback transitions.
+  Title-screen captures visually inspected. Both were hybrid-policy, JIT-capable
+  runs; strict-static and no-JIT execution have not been established.
 - Later levels, full playthrough and original music fidelity remain unverified.
 
 ## Active task state
@@ -41,8 +42,8 @@ Do not repeat R00/R01 unnecessarily.
 |---|---|---|
 | R00 | Complete | Pinned source built suyu/suyu-cmd; command-line host smoke exited 0; exporter RPC worked (E010) |
 | R01 | Complete for fixed exported modules | Four-module Hybrid ABI 6 source/manifest exported successfully; late-loaded/generated code remains unverified |
-| R02 | In progress | rtld/sdk/subsdk0 DLLs compiled; main building; execution proof pending |
-| R03 | Pending R02 | User-led hybrid correctness checks and categorized fallback evidence |
+| R02 | Complete | Four DLLs/hash evidence; matching host handshakes; advancing AOT counts; rendered title (E013) |
+| R03 | Ready; gameplay pending | Boot/title evidence only; PLAYTEST.md tracks user-led checks and categorized gaps |
 | R04 | Pending R03 | Iterative coverage/translation fixes with focused tests |
 | R05 | Pending validated routes | Strict-static zero-fallback tests, then separate no-JIT verification |
 | R06 | Pending R03 evidence | Profile and improve generated code/AOT runtime; preserve correctness |
@@ -59,19 +60,20 @@ A/B and logging/cache tuning are no longer next actions.
 2. Recomp roadmap, README, instructions and E005/E006 are committed in 5c6156a.
    Preserve subsequent changes and check current ahead/behind state afresh.
 3. Inspect existing generated export and build artifacts at the identities in
-   RUNBOOK. Resume R02; source remains unchanged at its pinned revision.
+   RUNBOOK. Continue R03; source remains unchanged at its pinned revision.
    The sequential runner records its PID and module completion/hash evidence in
    build/recomp/zarvot/build-status.json. Check that process and compiler activity
    before restarting; reports/r02-module-set-build.log holds raw progress.
-   If it completed after this handoff, verify all four DLLs and proceed to the
-   matching-host boot/execution check. If it failed, inspect the actual error
-   and resume incrementally after fixing it. Never infer failure from duration.
-4. Continue R02 without waiting for manual JIT performance tests. Inspect
+   The runner completed successfully. Preserve these outputs; incremental builds
+   are needed only after an affected source/export change.
+4. Continue recomp correctness/coverage work without fresh JIT performance tests. Inspect
    current project sessions before launching or stopping anything.
-5. The user handles gameplay. The separate recomp smoke host was stopped after
-   an unverified boot; no controller inputs were sent. No suyu process remained
-   in the final desktop process check. Recheck actual state before launching.
-   Preserve the original player profile/saves; do not automate play.
+5. The user handles gameplay. E013 uses unique build/zarvot-runs profiles, never
+   the original player profile/saves. Inspect actual process state before
+   launching; do not automate play. The launcher refuses a concurrent session.
+   User selected gameplay testing later. Both smoke hosts closed gracefully;
+   final check found no emulator running. A final StageOnly directory is local
+   preparation, not another execution result. Recheck actual state next time.
 6. Append evidence and update the relevant R row after each meaningful result.
 
 ## Identities and preserved local evidence
@@ -98,9 +100,8 @@ valuable even without an FPS gain, but does not itself prove speed or fidelity.
 Do not stop recomp work because JIT is fast enough. Keep graphics/audio support
 and original gameplay/music behavior. Fix source in the appropriate recomp
 components; current upstream features must be inspected before reimplementation.
-R00/R01 are complete; keep building toward the eventual optimized Zarvot recomp.
-The first module-loading smoke test stalled before AOT execution. Current source
-requires a firmware preflight dialog in this empty firmware profile; that is the
-leading explanation, not a visually verified diagnosis. Computer-use inspection
-timed out awaiting app approval. The test host was stopped; next work can compile
-remaining modules independently. No gameplay/coverage claim follows.
+R00-R02 are complete; keep building toward the eventual optimized Zarvot recomp.
+E010's GUI boot was unverified, but E013 proved execution through the ordinary
+CLI and rendered the title screen without a firmware preflight dialog. Gameplay
+coverage, audio fidelity and speed are separate remaining goals. No fallback on
+boot/title does not establish complete coverage or absence of JIT in the build.

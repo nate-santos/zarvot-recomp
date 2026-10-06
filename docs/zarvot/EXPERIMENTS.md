@@ -335,6 +335,57 @@ statements remain historical and do not override the current STATUS queue.
   host in a separate profile and retain increasing AOT counts plus fallback
   evidence. CLI requires the full module set because of the E011 mapping finding.
 
+## E013 — Complete module set and prove compiled boot/title execution (2026-10-05)
+
+- Tasks: R02 complete; R03 boot/title evidence prepared, gameplay pending.
+- The long main build finished successfully after 210.9 minutes (12,656.15
+  seconds including configure/artifact recording). Main DLL is 1,509,548,544
+  bytes, SHA-256 15d3bb4d96a40bd93a89f6e91381ee3728dac59a40b39ba953fd3b1f8509ce16.
+  Build-status records all four modules complete. Current manifest and every
+  DLL size/hash matched that record; no rebuild needed. Source remains clean at
+  pinned 5949cab3ba93233ddd1c319bfc6f010f6cfa910a; matching CLI hash unchanged.
+- Added start-zarvot-recomp.ps1: verifies the complete set, stages copies beside
+  the CLI in a unique local run directory and uses fresh portable config/saves.
+  Supplied keys copied locally only; original player profile untouched. Clears
+  inherited recomp/CLI diagnostic overrides for the child, then restores them.
+  Rejects concurrent sessions. No export README, so installed keys/NAND paths
+  are not selected by the export-package hook. Sends no controller input.
+- First Hybrid-policy run loaded all four modules: ABI 6, guard-v2 ready,
+  fastmem and FPX1 negotiated. Fresh default config initially selected docked;
+  launcher corrected to use explicit native default flags for handheld. First
+  snapshot pair: 3,589,809,639 -> 4,861,081,955 AOT blocks, zero transitions.
+  Recorder later observed 7,680,340,123 -> 7,951,582,393, zero transitions.
+  Captures progressed through intro/black transition to the visible title.
+- Handheld repeat confirmed native config values: handheld, Vulkan, 1x/HIGH,
+  100% speed, TAS disabled, local NAND/save paths. All four images/handshakes
+  passed again. A 30-second recorder run observed 7,312,156,998 -> 8,419,406,636
+  AOT blocks with zero lookup/opcode transitions and zero unresolved import
+  traps in the reports. Title-screen captures retained; no gameplay input sent.
+- Added measure-zarvot-coverage.ps1: preserves timestamped raw reports and JSON,
+  verifies executable/PID/start time, retains absent/partial telemetry as unknown
+  and reports counter advancement separately from correctness/performance.
+  Live validation caught PowerShell's automatic JSON date parsing; normalized
+  timestamps before comparison. Both live recordings then passed. Syntax,
+  staging/configuration and concurrent-session rejection checks passed.
+- Nonfatal recomp relocation diagnostics: eight unresolved rtld GOT/PLT symbols
+  (__EX/__got boundaries and TLS alignment symbols), despite zero runtime import
+  traps. Keep them in R03 diagnosis; no core fix or benignness claim follows.
+- Uncontrolled title interval readings were roughly 20-27 FPS after startup.
+  No matched-route benchmark, frame trace or speedup claim. Generated-code
+  size/build cost and compiled execution efficiency remain R06 work; general
+  emulator tuning is not introduced.
+- These were JIT-capable Hybrid-policy runs (SUYU_NO_JIT=OFF, strict requested
+  false). Zero observed fallbacks supports boot/title coverage only. Strict,
+  no-JIT, gameplay, input/save correctness and audio fidelity remain unverified.
+- Local evidence: build/recomp/zarvot/build-status.json; reports/r02-module-set-build.log;
+  build/zarvot-runs/20261006-012917-5168873f and 20261006-013402-d8d4938a,
+  each with launch/config/logs/captures/coverage/observations and shutdown record.
+  Both owned smoke processes closed gracefully. No emulator remains running.
+- User chose to prepare gameplay checks for later. PLAYTEST.md records the open
+  R03 route; completed builds/proof retained. Next: user-led Story checks with
+  the recorder, then categorize/fix actual coverage or correctness gaps. No
+  fresh export/main rebuild unless an affected source change requires it.
+
 ## Template for the next experiment
 
 - ID / R task / date:

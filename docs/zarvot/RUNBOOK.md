@@ -340,3 +340,48 @@ prove ongoing compiled execution. File updates are tied to compiled dispatch
 counts, so a missing or unchanged file alone does not diagnose a stopped host.
 Check process/log/state too. Positive counts alone do not establish gameplay
 correctness, strict-static/no-JIT execution or a speedup.
+
+## Verified compiled boot and manual gameplay preparation (E013)
+
+The main build completed in 210.9 minutes; all four module hashes matched the
+build record. Main DLL SHA-256:
+`15d3bb4d96a40bd93a89f6e91381ee3728dac59a40b39ba953fd3b1f8509ce16`.
+No new export or main compilation is needed to resume R03.
+
+From the workspace root, with no other emulator session running:
+
+```powershell
+$run = .\source\scripts\start-zarvot-recomp.ps1 -Capture
+.\source\scripts\measure-zarvot-coverage.ps1 -RunRoot $run.RunRoot -Seconds 60
+```
+
+The launcher verifies the completed four-module set and manifest, copies host
+and DLLs into a unique source/build/zarvot-runs directory, and starts the ordinary
+CLI. Every run has its own portable keys/config/NAND/saves/logs. Local keys stay
+ignored; this directory is not a release package. Use -StageOnly to prepare
+without launching. Existing player/test sessions are preserved, not stopped.
+
+Config preserves handheld Vulkan 1x/HIGH, 100% speed and disabled TAS. Native
+INI keys need explicit default=false when selecting a nondefault value; the
+data-storage section is Data%20Storage. Do not reuse Qt config with absolute
+paths into a different profile. CLI image load order requires all four DLLs.
+
+The recorder verifies PID/executable/start time and saves raw coverage snapshots
+plus observation.json under the run's observations directory. It handles JSON
+timestamps parsed as DateTime by current PowerShell. Incomplete reports keep
+unknown fields; never reinterpret missing counts as zero fallback. The recorder
+sends no input, stops no process and makes no FPS/gameplay verdict.
+Review CompiledCountAdvanced and Error in its result; command completion alone
+is not a passed execution check. Preserve an incomplete observation for diagnosis.
+
+E013 verified advancing AOT counts, ABI 6/guard/fastmem/FPX1 negotiation and the
+visible title. The handheld repeat advanced 7,312,156,998 -> 8,419,406,636 blocks
+with zero observed fallback transitions. The host remains JIT-capable; these
+were Hybrid-policy runs. -Strict sets the requested policy only, not a no-JIT
+build. Do not mark R05 complete from this evidence.
+
+The user chose gameplay testing later; both smoke hosts closed gracefully.
+Follow PLAYTEST.md for the opening Story route. For save/relaunch checks reuse
+the same staged executable/config/profile. Launch metadata records local ROM
+and host paths; normal fresh launcher calls deliberately create a new profile.
+Inspect process ownership before closing a test; preserve user-owned sessions.
