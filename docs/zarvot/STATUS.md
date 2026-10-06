@@ -1,6 +1,6 @@
 # Zarvot recomp handoff
 
-Updated: 2026-10-05. R00/R01/R02 complete (E013). R03 is next.
+Updated: 2026-10-05. R00/R01/R02 complete (E013). R03 playtest started (E014).
 
 ## Objective and next action
 
@@ -8,8 +8,12 @@ Work only on the recomp: build, coverage, correctness and execution improvements
 Reuse the compatibility stack. Do not resume general emulator performance,
 settings or GPU tuning. JIT is a reference and temporary hybrid fallback.
 
-**Next: R03 — user-led recomp gameplay checks and coverage/correctness
-diagnosis.** All four DLLs built, matched their recorded hashes, loaded with
+**Active: R03 — user-led recomp gameplay checks and coverage/correctness
+diagnosis.** E014 opened a visible isolated Hybrid session at the user's request,
+with a ten-minute coverage recorder and continuing runtime captures. Check the
+active run pointer in workspace reports/r03-active-run.json and actual processes
+before launching another session. Gameplay/audio results remain pending.
+All four DLLs built, matched their recorded hashes, loaded with
 ABI 6/guard/fastmem/FPX1 negotiation, and executed compiled game code. The title
 screen rendered; boot/title observations showed advancing AOT counts and zero
 fallback transitions. Follow PLAYTEST.md; gameplay and audio remain untested.
@@ -43,7 +47,7 @@ the 3.5-hour main build or export unless a source/export change requires it.
 | R00 | Complete | Pinned source built suyu/suyu-cmd; command-line host smoke exited 0; exporter RPC worked (E010) |
 | R01 | Complete for fixed exported modules | Four-module Hybrid ABI 6 source/manifest exported successfully; late-loaded/generated code remains unverified |
 | R02 | Complete | Four DLLs/hash evidence; matching host handshakes; advancing AOT counts; rendered title (E013) |
-| R03 | Ready; gameplay pending | Boot/title evidence only; PLAYTEST.md tracks user-led checks and categorized gaps |
+| R03 | Playtest started; feedback pending | E014 recording active; PLAYTEST.md tracks user-led checks and categorized gaps |
 | R04 | Pending R03 | Iterative coverage/translation fixes with focused tests |
 | R05 | Pending validated routes | Strict-static zero-fallback tests, then separate no-JIT verification |
 | R06 | Pending R03 evidence | Profile and improve generated code/AOT runtime; preserve correctness |
@@ -71,9 +75,10 @@ A/B and logging/cache tuning are no longer next actions.
 5. The user handles gameplay. E013 uses unique build/zarvot-runs profiles, never
    the original player profile/saves. Inspect actual process state before
    launching; do not automate play. The launcher refuses a concurrent session.
-   User selected gameplay testing later. Both smoke hosts closed gracefully;
-   final check found no emulator running. A final StageOnly directory is local
-   preparation, not another execution result. Recheck actual state next time.
+   Both E013 smoke hosts closed gracefully. The user subsequently requested
+   playtesting; E014 starts a separate visible session and recorder. Check the
+   active pointer and PID/path/start time; preserve that session and test saves.
+   Collect the user's observations before marking any gameplay/audio check passed.
 6. Append evidence and update the relevant R row after each meaningful result.
 
 ## Identities and preserved local evidence

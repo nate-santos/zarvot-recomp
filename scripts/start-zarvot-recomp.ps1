@@ -5,6 +5,7 @@ param(
     [string]$Rom,
     [switch]$Strict,
     [switch]$Capture,
+    [switch]$Visible,
     [switch]$StageOnly
 )
 
@@ -103,6 +104,7 @@ $launch = [ordered]@{
     image_features = $build.image_features
     modules = $build.modules
     strict_requested = [bool]$Strict
+    visible_requested = [bool]$Visible
     jit_unavailable_proven = $false
     controller_input_sent = $false
     state = 'staged'
@@ -124,9 +126,10 @@ if (-not $StageOnly) {
             $env:SUYU_CMD_CAPTURE_FIRST_SEC = '10'
             $env:SUYU_CMD_CAPTURE_INTERVAL_SEC = '30'
         }
+        $windowStyle = if ($Visible) { 'Normal' } else { 'Hidden' }
         $process = Start-Process -FilePath (Join-Path $runRoot 'suyu-cmd.exe') `
             -ArgumentList "-g `"$Rom`" -c `"$configPath`"" -WorkingDirectory $runRoot `
-            -WindowStyle Hidden -PassThru
+            -WindowStyle $windowStyle -PassThru
         $launch.pid = $process.Id
         $launch.process_started_utc = $process.StartTime.ToUniversalTime().ToString('o')
         $launch.state = 'started'

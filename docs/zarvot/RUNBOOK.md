@@ -351,7 +351,7 @@ No new export or main compilation is needed to resume R03.
 From the workspace root, with no other emulator session running:
 
 ```powershell
-$run = .\source\scripts\start-zarvot-recomp.ps1 -Capture
+$run = .\source\scripts\start-zarvot-recomp.ps1 -Capture -Visible
 .\source\scripts\measure-zarvot-coverage.ps1 -RunRoot $run.RunRoot -Seconds 60
 ```
 
@@ -360,6 +360,8 @@ and DLLs into a unique source/build/zarvot-runs directory, and starts the ordina
 CLI. Every run has its own portable keys/config/NAND/saves/logs. Local keys stay
 ignored; this directory is not a release package. Use -StageOnly to prepare
 without launching. Existing player/test sessions are preserved, not stopped.
+Use -Visible for an interactive user playtest; background smoke launches remain
+hidden by default. Launch metadata records whether visibility was requested.
 
 Config preserves handheld Vulkan 1x/HIGH, 100% speed and disabled TAS. Native
 INI keys need explicit default=false when selecting a nondefault value; the
@@ -380,7 +382,10 @@ with zero observed fallback transitions. The host remains JIT-capable; these
 were Hybrid-policy runs. -Strict sets the requested policy only, not a no-JIT
 build. Do not mark R05 complete from this evidence.
 
-The user chose gameplay testing later; both smoke hosts closed gracefully.
+Both E013 smoke hosts closed gracefully. E014 starts the requested user playtest;
+check reports/r03-active-run.json (workspace root) and the actual process before
+starting another session. The bounded recorder runs for ten minutes; runtime
+coverage and captures continue while the game remains open.
 Follow PLAYTEST.md for the opening Story route. For save/relaunch checks reuse
 the same staged executable/config/profile. Launch metadata records local ROM
 and host paths; normal fresh launcher calls deliberately create a new profile.

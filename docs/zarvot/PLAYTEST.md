@@ -15,8 +15,11 @@ remain separate. A visible title and zero fallbacks establish only that route.
 | P06: music / effects | Untested in recomp | Audible/stable audio, pitch/loops/transitions; original-hardware fidelity remains separate |
 | P07: later levels / modes / full game | Untested | Name each route and its evidence; track separately under R08 |
 
-Launch a fresh isolated Hybrid run using scripts/start-zarvot-recomp.ps1; use
-scripts/measure-zarvot-coverage.ps1 against its returned run directory while the
+E014 opens the user playtest with recording; behavioral results are pending.
+Inspect the active run and process before launching another session.
+
+Launch a fresh isolated Hybrid run using scripts/start-zarvot-recomp.ps1 -Visible;
+use scripts/measure-zarvot-coverage.ps1 against its returned run directory while the
 user plays. The CLI title displays the active backend and fallback transitions;
 F12 opens its existing controls panel. The recorder sends no input and makes no
 gameplay or performance verdict.

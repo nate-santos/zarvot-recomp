@@ -386,6 +386,33 @@ statements remain historical and do not override the current STATUS queue.
   the recorder, then categorize/fix actual coverage or correctness gaps. No
   fresh export/main rebuild unless an affected source change requires it.
 
+## E014 — Start user-led recomp gameplay recording (2026-10-05)
+
+- Task: R03. The user requested playtesting, then continued the project. Actual
+  process inspection found no emulator running; Git was clean and synchronized.
+  All four completed DLL identities and the ABI 6 export manifest verified again.
+  Reused the existing builds; no export, compilation or emulator tuning performed.
+- Added an explicit -Visible launcher option for interactive playtests, with
+  visibility recorded in launch metadata. Default background launches stay hidden.
+  PowerShell syntax check passed and the visible launch succeeded.
+- Started an isolated Hybrid session with fresh saves/config, original timing
+  and the E013 handheld 1x/HIGH settings. All four module load messages and
+  guard-v2/ABI 6/fastmem/FPX1 handshakes observed. Original player saves preserved.
+- Started a separate hidden ten-minute coverage recorder, with its PID/start
+  time recorded locally. The first 24 complete reports advanced from
+  503,045,903 to 3,352,528,309 AOT blocks with zero lookup/opcode transitions and
+  no recorder error. This is an interim boot observation, not a gameplay verdict.
+  Initial capture visually inspected: rendered Zarvot intro. No input sent.
+- Local evidence: build/zarvot-runs/20261006-021312-09bc211a, including launch,
+  recorder metadata, captures, logs and observations/20261006-021332-9e8f960e.
+  Workspace reports/r03-active-run.json points to this session. Check actual
+  process/PID/path/start time on resume; preserve the active playtest and saves.
+  Runtime coverage/captures continue after the bounded recorder finishes.
+- Gameplay, input/save/audio correctness, strict-static, no-JIT and comparative
+  performance remain unverified. PLAYTEST P01-P07 are still open. Next: collect
+  the user's named Story route and observations, inspect its coverage/failures,
+  then fix concrete recomp gaps. Leave the session open for the user.
+
 ## Template for the next experiment
 
 - ID / R task / date:
