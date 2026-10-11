@@ -629,6 +629,43 @@ statements remain historical and do not override the current STATUS queue.
   change with semantic checks. Avoid a repeat main compile just for symbols;
   preserve code guards, original timing/music and the completed module set.
 
+## E019 — Map compiled combat samples to generated blocks and helpers (2026-10-11)
+
+- Task: R06. Reused E017's closed combat trace and completed baseline images;
+  no export, game launch, input or rebuild. Added zarvot_native_map.py and six
+  synthetic tests. The isolated helper calls only ABI/base/index metadata exports,
+  never a generated block. Raw addresses and generated mappings remain local.
+- Before loading the image, verify canonical completed build, manifest and DLL
+  hash/size, recorded isolated run root, CPU analyzer process identity and full
+  module path. Check PE size and every selected sample's loaded-image interval,
+  instruction pointer and RVA. Recover guest-word spans from existing index
+  pointers; assign native block extents only at exact x64 unwind starts.
+- Runtime/dispatch labels come from existing COFF object bytes, matching every
+  nonrelocated byte and retaining aliases/ambiguous candidates. Six tests passed
+  PE/COFF boundaries, relocation masks, aliases/null index gaps, build/process
+  identity rejection and sample IP/RVA/load-interval rejection.
+- Main combat: 102,371 samples; 77,755 in 15,396 indexed block functions
+  (75.95% of main; 49.38% of all combat samples), 19,789 in 22 matched object
+  helpers (19.33% of main; 12.57% of all), 2,256 in run-slice (2.20% of main),
+  and 2,571 unassigned (2.51% of main). Lookup accounts for 7,269 main samples,
+  load64 for 4,777 and load32 for 2,879. These compiled helpers are separate from
+  E018's host callbacks; inlined costs remain inside their containing functions.
+- Top five block buckets have 3,471 / 2,875 / 2,098 / 2,029 / 1,943 samples.
+  Their native extents are 602,112 / 957,092 / 759,360 / 106,544 / 28,576 bytes.
+  Local source inspection finds many FP32 add/sub/multiply operations; the top
+  block contains 122 FPX operation sites. Its native prologue reserves 66,024
+  bytes of stack. These observations motivate a footprint experiment; they do
+  not prove exact helper duration, executing guest instruction or the FPS limit.
+- Local evidence: E017 cpu-profiles/20261011-030437-c0fcc6ec/
+  generated-mapping/main-combat-v3, plus host-attribution prototypes. Generated
+  samples, addresses, objects and binaries stay ignored. Baseline preserved.
+- Decision/next: test sharing unchanged FP32 exact fallback bodies in runtime.c,
+  retaining the native FPX gate at each lane and original flags/rounding/alias
+  behavior. Compare actual emitter output to the immutable baseline with full
+  state checks, negative controls and repeated quiet synthetic timings. If kept,
+  publish the source fork and export/build a separate candidate, then repeat the
+  same user-led combat route. R03 behavioral checks remain open independently.
+
 ## Template for the next experiment
 
 - ID / R task / date:

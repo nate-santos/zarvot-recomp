@@ -2,16 +2,18 @@
 # Generated units are memory-bound; let their CMake compile pool limit jobs.
 [CmdletBinding()]
 param(
+    # Separate candidate trees preserve the completed baseline modules.
+    [ValidatePattern('^[a-z0-9][a-z0-9-]{0,63}$')][string]$Target = 'zarvot',
     [string]$Package = 'out\Zarvot - Hybrid AOT + JIT',
     [ValidateRange(1, 64)][int]$ParallelJobs = 2
 )
 
 $ErrorActionPreference = 'Stop'
 $root = Split-Path -Parent $PSScriptRoot
-$exportRoot = [IO.Path]::GetFullPath((Join-Path $root "generated\zarvot\$Package\aot_cache"))
-$allowedRoot = [IO.Path]::GetFullPath((Join-Path $root 'generated\zarvot')) + [IO.Path]::DirectorySeparatorChar
+$exportRoot = [IO.Path]::GetFullPath((Join-Path $root "generated\$Target\$Package\aot_cache"))
+$allowedRoot = [IO.Path]::GetFullPath((Join-Path $root "generated\$Target")) + [IO.Path]::DirectorySeparatorChar
 if (-not $exportRoot.StartsWith($allowedRoot, [StringComparison]::OrdinalIgnoreCase)) {
-    throw 'Package resolved outside generated/zarvot'
+    throw 'Package resolved outside the selected generated target'
 }
 $manifestPath = Join-Path $exportRoot 'aot_manifest.json'
 $manifest = Get-Content -LiteralPath $manifestPath -Raw | ConvertFrom-Json
@@ -27,7 +29,7 @@ foreach ($module in $modules) {
     }
 }
 
-$buildRoot = Join-Path $root 'build\recomp\zarvot'
+$buildRoot = Join-Path $root "build\recomp\$Target"
 [IO.Directory]::CreateDirectory($buildRoot) | Out-Null
 $statusPath = Join-Path $buildRoot 'build-status.json'
 $manifestHash = (Get-FileHash -LiteralPath $manifestPath -Algorithm SHA256).Hash.ToLowerInvariant()
@@ -38,6 +40,7 @@ try {
     $status = [ordered]@{
         started_utc = [DateTime]::UtcNow.ToString('o')
         runner_pid = $PID
+        target = $Target
         state = 'building'
         export_manifest_sha256 = $manifestHash
         image_abi = $manifest.image_abi
@@ -61,7 +64,7 @@ try {
             if ((Get-FileHash -LiteralPath $manifestPath -Algorithm SHA256).Hash.ToLowerInvariant() -ne $manifestHash) {
                 throw 'Export manifest changed during the build; review and restart with a consistent export'
             }
-            & "$PSScriptRoot/build-recomp.ps1" -Root $root -Target zarvot -Package $Package `
+            & "$PSScriptRoot/build-recomp.ps1" -Root $root -Target $Target -Package $Package `
                 -Module $entry.name -ParallelJobs $ParallelJobs
             $imageName = if ($entry.name -eq 'main') { 'recompiled_image.dll' } else { "recompiled_$($entry.name).dll" }
             $image = Join-Path $buildRoot "$($entry.name)\$imageName"

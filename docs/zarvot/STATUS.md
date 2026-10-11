@@ -1,6 +1,6 @@
 # Zarvot recomp handoff
 
-Updated: 2026-10-10. R00/R01/R02 complete. First Story combat profiled (E017/E018).
+Updated: 2026-10-11. R00/R01/R02 complete. Combat generated-code mapping validated (E019).
 
 ## Objective and next action
 
@@ -8,8 +8,20 @@ Work only on the recomp: build, coverage, correctness and execution improvements
 Reuse the compatibility stack. Do not resume general emulator performance,
 settings or GPU tuning. JIT is a reference and temporary hybrid fallback.
 
-**First ready task: R06 — map hot native addresses in the main generated image
-to generated blocks/helpers, then select a measured recomp change.** E017 used
+**First ready task: R06 — validate the FP32 fallback outlining candidate, then
+build it separately and compare the same user-led combat route.** E019 recovered
+the existing main image's block index without rebuilding or executing game blocks.
+Of 102,371 main combat samples, 77,755 map to indexed block function extents,
+19,789 to byte-matched runtime/dispatch object functions, 2,256 to the run-slice
+export and 2,571 remain unassigned. Several hot blocks expand to 0.6-0.96 MB
+native extents and contain many repeated FP32 add/sub/multiply exact bodies.
+The candidate keeps each lane's native FPX gate inline and shares only the
+unchanged exact fallback arithmetic. Source and focused tests are being worked
+on in the submodule; no candidate game build or gameplay speedup is established.
+Finish semantic/negative-control checks and quiet repeated synthetic timings
+before publication and a separate export/build. Preserve the E013/E017 baseline.
+
+E017 used
 an isolated clone of E016 for the requested first Story action sequence. The
 user played it and reported many slowdowns/bad frame rates. All
 232 complete UI/file samples showed zero transitions/import traps, with advancing
@@ -21,9 +33,8 @@ identity, a 1 ms sample interval and zero reported lost events. During the
 capture-bounded combat window, 71.64% of CPU samples were in compiled DLLs,
 including 65.01% in main; 13.17% were in the host and 10.98% remain unmapped.
 Host recomp callbacks are small leaf buckets; no dominant host helper emerged.
-Most main samples lie outside its named run-slice export. Use the existing
-segment tables/object symbols or a verified symbol map to recover their generated
-locations without repeating compilation. Native RVAs are not guest PCs.
+E019 mapped most main samples through the verified index, unwind ranges and
+runtime/dispatch object bytes. Native RVAs and block labels are not guest PCs.
 These proportions locate CPU work, not the cause of low FPS or exact call time;
 title/combat are different scenes. Diagnostic overhead and inlined helpers remain.
 R03 input/audio/save correctness and exact hit timestamps remain unverified.
@@ -82,6 +93,11 @@ the 3.5-hour main build or export unless a source/export change requires it.
   SDK 10,049. Verified host map/PDB/unwind ranges place ArmRecomp::RunThread at
   1.44% of all combat samples; direct exclusive callbacks combined at 0.22%.
   No helper-cause or speedup claim. Analyzer identity/UTC/address tests passed.
+- E019: recovered 15,396 sampled block function mappings from the existing
+  hash-verified main DLL. Main samples: 75.95% block extents, 19.33% matched
+  object helpers, 2.20% run-slice export, 2.51% unassigned. Six mapping tests
+  passed; full sample IP/RVA/load-interval and process/build identities checked.
+  Out-of-line compiled lookup/load helpers are distinct from host callbacks.
 
 ## Active task state
 
@@ -93,7 +109,7 @@ the 3.5-hour main build or export unless a source/export change requires it.
 | R03 | In progress; first Story combat recorded | E017 slowdowns reproduced with zero observed fallbacks; input/audio/save checks pending |
 | R04 | Pending R03 | Iterative coverage/translation fixes with focused tests |
 | R05 | Pending validated routes | Strict-static zero-fallback tests, then separate no-JIT verification |
-| R06 | Combat module/host attribution validated | E018: map hot main generated locations, then choose/test one recomp change |
+| R06 | Hot generated blocks mapped; candidate under validation | E019: FP32 fallback outlining semantics/timings, then isolated candidate build and matched combat |
 | R07 | Pending R05 | Reproducible recomp package and endurance checks |
 | R08 | Pending R05 routes | Expand later-level/mode coverage; track full playthrough separately |
 
@@ -135,9 +151,11 @@ A/B and logging/cache tuning are no longer next actions.
    E018 native exports are under that profile's analysis directory: full
    20261011-031452-6d9ad68b, combat 20261011-031644-3bb647f2, title
    20261011-031647-dcec9403. Host/export range attribution and local prototypes
-   are in host-attribution. Use capture-bounded combat 03:06:40-03:08:10 UTC,
-   not an assumed hit timestamp. Next recover the hot main generated locations;
-   do not tune general emulator settings or assume a dispatch/helper bottleneck.
+   are in host-attribution. E019's verified main mapping is under
+   generated-mapping/main-combat-v3. Use capture-bounded combat
+   03:06:40-03:08:10 UTC, not an assumed hit timestamp. Validate the FP32
+   outlining candidate before a separate export/build; do not tune general
+   emulator settings or assume that a synthetic gain is a gameplay gain.
    Collect the user's observations before marking any gameplay/audio check passed.
 6. Append evidence and update the relevant R row after each meaningful result.
 

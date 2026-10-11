@@ -578,7 +578,38 @@ Exact run-slice export extents account for 2,256 main and 682 SDK samples; most
 main samples still need generated-function/helper attribution. No blanket helper,
 guard, timing or graphics change follows from these proportions.
 
-Next recover a verified native-to-generated mapping from existing segment tables,
-object symbols or a symbol map. Preserve completed DLLs and avoid recompiling
-all main units merely to obtain symbols. Select one measured generated-code or
-recomp-runtime change, test its semantics and then repeat the same user-led route.
+E019 recovered the mapping without compilation. From the source checkout,
+using a 64-bit Python runtime:
+
+```powershell
+python scripts/zarvot_native_map.py --launch "$run/launch.json" --module main `
+  --samples "$cpu/analysis/20261011-031644-3bb647f2/samples.csv" `
+  --object build/recomp/zarvot/main/CMakeFiles/recompiled_image.dir/recomp_runtime.c.obj `
+  --object build/recomp/zarvot/main/CMakeFiles/recompiled_image.dir/src/recompiled_main.c.obj `
+  --output "$cpu/generated-mapping/main-combat-new"
+python tests/test_zarvot_native_mapping.py
+```
+
+Here $run is the closed E017 run directory and $cpu its successful CPU profile
+directory. Output must be a new ignored build/local/generated directory. The
+tool verifies the canonical baseline build, image/manifest hash, exact process
+and full sample module path, plus loaded-image size and every selected IP/RVA/
+time interval before calling metadata-only image exports. Unwind starts and
+index pointers bound block labels; object relocation masks preserve aliases.
+Guest spans identify possible side entries, not the executing guest instruction.
+
+E019 assigns 97.49% of main samples to block extents, object helpers or the
+run-slice export. Six synthetic tests passed. The next candidate shares exact
+FP32 add/sub/multiply fallback bodies while retaining inline native FPX checks.
+Validate semantics and repeat quiet synthetic timings first; game speed remains
+unmeasured. Keep a separate target for the eventual candidate export/build:
+
+```powershell
+.\scripts\build-zarvot.ps1 -Target zarvot-fp32-outline -ParallelJobs 2
+```
+
+That runner expects an already completed four-module export under
+generated/zarvot-fp32-outline and writes its own build/recomp target and status.
+The default target remains zarvot. Preserve the completed baseline DLLs/profiles;
+do not repeat their main compilation just for symbols. A healthy candidate
+build may take a long time and has no overall timeout.
