@@ -721,10 +721,13 @@ statements remain historical and do not override the current STATUS queue.
   Manifest hash remains `29f3a9cb0aeec129475a94835cf165dfc48578b7a3e8a372e37d6dfac99cdb47`;
   it identifies inventory/ABI, not generated C or DLL bytes.
 - Separate sequential module build started at 13:47:17 UTC with two-job cap and
-  generated one-compile memory pool. rtld and SDK completed; subsdk0/main
-  completion remains pending. SDK DLL is 103,827,456 bytes with SHA-256
+  generated one-compile memory pool. rtld, SDK and subsdk0 completed; main
+  started at 13:54:39 UTC and completion remains pending. SDK DLL is
+  103,827,456 bytes with SHA-256
   `4d040bbff46f5ae231871296fce31e0e41d8e9d2c09d04ba0d39911585a0fa54`;
   its fresh build took 285.8 seconds, not comparable to an incremental resume.
+  subsdk0 took 150.8 seconds; its 67,309,568-byte DLL SHA-256 is
+  `0b0e23e704fa3ad7734bb43e4f5b7d9e72b05d0ca081d1bcee0ab28476a8a527`.
   Main emitted C shrank 3,230,233,647 -> 2,455,910,697 bytes (24.0%) across the
   same 112 units. SDK C shrank 2.6%; subsdk0 0.3%; rtld unchanged. These measure
   generated source footprint, not execution time. No arbitrary overall timeout.

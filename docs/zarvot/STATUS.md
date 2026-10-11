@@ -112,7 +112,8 @@ the 3.5-hour main build or export unless a source/export change requires it.
   and deliberate mismatch detection; 122-op native extent fell 97.65%, explicit
   stack allocation 65,176 -> 48 bytes. Separate candidate export has the same
   game/module/coverage manifest as baseline; runtime definitions contain all
-  three outlined helpers. rtld/SDK built; subsdk0/main are compiling in order.
+  three outlined helpers. rtld/SDK/subsdk0 built; main started at 13:54:39 UTC
+  and remains building. Check actual compiler activity and the live status file.
   Main generated C shrank 24.0% (3,230,233,647 -> 2,455,910,697 bytes) with the
   same 112 source units and coverage inventory; game FPS remains unmeasured.
   Separate-build launcher/profile reuse passed 27 synthetic isolation/rejection
