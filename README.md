@@ -27,9 +27,11 @@ independently. All 146 samples showed zero transitions; compiled-PC sampling
 worked. Story room/dialogue rendered, but the user confirmed no combat in this
 run. Repeat combat before attributing its cost; no fallback gap is corroborated.
 E017 repeated the first Story action sequence: the user reported severe slowdowns,
-while all 232 coverage samples showed zero transitions. A native CPU trace saved
-successfully; cost attribution and behavioral correctness checks remain pending.
-Execution counts alone do not measure cost.
+while all 232 coverage samples showed zero transitions. E018 native sampling
+places 71.64% of combat CPU samples in compiled modules, including 65.01% in main.
+Next map its hot generated locations; no dominant host helper emerged. These
+samples locate CPU work without establishing the slowdown's cause or a speedup.
+Behavioral correctness checks remain pending.
 The main MSVC build took 210.9 minutes and produced a roughly 1.5 GB DLL.
 Build cost and generated-code efficiency remain recomp work. See E013 for
 execution evidence and the [gameplay checklist](docs/zarvot/PLAYTEST.md).

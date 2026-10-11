@@ -1,6 +1,6 @@
 # Zarvot recomp handoff
 
-Updated: 2026-10-10. R00/R01/R02 complete. E017 first Story combat recorded.
+Updated: 2026-10-10. R00/R01/R02 complete. First Story combat profiled (E017/E018).
 
 ## Objective and next action
 
@@ -8,28 +8,30 @@ Work only on the recomp: build, coverage, correctness and execution improvements
 Reuse the compatibility stack. Do not resume general emulator performance,
 settings or GPU tuning. JIT is a reference and temporary hybrid fallback.
 
-**Active: R03 — user-led recomp gameplay checks and coverage/correctness
-diagnosis.** E016 finished normally on process exit: all 146 UI/file samples
-showed zero fallback transitions, with advancing AOT counts and no disagreements
-or regressions. The user noticed no transitions and clarified that this run
-contained no combat; captures show a Story room/dialogue. Their earlier possible
-count of six is now uncertain, with no corroborated fallback or gap PC.
-The recorder now preserves exact captions and coverage independently until exit;
-compiled-PC sampling produced module-relative locations. Next: record a named
-user-led combat route, obtain native compiled-code/helper duration evidence,
-then fix measured recomp costs or actual gaps and finish behavioral checks.
-E015's pipeline activity is a correlation; compiled CPU cost remains unattributed.
-E016 used a verified clone of the prior test saves/settings/caches and exited.
-E017 used a new isolated clone of E016 for the requested first Story action
-sequence. The user played it and reported many slowdowns/bad frame rates. All
+**First ready task: R06 — map hot native addresses in the main generated image
+to generated blocks/helpers, then select a measured recomp change.** E017 used
+an isolated clone of E016 for the requested first Story action sequence. The
+user played it and reported many slowdowns/bad frame rates. All
 232 complete UI/file samples showed zero transitions/import traps, with advancing
 AOT counts and no disagreements/regressions. In a capture-bounded 90-second
 combat window, 41/45 interval FPS polls were below 10 (median 7; range 5.5-11.5).
 The elevated native CPU trace saved successfully on game exit (1.996 GB). Game
-and recorders are closed; exact-process/time-filtered native attribution is next.
-Input/audio/save correctness and exact hit timestamps remain unverified. Check workspace
+and recorders are closed. E018 converted the trace and verified exact process
+identity, a 1 ms sample interval and zero reported lost events. During the
+capture-bounded combat window, 71.64% of CPU samples were in compiled DLLs,
+including 65.01% in main; 13.17% were in the host and 10.98% remain unmapped.
+Host recomp callbacks are small leaf buckets; no dominant host helper emerged.
+Most main samples lie outside its named run-slice export. Use the existing
+segment tables/object symbols or a verified symbol map to recover their generated
+locations without repeating compilation. Native RVAs are not guest PCs.
+These proportions locate CPU work, not the cause of low FPS or exact call time;
+title/combat are different scenes. Diagnostic overhead and inlined helpers remain.
+R03 input/audio/save correctness and exact hit timestamps remain unverified.
+The older possible UI count of six is uncertain; no fallback gap is corroborated.
+Check workspace
 reports/r03-active-run.json and actual processes before another launch; preserve
-all test profiles and evidence. Do not repeat gameplay before analyzing this trace.
+all test profiles and evidence. Continue from the saved profile before requesting
+another performance playtest. Keep R03 behavioral checks open independently.
 All four DLLs built, matched their recorded hashes, loaded with
 ABI 6/guard/fastmem/FPX1 negotiation, and executed compiled game code. The title
 screen rendered; boot/title observations showed advancing AOT counts and zero
@@ -75,6 +77,11 @@ the 3.5-hour main build or export unless a source/export change requires it.
   CPU attribution or gameplay/audio correctness verdict yet.
   Owned-profiler synthetic tests passed normal save/exit,
   rejected start, foreign process, PID reuse and failed-save cleanup.
+- E018: exact-process full trace and cached title/combat exports validated.
+  Combat contains 157,467 CPU samples, 112,804 in compiled modules; main 102,371,
+  SDK 10,049. Verified host map/PDB/unwind ranges place ArmRecomp::RunThread at
+  1.44% of all combat samples; direct exclusive callbacks combined at 0.22%.
+  No helper-cause or speedup claim. Analyzer identity/UTC/address tests passed.
 
 ## Active task state
 
@@ -86,7 +93,7 @@ the 3.5-hour main build or export unless a source/export change requires it.
 | R03 | In progress; first Story combat recorded | E017 slowdowns reproduced with zero observed fallbacks; input/audio/save checks pending |
 | R04 | Pending R03 | Iterative coverage/translation fixes with focused tests |
 | R05 | Pending validated routes | Strict-static zero-fallback tests, then separate no-JIT verification |
-| R06 | Native CPU trace saved | E017 exact-process/module attribution and combat cost analysis next |
+| R06 | Combat module/host attribution validated | E018: map hot main generated locations, then choose/test one recomp change |
 | R07 | Pending R05 | Reproducible recomp package and endurance checks |
 | R08 | Pending R05 routes | Expand later-level/mode coverage; track full playthrough separately |
 
@@ -125,8 +132,12 @@ A/B and logging/cache tuning are no longer next actions.
    a successful 1,995,440,128-byte cpu.etl save and process_exited end reason.
    The first non-elevated attempt failed without starting a session; retain it
    separately. Local interval/coverage review: analysis/20261011-031128.
-   Analyze the finalized exact-process CPU trace with matching host symbols;
-   use capture-bounded combat 03:06:40-03:08:10 UTC, not an assumed hit timestamp.
+   E018 native exports are under that profile's analysis directory: full
+   20261011-031452-6d9ad68b, combat 20261011-031644-3bb647f2, title
+   20261011-031647-dcec9403. Host/export range attribution and local prototypes
+   are in host-attribution. Use capture-bounded combat 03:06:40-03:08:10 UTC,
+   not an assumed hit timestamp. Next recover the hot main generated locations;
+   do not tune general emulator settings or assume a dispatch/helper bottleneck.
    Collect the user's observations before marking any gameplay/audio check passed.
 6. Append evidence and update the relevant R row after each meaningful result.
 

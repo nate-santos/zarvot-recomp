@@ -515,8 +515,9 @@ _NT_SYMBOL_PATH pointing to build/suyu/bin. This produces cpu.perfView.xml.zip.
 Omit the optional process-name argument and retain exact PID/time filtering for
 analysis: that argument is a name, and /Process:<pid> does not apply to this
 export command. Folded CSV is insufficient for matching the combat timeline.
-Do not read or convert a trace still being recorded. Export/attribution validation
-is pending the first saved E017 trace.
+Do not read or convert a trace still being recorded. E018 validated extraction
+through the bundled TraceEvent library as described below; the generic PerfView
+xml.zip export remains an alternate route, not the measured extraction method.
 
 Diagnostic PC sampling also copies boundary snapshots, locks its histogram and
 publishes coverage. Periodic captures convert/encode PNGs every 30 seconds.
@@ -531,5 +532,53 @@ cpu-profiles/20261011-030437-c0fcc6ec. Game and recorders have exited. The user
 confirmed first Story action and many slowdowns. All 232 UI/file samples had
 zero fallback/import traps. Captures bound a combat window to 03:06:40-03:08:10
 UTC: median interval FPS 7 (5.5-11.5), with 41/45 polls below 10. These are
-diagnostic interval readings. Native trace conversion/attribution is next;
-do not repeat gameplay before analyzing the saved evidence.
+diagnostic interval readings. E018 converted/profiled the saved evidence; recover
+hot generated locations before requesting another performance playtest.
+
+## Closed-trace exact-process analysis (E018)
+
+From the workspace root, with the prepared local PerfView tool/libraries:
+
+```powershell
+.\source\scripts\analyze-zarvot-cpu.ps1 -ProfilePath $cpuProfile
+# E017 combat: relative to ETL session start, not game launch or logger start.
+.\source\scripts\analyze-zarvot-cpu.ps1 -ProfilePath $cpuProfile `
+  -StartSeconds 122.1318034 -EndSeconds 212.1318034
+```
+
+The helper accepts only complete successful cpu-profile.json metadata and the
+recorded trace size. It loads libraries unpacked by the matching local PerfView
+executable, records their hash/version, converts once to cached cpu.etlx, then
+filters the exact PID, full executable path and start identity. A pre-existing
+process's trace start is clamped to session start; metadata's earlier recorder
+checks remain part of the identity evidence. Basename alone is rejected.
+
+Outputs under cpu-profiles/<id>/analysis/<id> include summary.json, sample-time
+CSV, module shares and image/thread/process maps. Unknown addresses and lost
+events stay explicit. Samples preserve native instruction pointer/RVA and UTC;
+native RVAs must not be treated as guest PCs. No symbol-server downloads, game
+input or new trace are performed. The typed ETL wrapper avoids an unrelated
+optional EventPipe-client dependency in PowerShell overload reflection.
+
+E018's first 2 GB conversion took about 70 seconds; cached title/combat windows
+took about five seconds together. Full trace had 517,377 target samples; combat
+had 157,467, with 71.64% compiled DLLs (main 65.01%, SDK 6.38%), host 13.17%,
+unknown 10.98%. ETL reports 1 ms sampling and zero lost events. Title module
+shares were similar; this does not identify the frame-rate limit. Analyzer
+metadata/identity, UTC/clamped starts and 64-bit image-boundary tests passed;
+full/window exports were live-data validated, and an empty range yielded zero.
+
+The preserved host-attribution local prototypes checked host SHA, PE/map timestamp
+and base, PDB GUID/age against the ETW image map, and bounded public labels using
+PE unwind ranges where possible. Combat ArmRecomp::RunThread occupied 1.44% of
+all leaf samples; four direct exclusive callbacks combined 0.22%. The largest
+host bucket was Common::Event::WaitFor (4.31%), whose caller/cause is not established.
+Inlining, padding, funclets, aliases and unbounded nearest labels remain limits.
+Exact run-slice export extents account for 2,256 main and 682 SDK samples; most
+main samples still need generated-function/helper attribution. No blanket helper,
+guard, timing or graphics change follows from these proportions.
+
+Next recover a verified native-to-generated mapping from existing segment tables,
+object symbols or a symbol map. Preserve completed DLLs and avoid recompiling
+all main units merely to obtain symbols. Select one measured generated-code or
+recomp-runtime change, test its semantics and then repeat the same user-led route.

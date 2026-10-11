@@ -577,6 +577,58 @@ statements remain historical and do not override the current STATUS queue.
   CPU costs, and select a measured recomp fix. Collect PLAYTEST observations
   independently; strict/no-JIT and full-game correctness remain open.
 
+## E018 — Attribute combat CPU samples to compiled modules and host ranges (2026-10-10)
+
+- Task: R06. Analyze the saved E017 first Story action trace before another
+  playtest or an optimization change. Source, host and four DLL identities remain
+  unchanged. No game/export/build or emulator-settings changes were made.
+- Added analyze-zarvot-cpu.ps1 for closed successful profile metadata only. Uses
+  matching local PerfView TraceEvent libraries, caches derived ETLX, validates
+  exact PID and independent full loaded-executable path, and preserves sample
+  UTC/time, thread, IP/native RVA, module/category, image/thread maps and losses.
+  Pre-trace process start is clamped to trace start; prior recorder identity
+  checks remain necessary. Basename-only identity is rejected; unknowns stay explicit.
+- Synthetic metadata/identity tests cover live/failed/foreign traces, another
+  PID, path evidence, reused start time, UTC/local equivalence and pre-trace
+  limits; native mapping covers 64-bit half-open image boundaries. Tests and
+  syntax passed. Full trace/title/combat extraction passed; a cached empty range
+  correctly returned zero samples. Fixed PowerShell optional EventPipe overload
+  reflection by binding the ETL API in C#, without installing extra dependencies.
+- First 1.996 GB conversion took about 70 seconds; cached title/combat exports
+  about five seconds together. Trace session 03:04:37.868-03:09:42.015 UTC,
+  sampling interval 1 ms, reported events lost 0. Full target-process samples:
+  517,377; 373,520 compiled DLLs (72.20%). Save/rundown extends beyond game exit;
+  process sample timestamps end around 03:09:19.54 UTC.
+- Capture-bounded combat 03:06:40-03:08:10 UTC: 157,467 samples; compiled DLLs
+  112,804 (71.64%), main 102,371 (65.01%), SDK 10,049 (6.38%), host executable
+  20,733 (13.17%), unmapped 17,284 (10.98%). Title 03:04:40-03:05:40 had 122,350
+  samples and similar proportions (72.09% compiled). These are different scenes;
+  shares alone establish neither a speedup nor the frame-rate limit.
+- Local host attribution checked host hash, matching PE/map timestamp and base,
+  and PE/PDB/ETW debug GUID/age. Public labels were bounded by PE unwind ranges
+  where available, preserving aliases. Combat ArmRecomp::RunThread: 2,274 leaf
+  samples (1.44% of all); four exclusive callbacks combined: 341 (0.22%).
+  Diagnostic sampler template: 162 (0.10%); an unbounded nearest SampleDiagnostics
+  label: 259 (0.16%), with weaker attribution. No dominant host recomp helper
+  emerged; host-side loads/stores/guards were not prominent standalone buckets.
+- Largest host bucket Common::Event::WaitFor: 6,781 (4.31% of all samples).
+  Its caller/cause is unproven. Compiled images also contain inlined helpers;
+  small standalone callback buckets do not prove every helper path is cheap.
+  PDB publics returned zero sizes, so no exact call-duration/inlining claim.
+- Exact exported run-slice unwind extents contain 2,256 main and 682 SDK samples;
+  100,115 main and 9,367 SDK samples remain outside that named function extent.
+  They need generated-code/helper mapping. Native RVAs are not guest PCs.
+- Local evidence under E017 cpu-profiles/20261011-030437-c0fcc6ec: analysis full
+  20261011-031452-6d9ad68b, combat 20261011-031644-3bb647f2, title
+  20261011-031647-dcec9403, plus host-attribution local prototypes/results.
+  Raw ETL/ETLX, addresses, maps and generated material stay local. Share tooling
+  and sanitized findings only. Recorder is committed/pushed in bf78a3d.
+- Decision: keep analyzer and measured baseline. No speedup, full correctness or
+  fallback cause claimed. Next map hot main native locations through existing
+  segment tables/object symbols or a verified symbol map, then select one recomp
+  change with semantic checks. Avoid a repeat main compile just for symbols;
+  preserve code guards, original timing/music and the completed module set.
+
 ## Template for the next experiment
 
 - ID / R task / date:
