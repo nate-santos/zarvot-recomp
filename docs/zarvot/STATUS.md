@@ -1,6 +1,6 @@
 # Zarvot recomp handoff
 
-Updated: 2026-10-06. R00/R01/R02 complete. R03 lifetime diagnostics validated (E016).
+Updated: 2026-10-10. R00/R01/R02 complete. E017 first Story combat recorded.
 
 ## Objective and next action
 
@@ -19,9 +19,17 @@ compiled-PC sampling produced module-relative locations. Next: record a named
 user-led combat route, obtain native compiled-code/helper duration evidence,
 then fix measured recomp costs or actual gaps and finish behavioral checks.
 E015's pipeline activity is a correlation; compiled CPU cost remains unattributed.
-E016 used a verified clone of the prior test saves/settings/caches. Game and
-recorder have exited. Check workspace reports/r03-active-run.json and actual
-processes before another launch; preserve both test profiles and evidence.
+E016 used a verified clone of the prior test saves/settings/caches and exited.
+E017 used a new isolated clone of E016 for the requested first Story action
+sequence. The user played it and reported many slowdowns/bad frame rates. All
+232 complete UI/file samples showed zero transitions/import traps, with advancing
+AOT counts and no disagreements/regressions. In a capture-bounded 90-second
+combat window, 41/45 interval FPS polls were below 10 (median 7; range 5.5-11.5).
+The elevated native CPU trace saved successfully on game exit (1.996 GB). Game
+and recorders are closed; exact-process/time-filtered native attribution is next.
+Input/audio/save correctness and exact hit timestamps remain unverified. Check workspace
+reports/r03-active-run.json and actual processes before another launch; preserve
+all test profiles and evidence. Do not repeat gameplay before analyzing this trace.
 All four DLLs built, matched their recorded hashes, loaded with
 ABI 6/guard/fastmem/FPX1 negotiation, and executed compiled game code. The title
 screen rendered; boot/title observations showed advancing AOT counts and zero
@@ -59,6 +67,14 @@ the 3.5-hour main build or export unless a source/export change requires it.
   and dialogue rendered; user confirmed no combat. Prior UI count uncertain.
   Profile clone's six NAND files matched hashes; source unchanged. Three synthetic
   diagnostic tests passed, including independent UI=6/file=0 and normal exit.
+- E017 preparation: reused the same four verified DLLs and host, with no rebuild
+  or settings tuning. AOT counts advanced 1,769,111,829 -> 18,317,539,853 across
+  232 complete reports, with zero UI/file fallbacks/import traps. Jar-arena
+  combat/effects and Story transition captures inspected; user confirmed first
+  action sequence and severe slowdowns. Native WPR trace saved normally; no
+  CPU attribution or gameplay/audio correctness verdict yet.
+  Owned-profiler synthetic tests passed normal save/exit,
+  rejected start, foreign process, PID reuse and failed-save cleanup.
 
 ## Active task state
 
@@ -67,10 +83,10 @@ the 3.5-hour main build or export unless a source/export change requires it.
 | R00 | Complete | Pinned source built suyu/suyu-cmd; command-line host smoke exited 0; exporter RPC worked (E010) |
 | R01 | Complete for fixed exported modules | Four-module Hybrid ABI 6 source/manifest exported successfully; late-loaded/generated code remains unverified |
 | R02 | Complete | Four DLLs/hash evidence; matching host handshakes; advancing AOT counts; rendered title (E013) |
-| R03 | In progress; lifetime diagnostics validated | E016 zero observed fallbacks on noncombat scenes; named combat/correctness checks pending |
+| R03 | In progress; first Story combat recorded | E017 slowdowns reproduced with zero observed fallbacks; input/audio/save checks pending |
 | R04 | Pending R03 | Iterative coverage/translation fixes with focused tests |
 | R05 | Pending validated routes | Strict-static zero-fallback tests, then separate no-JIT verification |
-| R06 | Compiled-PC sampling validated | E016 histogram populated; combat and native duration profile pending |
+| R06 | Native CPU trace saved | E017 exact-process/module attribution and combat cost analysis next |
 | R07 | Pending R05 | Reproducible recomp package and endurance checks |
 | R08 | Pending R05 routes | Expand later-level/mode coverage; track full playthrough separately |
 
@@ -102,6 +118,15 @@ A/B and logging/cache tuning are no longer next actions.
    a new isolated run with UntilExit recording and compiled-PC sampling. It
    subsequently exited; recorder completed normally. Check the active pointer
    and actual processes before relaunch; retain both profiles and saves.
+   E017 is the latest closed session: build/zarvot-runs/20261011-030031-b40a1ca6
+   (UTC run ID; started on October 10 locally). Historical game PID 7872,
+   lifetime recorder PID 21728 and elevated CPU recorder PID 28904 have finished.
+   Native profile cpu-profiles/20261011-030437-c0fcc6ec/cpu-profile.json records
+   a successful 1,995,440,128-byte cpu.etl save and process_exited end reason.
+   The first non-elevated attempt failed without starting a session; retain it
+   separately. Local interval/coverage review: analysis/20261011-031128.
+   Analyze the finalized exact-process CPU trace with matching host symbols;
+   use capture-bounded combat 03:06:40-03:08:10 UTC, not an assumed hit timestamp.
    Collect the user's observations before marking any gameplay/audio check passed.
 6. Append evidence and update the relevant R row after each meaningful result.
 

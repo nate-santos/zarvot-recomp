@@ -513,6 +513,70 @@ statements remain historical and do not override the current STATUS queue.
   recomp gaps or measured generated-code/runtime costs; finish behavioral/audio
   checks separately. Keep general emulator/GPU tuning outside scope.
 
+## E017 — Record first Story combat with native CPU samples (2026-10-10)
+
+- Tasks: R03 named user-led route; R06 compiled-cost attribution. The user
+  proposed playing the first Story action sequence. Git was clean/synchronized
+  and no emulator/compiler was active before launch. Reused the completed,
+  hash-verified four-module set and matching host; no rebuild/re-export, source
+  change or emulator settings optimization.
+- Started build/zarvot-runs/20261011-030031-b40a1ca6 (UTC ID, October 10 locally),
+  using a verified clone of closed E016's saves/settings/caches. Original player
+  profile and prior test evidence preserved. Game PID 7872/start time recorded
+  in launch.json; lifetime UI/coverage recorder PID 21728. Initial complete
+  reports advanced compiled counts with zero UI/file fallbacks/import traps.
+  These are interim boot observations, not a combat or full-coverage result.
+- Added measure-zarvot-cpu.ps1: bounded CPU.Verbose file trace with a unique WPR
+  instance, exact process identity checks, metadata/heartbeats and explicit
+  start/save/cleanup errors. Normal game exit finalizes only the owned trace;
+  the helper sends no gameplay input and never stops the game. Raw system-wide
+  traces stay local and must be filtered to the exact game process/route.
+- First non-elevated start returned 0xc5585011 and recording_started=false;
+  no trace/session was claimed or cancelled. The user approved Windows elevation
+  for the prepared recorder. Elevated recorder PID 28904 successfully started
+  native CPU recording at 03:04:37 UTC; metadata heartbeat confirms recording.
+  Limit: 900 seconds or game exit. Game exit finalized a successful
+  1,995,440,128-byte cpu.etl save; elapsed recorder time including save was
+  316.424 seconds, with no recorder/cleanup error. Usable samples/attribution
+  remain under analysis. Both recorders and game have exited.
+- Synthetic tests passed: full CPU/file-mode/temp-directory/instance arguments,
+  unique ownership, normal save/exit, denied start without cleanup, foreign
+  process rejection, PID reuse with owned save, and failed-save owned cleanup.
+  Both new scripts passed syntax checks. These test tooling, not game semantics.
+- Confirmed matching host PDB/map are available; generated AOT DLLs have no
+  PDB/maps. Initial native attribution can separate compiled modules and host
+  helpers; generated guest-function duration attribution is not yet established.
+  Existing PC histograms remain execution-frequency data, not time profiles.
+- Prepared official Microsoft PerfView 3.2.8 in ignored local/tools/PerfView.
+  Its SHA-256 matches the release digest and Authenticode signature is valid.
+  Actual CLI export help and bundled TraceEvent API availability were checked;
+  no live ETL was read. Saved-trace export and attribution remain unvalidated.
+- Inspected intro and later jar-arena combat/effects captures, including frame-14
+  at 03:07:40 UTC showing a score HUD. Brought the owned game window forward. No
+  controller/keyboard gameplay automated. Invited the user to reach first Story
+  combat, move/shoot/hit enemies, repeat if practical, exit normally and report
+  route, slowdown and input/audio behavior. The user confirmed playing the first
+  action sequence with many slowdowns/bad frame rates. Frame-12 shows the opening
+  jar arena/Pew Pew prompt; frame-17 shows a Story transition. Exact hit times
+  and input/audio correctness remain unconfirmed. Save copy hashes after launch
+  are partial (5/6 files unchanged); a live save can change and no semantic pass follows.
+- Final coverage: 232 complete UI/file samples, AOT blocks
+  1,769,111,829 -> 18,317,539,853; zero observed transitions/import traps,
+  disagreements or counter regressions, no recorder error. Capture-bounded
+  combat window 03:06:40-03:08:10 UTC contained 45 interval FPS readings,
+  range 5.5-11.5, median 7, with 41 below 10. The title-menu window had median
+  23.5 (30 readings, 19-25.5). These are different scenes, not a performance A/B.
+  Local preserved logs/coverage, timeline and interval summary are under
+  analysis/20261011-031128. Active pointer now records observed_exited.
+- Diagnostic PC snapshots/histogram/coverage publication and periodic PNG
+  encoding add work. Correlate capture times; no per-frame percentile or speedup
+  claim. E015 hit-effect slowdown remains unresolved and E016 remains a scoped
+  noncombat zero-fallback observation. No actual fallback gap is corroborated.
+- Decision: preserve the closed test profile and evidence. Next: convert the
+  saved trace, filter exact process and capture-bounded combat timestamps, attribute compiled/runtime
+  CPU costs, and select a measured recomp fix. Collect PLAYTEST observations
+  independently; strict/no-JIT and full-game correctness remain open.
+
 ## Template for the next experiment
 
 - ID / R task / date:

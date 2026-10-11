@@ -7,9 +7,10 @@ they are not a general emulator optimization queue.
 ## Recomp build workflow — next work
 
 R00 host/exporter build and R01 Hybrid source export succeeded (E010).
-R02 rtld compilation/loading succeeded; remaining modules and execution are open.
-Use the verified commands and identities below. Other inherited MK8 workflows
-remain unverified for Zarvot.
+R02 completed for all four modules, including verified compiled execution (E013).
+Reuse those outputs for R03 gameplay/coverage checks and R06 compiled-cost
+profiling. The build sections below retain historical commands and identities;
+other inherited MK8 workflows remain unverified for Zarvot.
 
 1. Check the source branch, changes and existing project processes. Initialize
    the pinned third_party/suyu submodule if missing; inspect current build docs.
@@ -282,8 +283,8 @@ Successful rtld build from the workspace root:
 .\source\scripts\build-recomp.ps1 -Target zarvot -Package 'out\Zarvot - Hybrid AOT + JIT' -Module rtld -ParallelJobs 2
 ```
 
-The same module helper is the candidate for main/sdk/subsdk0, which are not yet
-built. It uses MSVC currently. Main has 112 generated C units totaling about
+The same module helper subsequently built main/sdk/subsdk0 (E013). It uses MSVC
+currently. Main has 112 generated C units totaling about
 3 GB. The generated project selected a one-compile pool for rtld on this host;
 --parallel alone does not override that pool. Review current generated CMake
 and compiler support before a large main build; do not silently disable guards
@@ -387,8 +388,9 @@ check reports/r03-active-run.json (workspace root) and the actual process before
 starting another session. The bounded recorder runs for ten minutes; runtime
 coverage and captures continue while the game remains open.
 Follow PLAYTEST.md for the opening Story route. For save/relaunch checks reuse
-the same staged executable/config/profile. Launch metadata records local ROM
-and host paths; normal fresh launcher calls deliberately create a new profile.
+the same staged profile or explicitly clone a closed matching test run with
+-ProfileFromRun. Launch metadata records local ROM and host paths; normal fresh
+launcher calls deliberately create a new profile.
 Inspect process ownership before closing a test; preserve user-owned sessions.
 
 ## Combat slowdown diagnosis and compiled-PC sampling (E015)
@@ -467,3 +469,67 @@ PCs. Captures show a Story room/dialogue; combat cost/correctness remains open.
 Local run: build/zarvot-runs/20261006-035803-2d087b29; final analysis is under
 analysis/20261006-040756. Game and recorder are closed. Inspect the active pointer
 and actual processes before relaunch; preserve the profiles and evidence.
+
+## Owned native CPU capture for opening Story combat (E017)
+
+The next route is Story's first action sequence. Let the user move/shoot/hit
+enemies, report the room/tutorial and any failure, and repeat the encounter in
+the same session if practical. Exit normally to finalize lifetime recordings.
+Keep route reports and timestamps local; do not infer combat from a launch.
+
+Alongside the lifetime coverage recorder, from an elevated PowerShell:
+
+```powershell
+.\source\scripts\measure-zarvot-cpu.ps1 -RunRoot $run.RunRoot -Seconds 900
+```
+
+The helper verifies the recorded executable/PID/start time and uses a unique
+WPR instance with the built-in CPU.Verbose file profile. It stops/saves only its
+own successfully started instance, on game exit, identity change or the bounded
+duration. It sends no input and does not stop the game. Metadata/heartbeats and
+WPR command results stay under cpu-profiles/<id>; a successful save produces
+cpu.etl. Rejected starts remain explicit errors and never trigger stop/cancel.
+Check state, recording_started, error, cleanup_error and trace_bytes; a launched
+helper or successful start alone does not prove that a usable trace was saved.
+
+E017's non-elevated attempt returned 0xc5585011, "Failed to enable the policy to
+profile system performance." Windows administrator approval for just the recorder
+allowed recording to start. No security policy/settings were edited. See
+[Microsoft's WPR elevation guidance](https://learn.microsoft.com/en-us/windows/apps/develop/performance/power).
+Synthetic tests cover full WPR argument preservation, unique-instance ownership,
+normal exit/save, denied start, foreign process, PID reuse and failed-save cleanup.
+
+Native sampling estimates CPU time statistically, not exact call durations or
+frame percentiles. The trace is system-wide: filter the exact game process/start
+time and actual combat interval before drawing conclusions. Retain raw ETLs
+locally. Matching host symbols are in build/suyu/bin/suyu-cmd.pdb and .map;
+the four generated DLLs have no PDB/maps, so initial AOT attribution is by module
+and native address. Do not confuse helper stacks with guest-PC execution counts.
+
+Portable Microsoft PerfView 3.2.8 is prepared under ignored local/tools/PerfView;
+provenance.json records its official release, SHA-256 and valid Microsoft
+signature. Its actual CLI help was checked. After a successful trace save,
+sample-preserving export uses /AcceptEULA /ShowUnknownAddresses /LogFile:<path>
+UserCommand SaveCPUStacks <closed cpu.etl>, with the child process's
+_NT_SYMBOL_PATH pointing to build/suyu/bin. This produces cpu.perfView.xml.zip.
+Omit the optional process-name argument and retain exact PID/time filtering for
+analysis: that argument is a name, and /Process:<pid> does not apply to this
+export command. Folded CSV is insufficient for matching the combat timeline.
+Do not read or convert a trace still being recorded. Export/attribution validation
+is pending the first saved E017 trace.
+
+Diagnostic PC sampling also copies boundary snapshots, locks its histogram and
+publishes coverage. Periodic captures convert/encode PNGs every 30 seconds.
+Correlate CAPTURE log times before interpreting dips; these diagnostic runs are
+not matched performance benchmarks. Fix measured recomp costs/coverage only.
+Do not tune general graphics settings from a stack profile.
+
+E017 closed run: build/zarvot-runs/20261011-030031-b40a1ca6. Native recording
+started at 03:04:37 UTC (October 10 locally), then saved on game exit: state
+complete, process_exited, 1,995,440,128-byte cpu.etl under
+cpu-profiles/20261011-030437-c0fcc6ec. Game and recorders have exited. The user
+confirmed first Story action and many slowdowns. All 232 UI/file samples had
+zero fallback/import traps. Captures bound a combat window to 03:06:40-03:08:10
+UTC: median interval FPS 7 (5.5-11.5), with 41/45 polls below 10. These are
+diagnostic interval readings. Native trace conversion/attribution is next;
+do not repeat gameplay before analyzing the saved evidence.

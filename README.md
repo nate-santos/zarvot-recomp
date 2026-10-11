@@ -26,6 +26,10 @@ E016 adds process-lifetime recording of the actual window caption and coverage
 independently. All 146 samples showed zero transitions; compiled-PC sampling
 worked. Story room/dialogue rendered, but the user confirmed no combat in this
 run. Repeat combat before attributing its cost; no fallback gap is corroborated.
+E017 repeated the first Story action sequence: the user reported severe slowdowns,
+while all 232 coverage samples showed zero transitions. A native CPU trace saved
+successfully; cost attribution and behavioral correctness checks remain pending.
+Execution counts alone do not measure cost.
 The main MSVC build took 210.9 minutes and produced a roughly 1.5 GB DLL.
 Build cost and generated-code efficiency remain recomp work. See E013 for
 execution evidence and the [gameplay checklist](docs/zarvot/PLAYTEST.md).

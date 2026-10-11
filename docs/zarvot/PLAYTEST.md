@@ -8,7 +8,7 @@ remain separate. A visible title and zero fallbacks establish only that route.
 |---|---|---|
 | P00: boot/title | Complete for E013 smoke scope | Four matching images; advancing AOT counts; visible title |
 | P01: menus / Story entry | Menu/arena rendered (E015); Story room/dialogue rendered (E016); exact route and correctness pending | Buttons respond; menus/text render; opening Story loads |
-| P02: opening movement / shooting | Combat captured; severe hit-effect slowdown reported (E015); correctness pending | Movement and shots behave correctly; no stuck input or visual corruption |
+| P02: opening movement / shooting | First Story action sequence played; severe slowdowns reproduced with zero observed fallbacks (E017); correctness pending | Movement and shots behave correctly; no stuck input or visual corruption |
 | P03: pause / restart / death | Pause menu rendered (E015); resume/restart/death pending | Pause/resume and restart/death flow behave correctly |
 | P04: next scene / level | Different scene rendered (E015); transition correctness pending | Transition/load completes with correct visuals/input |
 | P05: save / exit / relaunch | Untested in recomp | Reuse the same test profile; expected progress persists |
@@ -36,8 +36,32 @@ gameplay or performance verdict.
 Record the route, any failure and the matching timestamp. Retain captures,
 coverage snapshots and logs locally. Group fallback PCs/reasons by module;
 unexpected behavior can be a correctness defect even when transitions stay zero.
-The launcher creates a fresh profile each time, so P05 must deliberately relaunch
-the same staged executable/config/profile rather than create another fresh run.
+The launcher creates a fresh profile by default. P05 must deliberately reuse the
+same staged profile or use -ProfileFromRun to clone a closed matching test run,
+then have the user verify that expected progress persists. Copy hashes alone
+do not establish save correctness.
+
+## Next named route: first Story level / opening combat
+
+E017 recorded this route: the user played the first action sequence and reported
+many slowdowns/bad frame rates. Captures show the Story menu, opening jar arena
+with Pew Pew prompt, combat effects/score and a Story transition. All 232 complete
+UI/file samples had zero fallback/import traps; CPU trace saved on normal exit.
+This does not establish input, restart/death, save or audio correctness. Analyze
+the trace before another performance run.
+
+For a future focused repeat, start Story and reach the first
+action sequence; report when combat begins and which room/tutorial name appears.
+Move, shoot and hit enemies for a few minutes. If practical, restart and repeat
+the same encounter in the same session. Report whether later hits still stall,
+any visual/input/audio problem, and any visible JIT count. Exit normally when
+finished so the lifetime recorder can finalize its evidence.
+
+Record actual route/timestamps rather than assuming that launch means combat
+started. Existing PC sampling ranks frequency, not CPU duration. Diagnostic
+sampling, coverage publication and periodic PNG capture have overhead; correlate
+capture times and attribute native samples before selecting a recomp change.
+These runs do not establish a matched FPS gain or per-frame percentiles.
 
 Strict testing must repeat an already checked named route with zero fallback
 attempts and advancing counts. Prove no-JIT separately with its build graph,
