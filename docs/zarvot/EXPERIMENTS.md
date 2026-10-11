@@ -666,6 +666,91 @@ statements remain historical and do not override the current STATUS queue.
   publish the source fork and export/build a separate candidate, then repeat the
   same user-led combat route. R03 behavioral checks remain open independently.
 
+## E020 — Outline exact FP32 fallbacks in compiled code (2026-10-11)
+
+- Task: R06, following E019's hot generated blocks. Change only FPX-on binary32
+  add/sub/mul code generation: keep each lane's native gate inline and call
+  shared noinline exact helpers for fallback arithmetic. The helper bodies use
+  the same emitter text. Preserve operand snapshots, sign-matched zero, FPCR,
+  sticky FPSR, guards and original timing. Fused forms and binary64 stay inline;
+  ABI/layout/features are unchanged. Shadow results/flags agree; its operand
+  diagnostics now retain the original captured bits rather than fallback-local
+  mutated operands. No blanket fast-math, emulator settings or JIT optimization.
+- Core commit `84568fcadc2b8f062022180b6492d0d8975f4d34` published to
+  nate-santos/suyu-zarvot-recomp, branch zarvot-support, from pinned 5949cab3ba.
+  GitHub redirects the former dougchansan/suyu-v0.0.4 repository to
+  suyu-emu/suyu-main; fork creation retained history, without merging its newer
+  head into the candidate. Parent submodule URL/pointer follows this fork.
+- Full focused harness: 76,477,440 value/FPSR comparisons, zero mismatches;
+  458,752 whole-context checks across 14 scalar/vector/pair/indexed alias cases.
+  Native and exact paths both exercised. Negative controls failed as designed
+  (nokeep 80,708; nomid 5,039; MXCSR 209,703 mismatches). Inhibit: 729,088 checks,
+  zero mismatches; shadow retained 534,966 fast results with zero differences;
+  repaired host FP environment passed. Initial sandbox C1902 was a compiler
+  setup failure; the same toolchain/tests passed outside that sandbox.
+- Full synthetic integration smoke passed coverage and ABI5, ABI6/FM1,
+  ABI6+GG1, FPX and GG1+FPX static/shared variants, guard controls and races.
+  ABI5/FM1 golden output unchanged. Only the intentional FPX runtime/header/
+  export/CMake delta changed its golden hash. Independent source review found
+  no actionable defects. No architectural hardware oracle ran on this x64 host.
+- Generic benchmark uses independent generators against immutable baseline and
+  actual candidate headers, MSVC /O2 /Ob2 /bigobj /fp:precise /MD, no LTO or
+  shadow/probe timing. 16-op and 122-op models passed 65,536 full-context
+  comparisons across 32 FPCR modes, four FPSR states and seeded edge/random
+  inputs. Deliberately corrupted output was detected with exit 1.
+- Quiet ABBAABBA repeated medians, equivalent work and matching checksums:
+  normal FPX large model 2,828.015 -> 715.658 ns/call (ratio 0.25306);
+  small model 111.649 -> 110.194 ns/call (near neutral). Large IXC-clear model
+  11,931.240 -> 1,571.110 ns; inhibited 12,674.686 -> 1,609.809 ns. Entry unwind
+  extent: large 587,035 -> 13,792 bytes; small 27,175 -> 2,111 bytes. Explicit
+  stack allocation: large 65,176 -> 48 bytes; small 272 -> 48 bytes. These
+  exclude other fragments/callees and pushed registers. Timings include identical
+  output/FPSR resets; RNG, validation and checksums are outside measured loops.
+  Named compiler/test processes were absent before/after the final quiet repeat.
+- These models isolate recomp arithmetic efficiency; they omit the game's other
+  instructions, guards, memory and scheduling. This is neither game FPS nor
+  proof that outlining alone resolves combat slowdown. Coverage is unchanged.
+  R03 gameplay, input/save/audio and strict/no-JIT checks remain open.
+- Exporter/host rebuilt successfully in 53.4 seconds. Candidate exporter SHA-256
+  `c6a7f40d21f26c84526a3faf7a3544d4a57ce5238bbb4095d923a43f5c9a73a2`;
+  emitter SHA-256 `a5c630fe391c67440c66c38c8af81d421b8d8019fef3bc8556a95f741a0c6f3d`.
+  Export completed with explicit Hybrid/FM1/GG1/FPX1/translate_all settings into
+  generated/zarvot-fp32-outline/out. User accepted the output-path warning;
+  compilation uses the separate Ninja build tree. Game/module/coverage fields
+  match baseline exactly, and each runtime has the three outlined definitions.
+  Manifest hash remains `29f3a9cb0aeec129475a94835cf165dfc48578b7a3e8a372e37d6dfac99cdb47`;
+  it identifies inventory/ABI, not generated C or DLL bytes.
+- Separate sequential module build started at 13:47:17 UTC with two-job cap and
+  generated one-compile memory pool. rtld and SDK completed; subsdk0/main
+  completion remains pending. SDK DLL is 103,827,456 bytes with SHA-256
+  `4d040bbff46f5ae231871296fce31e0e41d8e9d2c09d04ba0d39911585a0fa54`;
+  its fresh build took 285.8 seconds, not comparable to an incremental resume.
+  Main emitted C shrank 3,230,233,647 -> 2,455,910,697 bytes (24.0%) across the
+  same 112 units. SDK C shrank 2.6%; subsdk0 0.3%; rtld unchanged. These measure
+  generated source footprint, not execution time. No arbitrary overall timeout.
+  Baseline export, build, saves
+  and E017 host/DLL copies preserved. Candidate has not executed game code yet.
+- Local evidence: build/recompiler-fpx-outline/validation.log;
+  build/recompiler-smoke-outline/{golden-proof.log,validation.log};
+  build/zarvot-perf-prototypes/outline-fp32/{summary.json,results-final.log};
+  workspace reports/e020-{host-build.log,exporter.json,module-build.log};
+  build/recomp/zarvot-fp32-outline/build-status.json. Shareable generic benchmark
+  tooling added; its analysis path and underlying compiler workflow passed,
+  but the promoted wrapper's complete build invocation is not separately run.
+  Eight lightweight analysis contract cases accepted valid evidence and rejected
+  changed hashes, bad ABBA order/checksums, missing groups, incomplete semantic
+  counts and unfinished metadata. No timing was repeated during module builds.
+- Launcher now selects separate target/package/host artifacts and allows
+  explicitly requested same-game profile reuse after verifying the old manifest,
+  source ExeFS hash, module build IDs/segment layouts and process closure. Default
+  host/manifest/DLL matching remains strict. Twenty-seven staging/isolation/
+  rejection checks and existing profile rebasing tests passed. No actual game
+  session launched or saved profile modified by this work.
+- Decision: keep as the separately built candidate. Next finish and verify all
+  four DLLs, stage an isolated same-game profile, prove candidate compiled
+  execution and compare the same user-led opening combat route. Revert by
+  selecting preserved baseline artifacts; do not overwrite them.
+
 ## Template for the next experiment
 
 - ID / R task / date:

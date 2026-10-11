@@ -1,6 +1,6 @@
 # Zarvot recomp handoff
 
-Updated: 2026-10-11. R00/R01/R02 complete. Combat generated-code mapping validated (E019).
+Updated: 2026-10-11. R00/R01/R02 complete. FP32 outlining validated; candidate building (E020).
 
 ## Objective and next action
 
@@ -8,18 +8,27 @@ Work only on the recomp: build, coverage, correctness and execution improvements
 Reuse the compatibility stack. Do not resume general emulator performance,
 settings or GPU tuning. JIT is a reference and temporary hybrid fallback.
 
-**First ready task: R06 — validate the FP32 fallback outlining candidate, then
-build it separately and compare the same user-led combat route.** E019 recovered
+**First ready task: R06 — let the separate FP32 outlining candidate finish
+building, then compare the same user-led combat route.** Check actual runner
+and compiler activity before resuming. Candidate status is
+build/recomp/zarvot-fp32-outline/build-status.json; raw progress is in workspace
+reports/e020-module-build.log. Do not start a duplicate build or overwrite the
+E013/E017 baseline. E019 recovered
 the existing main image's block index without rebuilding or executing game blocks.
 Of 102,371 main combat samples, 77,755 map to indexed block function extents,
 19,789 to byte-matched runtime/dispatch object functions, 2,256 to the run-slice
 export and 2,571 remain unassigned. Several hot blocks expand to 0.6-0.96 MB
 native extents and contain many repeated FP32 add/sub/multiply exact bodies.
 The candidate keeps each lane's native FPX gate inline and shares only the
-unchanged exact fallback arithmetic. Source and focused tests are being worked
-on in the submodule; no candidate game build or gameplay speedup is established.
-Finish semantic/negative-control checks and quiet repeated synthetic timings
-before publication and a separate export/build. Preserve the E013/E017 baseline.
+unchanged exact fallback arithmetic. E020 passed 76,477,440 value/FPSR comparisons,
+458,752 whole-context alias checks, negative controls and the complete smoke
+suite. A 122-operation generic block shrank from 587,035 to 13,792 native bytes;
+quiet repeated timing was 2,828.015 -> 715.658 ns per call (74.7% less elapsed).
+The small normal-path model was near neutral. These are synthetic results,
+not gameplay speed or correctness evidence. Core commit 84568fcadc is pushed to
+nate-santos/suyu-zarvot-recomp, preserving the pinned baseline history. Exporter
+rebuild and separate candidate export completed. Candidate game execution and
+matched combat performance remain untested; preserve R03 checks independently.
 
 E017 used
 an isolated clone of E016 for the requested first Story action sequence. The
@@ -98,6 +107,16 @@ the 3.5-hour main build or export unless a source/export change requires it.
   object helpers, 2.20% run-slice export, 2.51% unassigned. Six mapping tests
   passed; full sample IP/RVA/load-interval and process/build identities checked.
   Out-of-line compiled lookup/load helpers are distinct from host callbacks.
+- E020: FPX-only FP32 outlining published with focused tests; ABI5/FM1 output
+  hashes unchanged. Generic benchmark passed 65,536 full-context comparisons
+  and deliberate mismatch detection; 122-op native extent fell 97.65%, explicit
+  stack allocation 65,176 -> 48 bytes. Separate candidate export has the same
+  game/module/coverage manifest as baseline; runtime definitions contain all
+  three outlined helpers. rtld/SDK built; subsdk0/main are compiling in order.
+  Main generated C shrank 24.0% (3,230,233,647 -> 2,455,910,697 bytes) with the
+  same 112 source units and coverage inventory; game FPS remains unmeasured.
+  Separate-build launcher/profile reuse passed 27 synthetic isolation/rejection
+  checks. Candidate/control staging commands are in RUNBOOK; no real run staged.
 
 ## Active task state
 
@@ -109,7 +128,7 @@ the 3.5-hour main build or export unless a source/export change requires it.
 | R03 | In progress; first Story combat recorded | E017 slowdowns reproduced with zero observed fallbacks; input/audio/save checks pending |
 | R04 | Pending R03 | Iterative coverage/translation fixes with focused tests |
 | R05 | Pending validated routes | Strict-static zero-fallback tests, then separate no-JIT verification |
-| R06 | Hot generated blocks mapped; candidate under validation | E019: FP32 fallback outlining semantics/timings, then isolated candidate build and matched combat |
+| R06 | FP32 outlining validated and published; candidate building | E020: finish isolated four-module build, verify identities, then matched user-led combat |
 | R07 | Pending R05 | Reproducible recomp package and endurance checks |
 | R08 | Pending R05 routes | Expand later-level/mode coverage; track full playthrough separately |
 
@@ -123,7 +142,7 @@ A/B and logging/cache tuning are no longer next actions.
 2. Recomp roadmap, README, instructions and E005/E006 are committed in 5c6156a.
    Preserve subsequent changes and check current ahead/behind state afresh.
 3. Inspect existing generated export and build artifacts at the identities in
-   RUNBOOK. Continue R03; source remains unchanged at its pinned revision.
+   RUNBOOK. Baseline source is 5949cab3ba; candidate source is 84568fcadc.
    The sequential runner records its PID and module completion/hash evidence in
    build/recomp/zarvot/build-status.json. Check that process and compiler activity
    before restarting; reports/r02-module-set-build.log holds raw progress.
@@ -153,9 +172,11 @@ A/B and logging/cache tuning are no longer next actions.
    20261011-031647-dcec9403. Host/export range attribution and local prototypes
    are in host-attribution. E019's verified main mapping is under
    generated-mapping/main-combat-v3. Use capture-bounded combat
-   03:06:40-03:08:10 UTC, not an assumed hit timestamp. Validate the FP32
-   outlining candidate before a separate export/build; do not tune general
-   emulator settings or assume that a synthetic gain is a gameplay gain.
+   03:06:40-03:08:10 UTC, not an assumed hit timestamp. E020 validated and
+   exported the FP32 outlining candidate; its separate build runner started
+   at 13:47:17 UTC (PID 31028 at launch). Check actual process and build status,
+   not this historical PID alone. Do not tune general emulator settings or
+   assume that a synthetic gain is a gameplay gain.
    Collect the user's observations before marking any gameplay/audio check passed.
 6. Append evidence and update the relevant R row after each meaningful result.
 
@@ -163,7 +184,8 @@ A/B and logging/cache tuning are no longer next actions.
 
 - Checkout: source/; branch: zarvot-support; origin: nate-santos/zarvot-recomp;
   upstream: dougchansan/mk8-recomp. Workspace root is not a Git repository.
-- Wrapper base db36cf5; pinned suyu 5949cab3ba93233ddd1c319bfc6f010f6cfa910a.
+- Wrapper base db36cf5; baseline suyu 5949cab3ba93233ddd1c319bfc6f010f6cfa910a;
+  candidate 84568fcadc2b8f062022180b6492d0d8975f4d34 in the Zarvot core fork.
 - Installed asset labeled v0.0.12 reports v0.0.11 / HEAD-40aeb31824-HEAD.
   Exact hashes and paths are in RUNBOOK; labels alone do not establish ABI match.
 - Host: Ryzen 7 5825U / integrated AMD Radeon, 16 GiB installed RAM.

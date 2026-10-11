@@ -21,7 +21,7 @@ reported. All 299 complete recorder reports showed zero fallback transitions;
 the user's earlier visible-transition recollection is now uncertain. Some hitches
 coincided with graphics-pipeline creation; compiled CPU cost remains unprofiled (E015).
 
-**Next: validate and build a targeted generated-code optimization.**
+**Next: finish the separate optimized recomp build, then compare matched combat.**
 E016 adds process-lifetime recording of the actual window caption and coverage
 independently. All 146 samples showed zero transitions; compiled-PC sampling
 worked. Story room/dialogue rendered, but the user confirmed no combat in this
@@ -32,8 +32,12 @@ places 71.64% of combat CPU samples in compiled modules, including 65.01% in mai
 E019 maps 97.49% of main samples to generated block extents, matched object
 helpers or the run-slice export. Several busy blocks have very large repeated
 FP32 fallback bodies. A candidate shares those exact bodies while keeping native
-FPX checks inline; semantic and timing validation precede a separate game build.
-These samples locate CPU work without establishing the slowdown's cause or a speedup.
+FPX checks inline. E020 passed 76,477,440 value/flag comparisons and 458,752
+whole-context alias checks. A generic large-block benchmark reduced native code
+from 587,035 to 13,792 bytes and median elapsed CPU work by 74.7%; this is not a
+game FPS result. The source change is published in the project's core fork.
+The matching candidate export completed; its separate four-module build is active.
+These samples locate CPU work without establishing the slowdown's cause or a game speedup.
 Behavioral correctness checks remain pending.
 The main MSVC build took 210.9 minutes and produced a roughly 1.5 GB DLL.
 Build cost and generated-code efficiency remain recomp work. See E013 for
@@ -73,7 +77,9 @@ available through the runbook; automated play requires a new user request.
 
 Development branch: `zarvot-support`. Based on
 [dougchansan/mk8-recomp](https://github.com/dougchansan/mk8-recomp) and its pinned
-[suyu fork](https://github.com/dougchansan/suyu-v0.0.4).
+[suyu lineage](https://github.com/dougchansan/suyu-v0.0.4). Recomp changes are pinned
+from [the Zarvot core fork](https://github.com/nate-santos/suyu-zarvot-recomp/tree/zarvot-support),
+preserving the original source history and the local E013/E017 baseline.
 Inherited scripts and research notes describe upstream work, sometimes historical
 versions. Check actual source and artifacts before relying on their assumptions.
 

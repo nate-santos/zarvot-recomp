@@ -190,8 +190,11 @@ edit the active config while suyu is running: shutdown may overwrite it.
 ## Source and runtime identity
 
 - Wrapper base: `db36cf53606e67977a26d6758215dfc89fa24724`.
-- Pinned emulator submodule: `5949cab3ba93233ddd1c319bfc6f010f6cfa910a`.
-- The pinned submodule is initialized; matching source build succeeded (E010).
+- Baseline emulator submodule: `5949cab3ba93233ddd1c319bfc6f010f6cfa910a` (E010).
+- Current recomp source: `84568fcadc2b8f062022180b6492d0d8975f4d34` (E020),
+  published to nate-santos/suyu-zarvot-recomp on zarvot-support. The parent pins
+  this fork; its history includes the baseline. Do not mix current host files
+  with old launch records silently; E017 retains the baseline host and DLLs.
 - Downloaded Windows release asset v0.0.12 SHA-256:
   `415e68c9aaf5374dd7f4864c8f267ce4833e13a2cbb2cc9cdf299ed06634ff2a`.
 - Installed suyu.exe SHA-256:
@@ -266,7 +269,7 @@ unverified for Zarvot and must be reviewed before use.
 
 ## E010 artifacts and next build
 
-Source stays at 5949cab3ba93233ddd1c319bfc6f010f6cfa910a. Release host hashes:
+Historical baseline source: 5949cab3ba93233ddd1c319bfc6f010f6cfa910a. Host hashes:
 
 - suyu.exe: `63e3da41e1fb4f7f52a0d85d901acffd164dd677d47b355da44ecae9465cc3fc`
 - suyu-cmd.exe: `43ae62506a513097acbc0a39f3af3891b103fd159bc67686027311a6833f0e5f`
@@ -300,6 +303,50 @@ and edits global settings. Use a project-owned, separate profile and retain
 original speed/graphics/audio settings for comparisons.
 
 ## Slow-laptop module builds
+
+E020's separate target is `zarvot-fp32-outline`. Its exporter rebuild and export
+completed, and the sequential runner is active. Check
+build/recomp/zarvot-fp32-outline/build-status.json and actual processes before
+resuming. Raw logs: workspace reports/e020-host-build.log and
+reports/e020-module-build.log. The original `zarvot` export/build stays intact.
+The candidate manifest is byte-identical to baseline because its game, coverage
+and ABI are unchanged; it does not identify emitted C. Candidate emitter SHA-256
+is `a5c630fe391c67440c66c38c8af81d421b8d8019fef3bc8556a95f741a0c6f3d`;
+exporter identity is recorded in reports/e020-exporter.json. Verify each new
+DLL against its own completed build record before staging.
+
+The generic optimization benchmark is documented in
+[tests/recomp_fp_outline_benchmark.md](../../tests/recomp_fp_outline_benchmark.md).
+Run only when project builds/tests/games are idle. Its synthetic speed result
+does not establish a Zarvot frame-rate gain. E020 retains the measured prototype
+and complete semantic/smoke logs under build/; generated artifacts stay local.
+
+After all candidate modules finish, stage a separate profile from the closed
+E017 run (workspace-root commands; this sends no input and starts no game):
+
+```powershell
+.\source\scripts\start-zarvot-recomp.ps1 -Target zarvot-fp32-outline `
+  -ProfileFromRun .\source\build\zarvot-runs\20261011-030031-b40a1ca6 `
+  -AllowSameGameProfileReuse -StageOnly
+```
+
+The explicit reuse switch verifies the old recorded manifest and the same
+source ExeFS hash, module build IDs and segment layouts. It copies saves/settings
+to a new run and rebases storage; default reuse still requires matching host,
+manifest and DLL identities. Closure checks reject an active/restarted source
+profile. Twenty-seven synthetic staging/rejection checks and profile tests pass.
+Choose the preserved baseline host explicitly when staging a matching control:
+
+```powershell
+.\source\scripts\start-zarvot-recomp.ps1 -Target zarvot `
+  -HostRoot .\source\build\zarvot-runs\20261011-030031-b40a1ca6 `
+  -ProfileFromRun .\source\build\zarvot-runs\20261011-030031-b40a1ca6 -StageOnly
+```
+
+No real candidate/control profiles have been staged by E020 yet. Inspect saves
+and route availability before the user-led comparison; a shared save does not
+prove identical actions or enemy/effect phases. Use the existing coverage/CPU
+recorders after staging and keep gameplay/audio correctness open until observed.
 
 Build the four exported modules sequentially from the workspace root:
 
