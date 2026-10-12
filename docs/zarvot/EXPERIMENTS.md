@@ -1378,6 +1378,90 @@ statements remain historical and do not override the current STATUS queue.
   warranted. Preserve rounding, FPCR/FPSR, NaNs, signed zero, subnormals,
   side entries, guards/acquire ordering and original gameplay/music timing.
 
+## E031 — Remove scalar FP32 operand-copy overhead (2026-10-12 local)
+
+- Task: R06. Continued offline from E028's saved trace without user input, game
+  launch, recording or settings changes. Metadata-only work does not execute
+  generated game blocks. Existing lookup/FP32/baseline images and profiles survive.
+- Attribution verifies main image SHA ca6976b4..., saved sample/mapping hashes,
+  unwind/index extents and every nonrelocation byte against the original source
+  unit object. All 1,283 samples in the two selected blocks land at decoded
+  instruction starts. Manually reviewed regions: 751 multiply operand extraction/
+  sign preparation (58.53% of those block leaves; 5.47% of all dip samples), 24
+  multiply FPX-open checks, one native multiply arithmetic/move, 13 multiply
+  keep checks/exact call sites, 229 add temporary/output-copy, 72 compare operand
+  extraction, 111 compare/flags, 12 entry/guard/side-entry and 70 other. Callee
+  leaves remain separate. Samples/regions are not dynamic instruction/call
+  counts or durations; sampling skid and shared paths prevent an exact stall cause.
+- Disassembly shows repeated zeroed 64-bit stack locals, partial 32-bit writes
+  and subsequent 64-bit reloads before multiplication. Avoidable operand
+  transport/store-forwarding cost is a hypothesis supported by a focused
+  prototype, not a measured hardware stall counter or explanation of the whole dip.
+- Change: FPX-enabled scalar FMUL/FNMUL S copies into uint32_t locals with memcpy,
+  then widens to the existing uint64_t helper operands. No pointer punning,
+  blanket inlining, fast-math, cached/hoisted gate, FPCR/FPSR, exact-helper,
+  zero-addend/sign, post-round FNMUL sign, guard/acquire, side-entry or ABI change.
+  ABI5, division, binary64 and other translations retain their old spelling.
+  Core 343402cf54 is committed/pushed to the user's core fork.
+- MSVC 19.44.35229.0 x64, Release /O2 /Ob2 /bigobj /fp:precise /MD, no LTO.
+  Old current-lookup emitter 284f411686 vs candidate emitter SHA-256
+  e624290e6e5ec3d46697c62ffee934af37e98cae46651abfc6fb7f18adcd44e3.
+  Immutable fixture snapshots under fp-operands-e031-{first,final} retain exact
+  compiled hashes; Git baseline text is LF-normalized, recorded separately.
+- Existing FPX suite: 100,587,904 value/FPSR comparisons, zero mismatches;
+  720,896 full-context alias checks, native 108,658 / exact 1,391,269 hits.
+  Expanded scalar FMUL/FNMUL cases cover distinct registers, either destination
+  alias, equal sources and all equal with nonzero unrelated/upper bits.
+  L6 nokeep/nomid/poisoned-MXCSR controls detect 393,543 / 25,068 / 1,023,976
+  mismatches as designed. Inhibit 3,560,000 cases pass; shadow keeps 2,610,513
+  native results with zero fast-vs-exact mismatches; repaired host environment
+  passes 30,320,000 cases. No AArch64 hardware golden or exhaustive 2^32 sweep.
+- Initial Windows setup failed its Debug compiler probe (PDB-manager mismatch)
+  and sandbox temporary cleanup. Retained failure evidence; run.py now uses
+  Release probes and normalized CMake source paths. The successful run used a
+  project-local temporary directory. This was fixture setup, not a game failure.
+- Source isolation re-generates all harness words from the old header: ABI5
+  ops/runtime, all runtime headers, exact helpers and shadow runtime match byte
+  for byte. Each FPX/control/shadow op table differs only at scalar FMUL S and
+  FNMUL S. Other alias functions are unchanged. The real changed translations
+  are tested; no hand-written candidate arithmetic becomes its own oracle.
+- Existing generic 16/122-operation block benchmark passes 65,536 whole-context
+  comparisons over rounding/FZ/DN/inhibit modes, sticky FPSR states, edge and
+  random inputs. Deliberate changed-result control fails. Three quiet timing
+  passes use equivalent work/checksums, ABBAABBA with BAABBAAB in the middle:
+
+  | Dataset | 16-op candidate/baseline range | 122-op range |
+  |---|---|---|
+  | FPX open, moderate finite | 0.396–0.414 | 0.609–0.618 |
+  | IXC initially clear | 0.727–0.828 | 0.860–0.868 |
+  | Native inhibited | 0.815–0.871 | 0.854–0.879 |
+
+- The first exploratory pass also improves. Some closed-path groups fluctuate
+  materially; report ranges, not a precise transferable gain. This fixture
+  includes output/FPSR resets but no game memory calls, side-entry or guard
+  dispatch. These are synthetic elapsed-time ratios, not a gameplay FPS forecast.
+  Generic block extents 2,111 -> 2,025 and 13,792 -> 13,385 bytes. Separately
+  compiling the two private game-block excerpts reproduces every old masked
+  object byte, then real Translate() changes just their six scalar multiply
+  statements. Each native extent falls 2,356 -> 2,292 bytes; assembly removes
+  the operand partial-store/wide-reload sequences. Add/compare transport remains
+  a separate future lead. No guest block was executed in that inspection.
+- Local evidence: build/zarvot-perf-prototypes/math-attribution-e031 contains
+  attributed/classified JSON, verified disassemblies, source excerpts, old/new
+  objects/assembly, native-comparison.json and isolation.json. Private build/
+  e031-{attribute,classify,native*,isolation*} scripts reproduce the review.
+  fp-operands-e031-final holds immutable benchmark, validation/control logs and
+  primary/reverse/repeat timing logs; fp-operands-e031-fpx-checked holds suite
+  objects/generated fixtures. Workspace reports/e031-*.log retains the runs.
+  Only source, generic benchmark repeat support and sanitized findings published.
+- Decision: keep the narrow source change; synthetic gain, unchanged semantics
+  and removal of measured operand work justify a separate recomp candidate.
+  Next E032 rebuilds the matching exporter, exports zarvot-fp32-operands, verifies
+  source/coverage/manifest differences, then builds all four images sequentially
+  with the normal memory-aware pool and no overall timeout. Verify image hashes,
+  ABI/features and compiled boot before a future user-led combat comparison.
+  No new game FPS, broad gameplay correctness, strict/no-JIT or coverage claim.
+
 ## Template for the next experiment
 
 - ID / R task / date:

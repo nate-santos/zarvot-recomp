@@ -920,3 +920,33 @@ Current core remains 284f411686 and all three game module sets are unchanged.
 Next work can also proceed offline: attribute the native leaves in the two
 mapped late-dip math blocks before choosing a new FP32/emitter prototype. Raw
 generated source, addresses and object disassemblies remain local.
+
+## E031 scalar FP32 operand candidate
+
+Core 343402cf54 replaces partial-width scalar FMUL/FNMUL input copies with
+width-matched memcpy followed by widening. FPX gates/exact helpers, ABI and
+other translations remain unchanged. The FPX differential/alias/control suite
+and repeated synthetic benchmark pass; no game performance result yet.
+
+Reproduce the synthetic comparison with the command in
+tests/recomp_fp_outline_benchmark.md, selecting baseline 284f411686. Its reverse
+timing option keeps A as baseline and uses BAABBAAB. E031's local evidence is
+build/zarvot-perf-prototypes/fp-operands-e031-{final,fpx-checked} and
+math-attribution-e031. Do not publish raw blocks or native addresses.
+
+For the FPX suite, use the configured Visual C++ environment, bundled Ninja,
+and project-local Python. On sandboxed Windows place tempfile.tempdir under
+build/test-temp as with the smoke runner above, then invoke
+third_party/suyu/tests/recompiler_fpx/run.py with --source third_party/suyu,
+--build a new ignored directory, --generator Ninja, --jobs 2, --cflags /Ob2,
+--cases 20000 --adv 20000 --legs 123 --controls. Release probes avoid the local
+Debug PDB-manager failure. A passing x64 soft-reference test is not hardware
+golden or full-game validation.
+
+The next separate target is zarvot-fp32-operands. Inspect E032 exporter/build
+state and processes before restarting; preserve lookup/outline/baseline images.
+Rebuild the matching exporter, export through a short verified alias as in E026,
+and compare source/manifest/coverage before the sequential module build. Keep
+the normal one-compile pool and no overall timeout. Verify all image identities
+and compiled boot, then stage with E017 host/E016 initial profile for later
+user-led combat. No input or new CPU recording is needed for build preparation.

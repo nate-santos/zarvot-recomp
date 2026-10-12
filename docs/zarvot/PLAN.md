@@ -62,8 +62,12 @@ correctness, but timing/code-size evidence rejected the first three and the
 fourth compiled to unchanged instructions. Current emitter/game builds remain
 intact. Two busy late-dip math blocks are the next attribution target; locate
 their native sample positions before selecting a narrow FP32 gate/code-layout
-prototype. Preserve exact semantics and validate before another export/build.
-No rebuild is needed now. Preserve all three module sets,
+prototype. E031 located most of those block samples in operand preparation and
+validated width-matched scalar FP32 FMUL/FNMUL input copies. Exact FPX gates and
+fallbacks remain unchanged. Broad FP/alias/control checks pass and repeated
+synthetic timings improve; game FPS is unmeasured. A separate zarvot-fp32-operands
+export/build is warranted from core 343402cf54; verify identities and compiled
+boot before a future user-led combat test. Preserve all three earlier module sets,
 extend behavioral checks and repeat native CPU comparisons. Smaller code is not
 itself a gameplay speedup.
 Do not wait for general emulator bottleneck classification or a fresh JIT
@@ -145,7 +149,10 @@ Use the inherited MK8 approach after checking which mechanisms already exist:
   combined-guard/masked-offset alternatives did not justify a source change.
   Keep its harness/results to avoid repeating rejected work. Further memory
   prototypes must preserve acquire ordering and avoid the inherited full-helper
-  inlining loss. Attribute busy FP32 block instructions before another FPX change.
+  inlining loss. E031's native instruction attribution identifies partial-width
+  operand copies as a focused target. Width-matched scalar FMUL/FNMUL loads pass
+  FP/alias/control checks with unchanged gates/exact helpers and smaller blocks;
+  repeated synthetic gains justify a separate build, not a gameplay speedup claim.
 - Consider LTO/PGO or narrowly recovered native routines only with a demonstrated
   recomp cost and differential tests for the affected behavior.
 

@@ -14,7 +14,7 @@ From the source checkout:
 
 The baseline defaults to pinned suyu commit
 `5949cab3ba93233ddd1c319bfc6f010f6cfa910a`. `-BaselineRef` selects another local
-commit that still emits inline exact FP32 bodies. The candidate is the current
+commit for comparison, including a later revision with outlined bodies. The candidate is the current
 `third_party/suyu/src/core/recompiler/arm64_to_c.h`. Both headers are copied into
 a new ignored `build/zarvot-perf-prototypes/fp-outline-<id>` directory before
 compilation. Git's baseline text is normalized to LF; metadata records the exact
@@ -61,3 +61,20 @@ six timing groups, the ABBA ordering, equal call counts and checksums. Keep raw
 artifacts local. Record sanitized results in the project ledger, with the
 explicit limit that a synthetic CPU improvement does not establish game FPS,
 route correctness or coverage.
+
+E031 reuses this fixture to compare scalar FP32 operand extraction against
+`284f411686160ceaf7ecaead936148c7de5cfe53`, where both sides already outline
+exact helpers. Only the candidate's FMUL/FNMUL input copies change; the shared
+exact helper definitions remain identical. Reproduce with:
+
+```powershell
+.\scripts\measure-recomp-fp-outline.ps1 -BaselineRef 284f411686160ceaf7ecaead936148c7de5cfe53
+# After the script completes, use its WorkDir for quiet repeats:
+& <WorkDir>/bench.exe --bench-reverse
+& <WorkDir>/bench.exe --bench-only
+```
+
+`--bench-reverse` uses BAABBAAB with A still the baseline. The default script's
+saved primary timing and AnalyzeOnly checks retain ABBAABBA. Keep each repeat
+log separately; compare equal call counts/checksums and report spread. These
+synthetic blocks do not include game-side entry/guard dispatch or memory calls.

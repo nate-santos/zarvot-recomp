@@ -1,6 +1,6 @@
 # Zarvot recomp handoff
 
-Updated: 2026-10-12. Offline memory-helper experiment complete (E030).
+Updated: 2026-10-12. FP32 operand experiment validated and published (E031).
 
 ## Objective and next action
 
@@ -8,9 +8,31 @@ Work only on the recomp: build, coverage, correctness and execution improvements
 Reuse the compatibility stack. Do not resume general emulator performance,
 settings or GPU tuning. JIT is a reference and temporary hybrid fallback.
 
-**First ready task: R06 — attribute native sample positions inside the two busy
-late-dip math blocks, then select a focused FP32 gate/code-layout prototype.**
-No new playtest, recording or large rebuild is needed. E030 completed the
+**First ready task: R06 — export/build the separate scalar FP32 operand candidate
+from core 343402cf54, then verify images and compiled boot before later combat.**
+Matching exporter rebuild completed; inspect workspace reports/e032-exporter-build.log
+and actual processes before resuming or starting another build. The new target
+will be zarvot-fp32-operands; preserve all three earlier module sets and profiles.
+No new playtest or recording is needed for preparation. E031 attributed the two
+busy dip blocks: 751/1,283 block samples fall in multiply operand preparation,
+with only one on native multiply arithmetic/moves. Partial 32-bit writes into
+zeroed 64-bit stack locals followed by 64-bit reloads suggest avoidable transport
+cost; sampling cannot prove store-forwarding latency or the cause of the dip.
+
+The validated change copies scalar FP32 FMUL/FNMUL inputs into uint32_t locals,
+then widens them. FPX gates, exact helpers, FPCR/FPSR, sign/rounding semantics,
+guards, side entries and ABI remain unchanged. E031 passed 100,587,904 FP
+comparisons, 720,896 full-context alias checks, negative/shadow/environment
+controls and 65,536 old/new synthetic block comparisons. Three quiet timing
+passes (one reversed) show native-path ratios 0.396–0.414 small / 0.609–0.618
+large; closed/inhibited paths also improve, with wider noise. These are
+synthetic elapsed-time results, not game FPS or full-game correctness.
+Metadata-only compilation reproduces both recorded block objects, then reduces
+their native extents 2,356 -> 2,292 bytes with the six operand-copy sites changed.
+Keep generated blocks/disassemblies and samples local. No game blocks were
+executed by that inspection. See E031 for hashes, evidence and limitations.
+
+E030 completed the
 memory-helper experiment without user input and rejected all four alternatives:
 alignment shortcut adds code and regresses unaligned/mixed loads, reversed and
 combined guards regress, and mask-before-shift compiles to identical helper
@@ -252,6 +274,10 @@ the 3.5-hour main build or export unless a source/export change requires it.
   readings in this run and the late 0–9 FPS dip. Lookup binary-search leaves
   disappeared from the samples; memory helpers remain a recomp investigation
   target. No controlled causal speedup or full-game correctness claim.
+- E031: native instruction attribution led to width-matched scalar FP32 multiply
+  input copies. Full FP/alias/control checks and repeated synthetic timings
+  passed; core 343402cf54 published. Separate exporter/build preparation underway;
+  no new game execution or FPS result yet.
 - E030: four offline FM1 gate alternatives passed correctness checks; none
   justified a product change. Existing helpers/builds retained. Reusable harness
   committed; next attribute the two busy dip math blocks before a new prototype.
@@ -266,7 +292,7 @@ the 3.5-hour main build or export unless a source/export change requires it.
 | R03 | Opening action checked; broader behavior pending | E028 movement/shooting/audio correct by user report; Bluetooth works; saves/death/restart/music fidelity pending |
 | R04 | Pending R03 | Iterative coverage/translation fixes with focused tests |
 | R05 | Pending validated routes | Strict-static zero-fallback tests, then separate no-JIT verification |
-| R06 | Memory-helper experiment complete; hot math attribution ready | E030 rejected four FM1 alternatives after semantic/timing/code checks; keep current build and map native work in two busy dip math blocks before a new prototype |
+| R06 | FP32 operand source validated; separate build preparation active | E031 removes partial-width operand stack copies without changing gates/FP semantics; inspect E032 exporter/build state, then verify candidate images/boot before later combat |
 | R07 | Pending R05 | Reproducible recomp package and endurance checks |
 | R08 | Pending R05 routes | Expand later-level/mode coverage; track full playthrough separately |
 

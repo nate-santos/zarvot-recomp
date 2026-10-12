@@ -58,8 +58,13 @@ lookup optimization. Native samples no longer land in its binary-search path.
 E030 tested four guest-memory helper alternatives without gameplay input. All
 passed focused correctness checks, but none justified replacing the current
 helpers: three regressed or added code and one compiled to unchanged native
-instructions. The reusable harness and results guide the next offline analysis
-of two busy floating-point math blocks. The playable build remains unchanged.
+instructions. E031 then located repeated temporary operand copies in two busy
+math blocks and validated a narrow scalar FP32 multiply input-load improvement.
+Over 100 million FP comparisons and 720,896 full-context alias checks passed.
+Repeated synthetic native-path work uses about 59–60% less time in a small block
+and 38–39% less in a large block; these are not game FPS gains. Core 343402cf54
+is published and a separate candidate build is being prepared. The playable
+lookup build remains unchanged until that candidate is verified.
 All three module sets and recordings are preserved. Save/death/restart
 checks, original music fidelity, strict/no-JIT
 execution and later routes remain open. See the [gameplay checklist](docs/zarvot/PLAYTEST.md).

@@ -99,7 +99,7 @@ void NativeExtent(const char* name, Fn fn) {
     std::printf("NATIVE_EXTENT function=%s unwind_bytes=%lu native_address=%p\n", name,
                 entry ? entry->EndAddress - entry->BeginAddress : 0, reinterpret_cast<void*>(fn));
 }
-bool Bench(Fn a, Fn b, unsigned n, unsigned dataset) {
+bool Bench(Fn a, Fn b, unsigned n, unsigned dataset, bool reverse) {
     std::array<GuestContext,16> initial{};
     for (unsigned j=0;j<initial.size();++j) {
         Seed(initial[j],1000+j,0,dataset==1?0:16);
@@ -124,7 +124,7 @@ bool Bench(Fn a, Fn b, unsigned n, unsigned dataset) {
         repeats *= 2;
     }
     repeats=std::max(1u,static_cast<unsigned>(repeats*(.12/seconds)));
-    const char* pattern="ABBAABBA";
+    const char* pattern=reverse?"BAABBAAB":"ABBAABBA";
     std::vector<double> ta,tb;
     std::uint64_t expected=Hash(ca);
     for(unsigned k=0;k<8;++k) {
@@ -141,8 +141,9 @@ bool Bench(Fn a, Fn b, unsigned n, unsigned dataset) {
 }
 int main(int argc,char** argv) {
     if (argc > 2 || (argc == 2 && std::strcmp(argv[1],"--inject-mismatch") &&
-        std::strcmp(argv[1],"--correct-only") && std::strcmp(argv[1],"--bench-only"))) {
-        std::fprintf(stderr,"usage: benchmark [--correct-only|--bench-only|--inject-mismatch]\n");
+        std::strcmp(argv[1],"--correct-only") && std::strcmp(argv[1],"--bench-only") &&
+        std::strcmp(argv[1],"--bench-reverse"))) {
+        std::fprintf(stderr,"usage: benchmark [--correct-only|--bench-only|--bench-reverse|--inject-mismatch]\n");
         return 2;
     }
     const unsigned csr=_mm_getcsr();
@@ -155,10 +156,11 @@ int main(int argc,char** argv) {
     NativeExtent("exact_mul32",reinterpret_cast<Fn>(recomp_fp_mul32_exact));
     const bool inject=argc==2&&std::strcmp(argv[1],"--inject-mismatch")==0;
     const bool only_correct=argc==2&&std::strcmp(argv[1],"--correct-only")==0;
-    const bool only_bench=argc==2&&std::strcmp(argv[1],"--bench-only")==0;
+    const bool reverse=argc==2&&std::strcmp(argv[1],"--bench-reverse")==0;
+    const bool only_bench=reverse||(argc==2&&std::strcmp(argv[1],"--bench-only")==0);
     bool ok=only_bench||Correct(baseline_16,candidate_16,16,inject);
     if(ok&&!inject&&!only_bench)ok=Correct(baseline_122,candidate_122,122,false);
-    if(ok&&!inject&&!only_correct)for(unsigned ds=0;ds<3&&ok;++ds) {ok=Bench(baseline_16,candidate_16,16,ds)&&Bench(baseline_122,candidate_122,122,ds);}
+    if(ok&&!inject&&!only_correct)for(unsigned ds=0;ds<3&&ok;++ds) {ok=Bench(baseline_16,candidate_16,16,ds,reverse)&&Bench(baseline_122,candidate_122,122,ds,reverse);}
     _mm_setcsr(csr);
     return ok?0:1;
 }
