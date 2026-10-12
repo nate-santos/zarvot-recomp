@@ -44,8 +44,12 @@ The first deliverable was achieved in E013: all four images loaded and AOT count
 advanced during rendered boot/title tests. R03 and R06 are active. E021's separate
 FP32 outlining candidate built and executed the first Story action with zero
 recorded fallbacks; movement/effects looked good to the user, with some stutter.
-Preserve both module sets and extend behavioral checks and controlled native CPU
-comparisons. Smaller generated/native code is not itself a gameplay speedup.
+E023 repeated the route with the preserved host/pre-combat profile and verified
+recorders; Bluetooth, shooting and audio worked, performance felt about the same.
+E024 maps the closed combat trace: compiled lookup/load helpers remain measurable
+targets. Next differentially test a narrow runtime prototype before re-exporting
+or rebuilding the game. Preserve both module sets and extend behavioral checks
+and repeated native CPU comparisons. Smaller code is not itself a gameplay speedup.
 Do not wait for general emulator bottleneck classification or a fresh JIT
 benchmark before R00-R02. Do not wait for a full playthrough before fixing
 known recomp defects or improving a validated compiled path.
@@ -114,6 +118,12 @@ Use the inherited MK8 approach after checking which mechanisms already exist:
 - Profile compiled blocks, memory helpers, guards and floating-point helpers.
   Preserve permissions, invalidation, ordering, exclusives and exact semantics;
   avoid blanket fast-math and disabling correctness guards.
+- E024 next experiment: skip the binary search for out-of-range/misaligned
+  addresses when the complete block index exists. Keep valid hits/holes and
+  allocation-failure search unchanged. Compare generated old/new lookup across
+  edge/random PCs, successful/failed allocation, negative controls and repeated
+  quiet timings before a separate game candidate. Later FM1 load-gate work must
+  preserve acquire ordering and avoid the inherited full-helper inlining loss.
 - Consider LTO/PGO or narrowly recovered native routines only with a demonstrated
   recomp cost and differential tests for the affected behavior.
 

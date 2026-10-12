@@ -32,10 +32,16 @@ The final report recorded 9.34 billion compiled blocks and zero fallback/import
 traps. Initial combat interval readings are encouraging, but differing host,
 profile state and recording overhead prevent a controlled speedup claim.
 
-**Next: profile the candidate on the same combat route using the preserved host
-and pre-combat profile, with recorders attached before play.** Both module sets
-are preserved; no rebuild is needed. The controlled retry is recording in E023;
-inspect its actual state before launching another session. Audio/save/death/restart checks, strict/no-JIT
+E023 repeated opening combat using the preserved host, pre-combat profile and
+verified recorders. Bluetooth, shooting and audio worked; the user felt
+performance was about the same. Combat interval readings remain low (median
+about 8 FPS). E024 mapped the saved native trace: 66.42% of combat CPU samples
+are in compiled modules, with lookup and load helpers among the remaining costs.
+Differences in combat phase and inputs prevent a causal gameplay speedup claim.
+
+**Next: test a narrow compiled runtime improvement against the measured
+lookup/load costs before another game build.** Both module sets and recordings
+are preserved. Save/death/restart checks, original music fidelity, strict/no-JIT
 execution and later routes remain open. See the [gameplay checklist](docs/zarvot/PLAYTEST.md).
 
 ## Development sequence

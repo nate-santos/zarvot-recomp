@@ -389,12 +389,16 @@ E022 used that configuration but closed before combat because Bluetooth input
 did not control the game. It retains successful startup coverage and an owned
 809,500,672-byte CPU trace; both recorders finished. E023 is the requested retry
 with Stadia connected before launch: build/zarvot-runs/20261012-003140-dc25d36d
-(October 11 locally). Automatic coverage attached; owned CPU recorder PID 21416
-is recording under cpu-profiles/20261012-003248-38053670, with no error.
-F12 detects Google Stadia Controller 0 and current bindings use Bluetooth.
-Both recorders were verified before inviting action; actual control remains a
-user check. Inspect metadata/heartbeats and the active pointer before proceeding,
-rather than starting another game or duplicate recorder. Keep transport-specific
+(October 11 locally). Both recorders completed on normal exit. Owned CPU profile
+cpu-profiles/20261012-003248-38053670 saved 2,545,942,528 bytes without recording
+or cleanup errors; coverage has 199 complete reports and zero fallback/import
+traps. User confirmed Bluetooth works and shooting/audio were fine, with
+performance about the same. E024 full CPU export is analysis/20261012-004109-4738000c;
+combat is analysis/20261012-004418-56508734. Captures 8–11 bound combat at
+00:35:34.1295148–00:37:04.1983949 UTC (ETL seconds 165.4623115–255.5311916).
+Interval review is in the run's analysis/20261012-004536-b10729f4 directory.
+Inspect actual desktop processes and the active pointer before any next launch.
+Keep transport-specific
 bindings in test profiles; preserve original wired settings and saves.
 
 E021 main completed at 15:02:11 UTC after 4,051.7 seconds (67.5 minutes).
@@ -704,17 +708,24 @@ python tests/test_zarvot_native_mapping.py
 
 Here $run is the closed E017 run directory and $cpu its successful CPU profile
 directory. Output must be a new ignored build/local/generated directory. The
-tool verifies the canonical baseline build, image/manifest hash, exact process
+tool selects build/recomp/<launch target>/build-status.json (legacy records with
+no target use zarvot), rejects invalid/escaped paths and mismatched/incomplete
+build records, then verifies image/manifest hash, exact process
 and full sample module path, plus loaded-image size and every selected IP/RVA/
 time interval before calling metadata-only image exports. Unwind starts and
 index pointers bound block labels; object relocation masks preserve aliases.
 Guest spans identify possible side entries, not the executing guest instruction.
 
 E019 assigns 97.49% of main samples to block extents, object helpers or the
-run-slice export. Six synthetic tests passed. E020 validated sharing exact FP32
+run-slice export. Nine synthetic mapping tests now pass, including candidate
+selection with a deliberately stale baseline record. E024 used the same tool
+on the real candidate main/SDK and their own matching runtime/dispatch objects;
+outputs are generated-mapping/main-combat-v1 and sdk-combat-v1 under the E023 CPU
+profile. Do not supply baseline objects for the candidate. E020 validated sharing exact FP32
 add/sub/multiply fallback bodies while retaining inline native FPX checks; E021
-built and exercised the separate candidate. A controlled gameplay comparison is
-pending. Its preserved separate build target is:
+built and exercised the separate candidate. E023/E024 completed a recorded
+combat comparison; phase/input differences still limit a speedup claim.
+Its preserved separate build target is:
 
 ```powershell
 .\scripts\build-zarvot.ps1 -Target zarvot-fp32-outline -ParallelJobs 2

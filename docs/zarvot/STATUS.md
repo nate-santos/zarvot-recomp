@@ -1,6 +1,6 @@
 # Zarvot recomp handoff
 
-Updated: 2026-10-11. R00/R01/R02 complete. FP32 candidate built and played (E021).
+Updated: 2026-10-11. R00/R01/R02 complete. Candidate combat recorded and profiled (E023/E024).
 
 ## Objective and next action
 
@@ -8,52 +8,52 @@ Work only on the recomp: build, coverage, correctness and execution improvements
 Reuse the compatibility stack. Do not resume general emulator performance,
 settings or GPU tuning. JIT is a reference and temporary hybrid fallback.
 
-**First ready task: R06 — complete the active controlled candidate recording,
-then analyze its closed combat trace.** E023 is open at
-build/zarvot-runs/20261012-003140-dc25d36d (October 11 locally), game PID 24476.
-Automatic lifetime coverage attached (recorder PID 29464); owned CPU recorder
-PID 21416 is recording, verified from
-cpu-profiles/20261012-003248-38053670/cpu-profile.json. User connected the Stadia
-controller over Bluetooth before this retry; F12 panel detects it and saved
-bindings use its Bluetooth identifier. User asked to confirm controls, repeat
-opening Story action and exit normally. Check actual metadata/heartbeats;
-do not launch another game or analyze a live trace. Use the existing active
-pointer and exact PID/path/start identity; never operate on another WPR instance.
-All four candidate modules are
-complete and hash-verified; do not rebuild them. E021 reached the first action
-sequence. The user reported improvement, good movement/effects and remaining
-stutter. Its final report contains 9,340,755,870 compiled blocks and zero fallback
-or import traps. The game log/screenshots survived normal exit; separate UI and
-native CPU recorders missed this short session. Do not imply they recorded it.
-Use the preserved E017 host and the E016 pre-combat profile for the next comparison
-to hold both host and initial save/cache state constant. A candidate with those
-identities is staged at build/zarvot-runs/20261011-152125-1090520b (not launched).
-Check workspace reports/r03-active-run.json and actual desktop processes before
-launching; preserve all profiles. Start and verify recorders before inviting play.
-Use -RecordCoverage and require CoverageRecorderState=attached, then separately
-verify the owned CPU recorder. New startup/helper checks and existing staging,
-profile and telemetry checks pass; see RUNBOOK.
-Candidate status is build/recomp/zarvot-fp32-outline/build-status.json; raw build
-progress is in workspace reports/e020-module-build.log. Preserve E013/E017.
-E019 recovered
-the existing main image's block index without rebuilding or executing game blocks.
-Of 102,371 main combat samples, 77,755 map to indexed block function extents,
-19,789 to byte-matched runtime/dispatch object functions, 2,256 to the run-slice
-export and 2,571 remain unassigned. Several hot blocks expand to 0.6-0.96 MB
-native extents and contain many repeated FP32 add/sub/multiply exact bodies.
-The candidate keeps each lane's native FPX gate inline and shares only the
-unchanged exact fallback arithmetic. E020 passed 76,477,440 value/FPSR comparisons,
-458,752 whole-context alias checks, negative controls and the complete smoke
-suite. A 122-operation generic block shrank from 587,035 to 13,792 native bytes;
-quiet repeated timing was 2,828.015 -> 715.658 ns per call (74.7% less elapsed).
-The small normal-path model was near neutral. These are synthetic results,
-not gameplay speed or correctness evidence. Core commit 84568fcadc is pushed to
-nate-santos/suyu-zarvot-recomp, preserving the pinned baseline history. Exporter
-rebuild and separate candidate export completed. E021's main DLL is 807,949,824
-bytes (46.48% smaller), built in 67.5 minutes. The same five hot block extents
-shrank from 2,453,684 to 103,608 native bytes (95.78%). These are footprint
-results, not frame-rate or peak-stack claims. A controlled repeated combat
-comparison and candidate CPU attribution remain pending; preserve R03 checks.
+**First ready task: R06 — validate a narrow indexed-lookup miss improvement
+against E024's native evidence, then prepare its separate game candidate.** When
+the complete block index exists, out-of-range/misaligned addresses can return
+no block without searching segment tables. Preserve existing valid index hits,
+holes and the binary search when index allocation fails. Require generated
+old/new differential tests, negative controls and repeated synthetic timing
+before a game export/build. Keep ABI/layout, guards, FP and gameplay timing
+unchanged. Do not rebuild merely for symbols or request another playtest before
+there is a concrete validated candidate. FM1 load-gate experiments remain later
+leads; inherited full-helper inlining regressed and acquire ordering must survive.
+
+E023 is closed: build/zarvot-runs/20261012-003140-dc25d36d (October 11 locally).
+Historical game/coverage/CPU PIDs 24476/29464/21416 all exited. CPU profile
+cpu-profiles/20261012-003248-38053670 saved 2,545,942,528 bytes with no recording
+or cleanup error. Coverage has 199 complete reports, advancing AOT counts to
+12,665,187,218 and zero UI/file fallbacks, import traps, disagreements or
+regressions. User confirmed Stadia Bluetooth works, finished opening Story
+action, and reported performance about the same with shooting/audio fine.
+Movement-specific recheck, saves, death/restart and original music fidelity
+remain open independently.
+
+E024 converted and verified the exact process, 1 ms sampling and zero lost
+events. Capture 8 through 11 bounds combat at 00:35:34.1295148–00:37:04.1983949
+UTC: 178,841 CPU samples, 66.42% in compiled modules, main 57.86%, SDK 8.25%,
+host 12.57%, unknown 15.98%. Main mapping assigns 96.58% to indexed blocks,
+byte-matched helpers or run-slice export. Across main/SDK, block lookup accounts
+for 12,288 leaf samples (6.87% of all), load32/load64 11,874 (6.64%), and the
+three outlined exact FP32 helpers 6,264 (3.50%). Host RunThread is 1.87% and
+direct exclusive callbacks 0.29%; no dominant host recomp helper emerged.
+Leaf shares locate work, not exact call time or the cause of stutter.
+
+Combat PERF intervals have median 7.9945 FPS (90 samples, 79 below 10), versus
+6.997 in E017's original 90-second combat window. Same preserved host, E016
+initial profile and diagnostic configuration reduce comparison differences,
+but phase mix, inputs/effects, Bluetooth transport and laptop load are not
+matched. The user still perceives similar performance; no causal speedup or
+frame-percentile claim. See E024 for the separate UI metrics and phase checks.
+All four candidate modules are complete and preserved at
+build/recomp/zarvot-fp32-outline. Main is 46.48% smaller than baseline; the five
+previous hot blocks are 95.78% smaller in aggregate. E020's focused semantic
+checks passed; these footprint/synthetic results do not establish full-game
+correctness. Keep both module sets, E013/E017 profiles and raw evidence local.
+Check reports/r03-active-run.json and actual desktop processes before launching.
+Use -RecordCoverage plus the separately verified owned CPU recorder when a new
+user-led test is warranted. Native mapping now selects and verifies the recorded
+build target, rather than assuming baseline; nine focused tests pass.
 
 E017 used
 an isolated clone of E016 for the requested first Story action sequence. The
@@ -150,8 +150,13 @@ the 3.5-hour main build or export unless a source/export change requires it.
   112/144/144/64/56 bytes, excluding callees. Candidate ABI6/features7, generation
   guards, fastmem and FPX handshake/runtime-on were observed. User replayed the
   first Story level/action, reported good movement/effects and some stutter.
-  Audio, death/restart, saves and later routes remain open. Hybrid policy remains
+  At that point audio, death/restart, saves and later routes remained open. Hybrid policy remains
   JIT-capable; zero recorded transitions is not strict/no-JIT proof.
+- E023/E024: controlled setup completed opening action with working Bluetooth,
+  shooting and audible/stable audio reported by the user. Native trace saved
+  normally and was mapped against verified candidate images and preserved host
+  labels. Combat remains slow; target compiled lookup/load paths next. Save,
+  death/restart, original music fidelity and later routes are unverified.
 
 ## Active task state
 
@@ -160,10 +165,10 @@ the 3.5-hour main build or export unless a source/export change requires it.
 | R00 | Complete | Pinned source built suyu/suyu-cmd; command-line host smoke exited 0; exporter RPC worked (E010) |
 | R01 | Complete for fixed exported modules | Four-module Hybrid ABI 6 source/manifest exported successfully; late-loaded/generated code remains unverified |
 | R02 | Complete | Four DLLs/hash evidence; matching host handshakes; advancing AOT counts; rendered title (E013) |
-| R03 | In progress; candidate first Story action played | E021 movement/effects reported good, some stutter; audio/save/death/restart checks pending |
+| R03 | Opening action checked; broader behavior pending | E021 movement/effects good; E023 Bluetooth/shooting/audio fine; saves/death/restart/music fidelity pending |
 | R04 | Pending R03 | Iterative coverage/translation fixes with focused tests |
 | R05 | Pending validated routes | Strict-static zero-fallback tests, then separate no-JIT verification |
-| R06 | Controlled candidate retry recording; user-led action pending | E023 uses E017 host/E016 profile; Stadia Bluetooth bindings detected; coverage and CPU recording verified |
+| R06 | Candidate combat analyzed; narrow runtime prototype next | E024 maps remaining compiled lookup/load cost; differential correctness and synthetic timing before re-export/build |
 | R07 | Pending R05 | Reproducible recomp package and endurance checks |
 | R08 | Pending R05 routes | Expand later-level/mode coverage; track full playthrough separately |
 
@@ -221,8 +226,12 @@ A/B and logging/cache tuning are no longer next actions.
    E023 is the user-requested retry after connecting Stadia before launch:
    build/zarvot-runs/20261012-003140-dc25d36d. Read reports/e023-active-run.json
    and reports/e023-recorders.json; verify current game and recorder state.
-   CPU profile is cpu-profiles/20261012-003248-38053670; it is recording with
-   no error. No saved trace or completed combat/input claim yet.
+   CPU profile is cpu-profiles/20261012-003248-38053670; it completed with a
+   2,545,942,528-byte trace and no error. User confirmed input/shooting/audio,
+   performance about the same. E024 full native export is analysis/
+   20261012-004109-4738000c; capture-bounded combat is 20261012-004418-56508734.
+   Main/SDK mappings are generated-mapping/main-combat-v1 and sdk-combat-v1;
+   preserved-host labels were independently verified in host-attribution.
    Do not tune general emulator settings or
    assume that a synthetic gain is a gameplay gain.
    Collect the user's observations before marking any gameplay/audio check passed.

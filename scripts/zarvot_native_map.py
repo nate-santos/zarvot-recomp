@@ -16,6 +16,7 @@ import json
 import mmap
 import ntpath
 import pathlib
+import re
 import struct
 
 
@@ -278,13 +279,35 @@ def verify_inputs(launch, analysis, image, module, manifest_path):
     return matches[0], text[0]
 
 
+def recorded_target(record):
+    """Old baseline records omitted target; other missing/invalid values never default."""
+    target = record.get('target', 'zarvot')
+    reserved = {'con', 'prn', 'aux', 'nul'} | {f'{kind}{i}' for kind in ('com', 'lpt') for i in range(1, 10)}
+    if not isinstance(target, str) or not re.fullmatch(r'[a-z0-9][a-z0-9-]{0,63}', target) or target in reserved:
+        raise ValueError('Recorded target must be a valid project build directory name')
+    return target
+
+
+def build_record_path(root, launch):
+    target = recorded_target(launch)
+    builds = (root / 'build/recomp').resolve()
+    path = (builds / target / 'build-status.json').resolve()
+    if not builds.is_relative_to(root.resolve()) or path.parent.parent != builds:
+        raise ValueError('Build record resolves outside the project recomp build directory')
+    return target, path
+
+
 def verify_build_record(launch, build, module):
     """Anchor the recorded launch to the project's completed module-set evidence."""
+    if recorded_target(launch) != recorded_target(build):
+        raise ValueError('Launch target differs from the completed project build record')
     if build['state'] != 'complete' or any(launch[key] != build[key] for key in ('image_abi', 'image_features', 'export_manifest_sha256')):
         raise ValueError('Launch differs from the completed project build record')
     recorded = [entry for entry in launch['modules'] if entry['name'] == module]
     completed = [entry for entry in build['modules'] if entry['name'] == module]
-    if len(recorded) != 1 or len(completed) != 1 or any(recorded[0][key] != completed[0][key] for key in ('sha256', 'bytes')):
+    if (len(recorded) != 1 or len(completed) != 1 or
+            recorded[0].get('state') != 'complete' or completed[0].get('state') != 'complete' or
+            any(recorded[0][key] != completed[0][key] for key in ('sha256', 'bytes'))):
         raise ValueError('Selected image differs from the completed project build record')
 
 
@@ -357,7 +380,8 @@ def run(args):
     launch = json.loads(launch_path.read_text(encoding='utf-8-sig'))
     if normalize_path(launch_path.parent) != normalize_path(launch['run_root']):
         raise ValueError('Recorded run root differs from the launch directory')
-    build = json.loads((root / 'build/recomp/zarvot/build-status.json').read_text(encoding='utf-8-sig'))
+    target, build_path = build_record_path(root, launch)
+    build = json.loads(build_path.read_text(encoding='utf-8-sig'))
     verify_build_record(launch, build, args.module)
     analysis = json.loads(samples_path.with_name('summary.json').read_text(encoding='utf-8-sig'))
     image_name = 'recompiled_image.dll' if args.module == 'main' else f'recompiled_{args.module}.dll'
@@ -442,10 +466,10 @@ def run(args):
         if (stat.st_size, stat.st_mtime_ns) != (image.stat().st_size, image.stat().st_mtime_ns):
             raise ValueError('Image changed during analysis')
         output.mkdir(parents=True, exist_ok=False)
-        result = dict(mapping_version=1, module=args.module, image_sha256=expected['sha256'], image_bytes=stat.st_size,
+        result = dict(mapping_version=1, module=args.module, target=target, image_sha256=expected['sha256'], image_bytes=stat.st_size,
                       sample_file_sha256=sha256(samples_path), launch_file_sha256=sha256(launch_path),
                       export_manifest_sha256=launch['export_manifest_sha256'],
-                      build_record_sha256=sha256(root / 'build/recomp/zarvot/build-status.json'),
+                      build_record_path=build_path.relative_to(root).as_posix(), build_record_sha256=sha256(build_path),
                       image_map_file_sha256=sha256(samples_path.with_name('image-maps.csv')),
                       pe_timestamp=hex(pe.timestamp), preferred_base=hex(pe.base), index=index,
                       total_sample_records=total_samples, module_sample_records=selected,

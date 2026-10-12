@@ -895,6 +895,106 @@ statements remain historical and do not override the current STATUS queue.
   remaining candidate compiled CPU work. Do not launch a duplicate or infer
   combat from the launch. Preserve source profiles and test saves.
 
+### E023 closure and user observations
+
+- User confirmed Stadia Bluetooth works, finished opening Story action and
+  closed the window normally. Feedback: performance seemed about the same;
+  shooting and audio were fine. No new movement-specific, save, death/restart
+  or original music fidelity verdict. This establishes scoped user input/audio
+  behavior, not full gameplay correctness.
+- Actual game/coverage/CPU processes all exited. Lifetime coverage ended with
+  process_exited and no error: 206 polls, 199 complete reports, compiled blocks
+  30,934,695 -> 12,665,187,218. Zero UI/file transitions, lookup misses,
+  unhandled opcodes, unresolved import traps, disagreements or counter
+  regressions. Hybrid remains JIT-capable; no strict/no-JIT proof.
+- Owned CPU recorder completed and saved 2,545,942,528-byte cpu.etl without
+  recording or cleanup errors. Preserve the closed trace and all saves. No
+  game or recorder was restarted during analysis.
+
+## E024 — Candidate combat attribution and next runtime target (2026-10-11 local)
+
+- Tasks: R03/R06. Hypothesis: after exact FP32 fallback outlining, remaining
+  recomp costs can be selected from the candidate's own native trace. E023
+  retains E017's exact host SHA 43ae6250..., E016 initial profile, ABI6/features7,
+  PC sampling after120/shift18, CPU.Verbose, capture and coverage configuration.
+  Candidate source remains 84568fcadc; no core change, export or game rebuild.
+- Converted only the completed E023 trace. Full analysis:
+  cpu-profiles/20261012-003248-38053670/analysis/20261012-004109-4738000c.
+  Exact PID/path/start identity passed, sample interval 1 ms, zero lost events;
+  full run has 663,917 leaf samples. Trace session starts 00:32:48.6672033 UTC;
+  the game predates tracing, so recorded identity and clamped trace start are
+  both retained. Full-run samples are not a combat metric.
+- Captures 8–11 show blue jar-arena projectiles, red boss combat/effects and
+  increasing score; 12/13 show letterboxed transition. Combat window uses exact
+  file UTC 00:35:34.1295148–00:37:04.1983949 (90.0688801 seconds), ETL-relative
+  165.4623115–255.5311916. Combat export: analysis/20261012-004418-56508734.
+  Screenshots establish scene at capture times, not continuous identical work.
+- Combat CPU: 178,841 samples; compiled modules 118,791 (66.42%), main 103,486
+  (57.86%), SDK 14,752 (8.25%), host 22,478 (12.57%), unknown 28,574 (15.98%).
+  Unknown samples stay unknown; module fractions are statistical leaf shares,
+  not exact call durations, frame time or causal bottleneck proof.
+- Fixed native mapping's baseline-only build path. Select the launch's recorded
+  build target; require target, completed module state/hash/size, image/manifest,
+  exact process and loaded IP/RVA/time identities to agree. Only absent legacy
+  targets default to zarvot; invalid names, path escapes and mismatches reject.
+  Mapping retains selected build path/hash. Nine focused synthetic tests pass,
+  including candidate selection while baseline metadata is deliberately stale.
+- Real candidate main and SDK mapped using their own verified images and
+  runtime/dispatch COFF objects. Main: 62,411 indexed-block samples, 34,117
+  matched helper samples, 3,420 run-slice export, 3,538 unassigned; 96.58% mapped.
+  SDK: 7,897 indexed blocks, 5,513 matched helpers, 1,019 run-slice, 323 unassigned;
+  97.81% mapped. Metadata workers executed no game blocks. Raw ranges, side
+  entries and generated code stay local in generated-mapping/main-combat-v1
+  and sdk-combat-v1 under the CPU profile.
+- Across main/SDK, recomp_lookup has 12,288 leaf samples (6.87% of all combat),
+  load32/load64 11,874 (6.64%), three outlined exact FP32 helpers 6,264 (3.50%).
+  These helper leaves were previously inlined or shared differently; shifting
+  labels or proportions is not itself an execution improvement. The current
+  loads retain FM1's bounds, same-page, entry-mask checks and shared slow path.
+- Instruction-range review places 1,873 lookup leaves in binary-search fallback
+  (1.05% of all combat samples): 1,383 main and 490 SDK. Of these, 1,862 land in
+  the first segment-search/setup range and 11 in its no-match return; none land
+  in the second entry-search/match range. Shared check samples cannot establish
+  branch outcomes and sampling skid prevents exact call counts. These are
+  internal lookup searches, not JIT transitions or a coverage gap. All 11,874
+  load32/load64 leaves precede the slow-path tail jump; 7,287 are at the fast-only
+  return. Memory latency can move with inlining; those shares are not removable
+  overhead estimates.
+- Reused historical host labels only after independently checking both retained
+  EXE hashes, PE unwind structure and matching historical PDB GUID/age. The
+  rebuilt current PDB/map was not used. A baseline self-check reproduced original
+  counts. Candidate host RunThread: 3,347 (1.87% all), direct exclusive callbacks
+  519 (0.29%), recomp diagnostics 600 (0.34%); entire arm_recomp.cpp object
+  5,116 (2.86%). Largest host leaf Event::WaitFor is 2.52%; caller/cause unknown.
+  Only 454 host leaves remain unlabeled. No dominant host recomp callback found.
+  Evidence is in the CPU profile's host-attribution directory.
+- Same-source PERF intervals: candidate 90 samples, median 7.9945 FPS,
+  range 6.479–12.986, 79/90 below10. E017 combat has 90 samples, median6.997,
+  range4.997–11.992, 85/90 below10. Candidate UI exact capture window:45 samples,
+  median8, range6–13, 35 below10. E017 exact capture window:44 samples,
+  median7.25, range5.5–11.5, 40 below10. Preserve the earlier published rounded
+  E017 UI window separately:45 samples, median7, 41 below10; no silent revision.
+- Phase checks around captures (+/-5 seconds,10 PERF samples each): blue arena
+  candidate7.494 vs baseline6.9965 medians, both all below10; red boss8.7435 vs
+  6.996. The broad windows mix phases differently, and these neighborhoods are
+  not independent benchmark repeats. Inputs/effects, Bluetooth vs wired and
+  laptop load differ. User perceived similar performance. No causal speedup,
+  per-frame percentile, exact hit latency or full correctness claim.
+- Interval evidence: run analysis/20261012-004536-b10729f4/{REPORT.md,summary.json,
+  *csv}. All raw traces, captures, samples, generated labels and profiles remain
+  ignored/local. Shared changes are the mapper, focused tests and this handoff.
+- Decision: keep the smaller, validated FP32 candidate and baseline rollback.
+  Inspect native lookup/load sample locations before selecting the next change.
+  The first narrow prototype skips segment search for addresses the completed
+  block index already rules out, retaining search when index allocation fails.
+  Require generated old/new differential boundary/gap/alignment/random tests,
+  negative controls and quiet synthetic timings before a separate game candidate.
+  FM1 load gates remain later leads: inherited full-helper inlining increased
+  footprint and lost performance, and acquire ordering must be preserved.
+  Do not introduce a TLS dispatch cache based on leaf counts alone; inherited
+  work already found a regression. Graphics, audio, timing and general emulator
+  tuning remain outside scope.
+
 ## Template for the next experiment
 
 - ID / R task / date:
