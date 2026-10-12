@@ -66,7 +66,9 @@ prototype. E031 located most of those block samples in operand preparation and
 validated width-matched scalar FP32 FMUL/FNMUL input copies. Exact FPX gates and
 fallbacks remain unchanged. Broad FP/alias/control checks pass and repeated
 synthetic timings improve; game FPS is unmeasured. A separate zarvot-fp32-operands
-export/build is warranted from core 343402cf54; verify identities and compiled
+export/build is warranted from core 343402cf54. E032 verified that export and
+started its sequential module build with automatic image checks/staging;
+inspect actual build/runner state, then verify identities and compiled
 boot before a future user-led combat test. Preserve all three earlier module sets,
 extend behavioral checks and repeat native CPU comparisons. Smaller code is not
 itself a gameplay speedup.

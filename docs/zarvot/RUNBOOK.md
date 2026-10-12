@@ -950,3 +950,17 @@ and compare source/manifest/coverage before the sequential module build. Keep
 the normal one-compile pool and no overall timeout. Verify all image identities
 and compiled boot, then stage with E017 host/E016 initial profile for later
 user-led combat. No input or new CPU recording is needed for build preparation.
+
+E032's export is complete and verified: 107 of 186 files change only at 65,738
+scalar multiply operand-load sites; manifest/coverage and all runtime/dispatch
+definitions remain identical. The exporter is closed. The detached build runner
+started at 22:47:10 UTC, recorded PID 6092. Inspect actual process state plus
+reports/e032-{build-start,module-runner}.json and module-build logs in the
+workspace, and build/recomp/zarvot-fp32-operands/build-status.json. Do not start a
+second build. The local runner automatically verifies images then stages with
+E017 host/E016 initial profile; ready_for_boot_check still requires a separate
+compiled boot check. All output stays local and earlier targets remain intact.
+If it actually fails and no compiler/runner remains, inspect/fix the cause and
+resume the existing module trees with build-zarvot.ps1 -Target
+zarvot-fp32-operands -ParallelJobs 2. Keep healthy compilation running without an
+arbitrary timeout; no new export is needed for an incremental compile resume.

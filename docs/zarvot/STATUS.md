@@ -1,6 +1,6 @@
 # Zarvot recomp handoff
 
-Updated: 2026-10-12. FP32 operand experiment validated and published (E031).
+Updated: 2026-10-12. FP32 operand candidate exported; module build active (E032).
 
 ## Objective and next action
 
@@ -8,11 +8,20 @@ Work only on the recomp: build, coverage, correctness and execution improvements
 Reuse the compatibility stack. Do not resume general emulator performance,
 settings or GPU tuning. JIT is a reference and temporary hybrid fallback.
 
-**First ready task: R06 — export/build the separate scalar FP32 operand candidate
-from core 343402cf54, then verify images and compiled boot before later combat.**
-Matching exporter rebuild completed; inspect workspace reports/e032-exporter-build.log
-and actual processes before resuming or starting another build. The new target
-will be zarvot-fp32-operands; preserve all three earlier module sets and profiles.
+**First ready task: R06 — inspect the active zarvot-fp32-operands build from core
+343402cf54; let healthy compilation finish, then verify compiled boot.**
+E032 rebuilt the matching exporter and completed/verified the separate export.
+Of 186 module files, 79 are identical and 107 differ only at 65,738 validated
+scalar multiply input-load sites. Manifest/coverage, ABI6/features7 and all
+runtime/dispatch/guard definitions are unchanged. Exporter is closed.
+Detached sequential runner started at 22:47:10 UTC, recorded PID 6092. Inspect
+workspace reports/e032-{build-start,module-runner}.json, module-build.log and
+module-build.stderr.log, build/recomp/zarvot-fp32-operands/build-status.json,
+and actual processes before resuming or starting another build. It has no
+overall timeout and retains the generated one-compile memory pool. After all
+four images finish, the same runner checks hashes/metadata/indexes and stages
+with E017 host/E016 initial profile; ready_for_boot_check is not boot or gameplay
+proof. No game or recorder is running. Preserve all earlier module sets/profiles.
 No new playtest or recording is needed for preparation. E031 attributed the two
 busy dip blocks: 751/1,283 block samples fall in multiply operand preparation,
 with only one on native multiply arithmetic/moves. Partial 32-bit writes into
@@ -36,7 +45,7 @@ E030 completed the
 memory-helper experiment without user input and rejected all four alternatives:
 alignment shortcut adds code and regresses unaligned/mixed loads, reversed and
 combined guards regress, and mask-before-shift compiles to identical helper
-instructions. Core/exporter and all three game module sets remain unchanged.
+instructions. That experiment left core/exporter and game module sets unchanged.
 Do not retry these alternatives or blanket inlining without new evidence.
 
 The final fixture passed 1,110,900 gate/value/context/callback/offset checks,
@@ -274,6 +283,10 @@ the 3.5-hour main build or export unless a source/export change requires it.
   readings in this run and the late 0–9 FPS dip. Lookup binary-search leaves
   disappeared from the samples; memory helpers remain a recomp investigation
   target. No controlled causal speedup or full-game correctness claim.
+- E032: matching exporter rebuilt and separate export verified; all differences
+  are the validated input-load spelling with unchanged coverage/ABI/runtime.
+  Sequential four-module build is active; automatic image checks/staging follow,
+  but compiled boot and later combat are still pending. Inspect actual state.
 - E031: native instruction attribution led to width-matched scalar FP32 multiply
   input copies. Full FP/alias/control checks and repeated synthetic timings
   passed; core 343402cf54 published. Separate exporter/build preparation underway;
@@ -292,7 +305,7 @@ the 3.5-hour main build or export unless a source/export change requires it.
 | R03 | Opening action checked; broader behavior pending | E028 movement/shooting/audio correct by user report; Bluetooth works; saves/death/restart/music fidelity pending |
 | R04 | Pending R03 | Iterative coverage/translation fixes with focused tests |
 | R05 | Pending validated routes | Strict-static zero-fallback tests, then separate no-JIT verification |
-| R06 | FP32 operand source validated; separate build preparation active | E031 removes partial-width operand stack copies without changing gates/FP semantics; inspect E032 exporter/build state, then verify candidate images/boot before later combat |
+| R06 | FP32 operand export verified; separate module build active | E031 removes partial-width operand stack copies without changing gates/FP semantics; inspect E032 build/automatic staging, then verify compiled boot before later combat |
 | R07 | Pending R05 | Reproducible recomp package and endurance checks |
 | R08 | Pending R05 routes | Expand later-level/mode coverage; track full playthrough separately |
 

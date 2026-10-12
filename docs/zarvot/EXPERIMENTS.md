@@ -1462,6 +1462,54 @@ statements remain historical and do not override the current STATUS queue.
   ABI/features and compiled boot before a future user-led combat comparison.
   No new game FPS, broad gameplay correctness, strict/no-JIT or coverage claim.
 
+## E032 — Separate operand candidate export and build (2026-10-12 local)
+
+- Tasks: R01/R02/R06 continuation of E031. Matching exporter rebuilt from core
+  343402cf54b64ede2b931101ae33d2c29976672a in 0.8 minutes. E017's preserved
+  runtime host and all earlier DLL/profile sets remain unchanged. Current build/
+  suyu/bin tools are newer and must not be confused with that comparison host.
+  Exporter executable SHA-256
+  f8ca4b0982086cd0ba80fe3b765097fe6f7fb6bc06cbf50e4da24ea83fce8383;
+  emitter e624290e... as in E031. Workspace reports/e032-exporter-build.log and
+  e032-exporter.json retain full identities. No gameplay/recording/settings work.
+- Isolated portable exporter ran on its dedicated RPC port with translate_all
+  and explicit hybrid backend. New generated/zarvot-fp32-operands output, verified
+  short junction generated/fo, direct export request avoids the old long-path
+  warning without user input. done=true/success=true, no fallback modules;
+  reports/e032-export-status.json preserves completion. Completed hidden exporter
+  had no normal main-window handle; terminated only its verified PID/path/start
+  after output verification. No player session was touched.
+- Full byte/hash and line-by-line comparison of 186 module files: 79 identical,
+  107 changed source units; exactly 65,738 scalar multiply operand-load lines
+  match the validated emitter replacement (main 63,890; SDK 1,710; subsdk0 138).
+  Each following FPX/exact multiply statement is identical. No other source
+  difference accepted. Runtime/header, dispatch, guards, CMake and instruction/
+  side-entry inventory unchanged. Manifest byte-identical SHA-256
+  29f3a9cb0aeec129475a94835cf165dfc48578b7a3e8a372e37d6dfac99cdb47;
+  ABI6/features7, four modules. An unchanged manifest is coverage evidence,
+  not interchangeable codegen identity. Private review is build/
+  e032-compare-export.py and reports/e032-export-{verification.json,compare.log}.
+- Started separate sequential build at 22:47:10 UTC (recorded runner PID 6092),
+  target zarvot-fp32-operands, normal generated memory-aware pool and jobs 2.
+  No overall timeout or duplicate compiler. It builds rtld, SDK, subsdk0, main,
+  records image hashes/sizes and module status. Then it verifies all four image
+  exports/ABI/features and index/rebase probes without invoking guest blocks,
+  and StageOnly clones E017 host/E016 initial profile into a new local run.
+  ready_for_boot_check means those preparation steps passed, not compiled
+  execution or a gameplay result. No automatic game launch/input/CPU recording.
+- Live evidence: build/recomp/zarvot-fp32-operands/build-status.json, workspace
+  reports/e032-{build-start,module-runner}.json, e032-module-build.log and
+  e032-module-build.stderr.log. Private runner build/e032-build-runner.ps1;
+  readiness verifier e032-verify-images.py. On completion inspect
+  reports/e032-image-verification.json and the runner's recorded stage output.
+  Preserve incomplete objects on an actual failure; resume incrementally after
+  checking process identity/state. A quiet healthy compiler is not a stall.
+- Decision: let the build finish. Next verify hashes and compiled boot using an
+  isolated profile, then retain the candidate for a later user-led opening Story
+  comparison with the same preserved host/initial profile and verified recorders.
+  No new coverage gap, FPS improvement, gameplay/FP fidelity or strict/no-JIT
+  claim follows from this export/build-in-progress.
+
 ## Template for the next experiment
 
 - ID / R task / date:

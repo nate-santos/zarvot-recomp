@@ -63,7 +63,8 @@ math blocks and validated a narrow scalar FP32 multiply input-load improvement.
 Over 100 million FP comparisons and 720,896 full-context alias checks passed.
 Repeated synthetic native-path work uses about 59–60% less time in a small block
 and 38–39% less in a large block; these are not game FPS gains. Core 343402cf54
-is published and a separate candidate build is being prepared. The playable
+is published; E032 verified the separate export and started its module build.
+Image verification/staging will follow automatically; boot/gameplay are pending. The playable
 lookup build remains unchanged until that candidate is verified.
 All three module sets and recordings are preserved. Save/death/restart
 checks, original music fidelity, strict/no-JIT
