@@ -1,6 +1,6 @@
 # Zarvot recomp handoff
 
-Updated: 2026-10-12. Lookup candidate combat closed and analyzed (E028/E029).
+Updated: 2026-10-12. Offline memory-helper experiment complete (E030).
 
 ## Objective and next action
 
@@ -8,14 +8,31 @@ Work only on the recomp: build, coverage, correctness and execution improvements
 Reuse the compatibility stack. Do not resume general emulator performance,
 settings or GPU tuning. JIT is a reference and temporary hybrid fallback.
 
-**First ready task: R06 — examine the mapped late-dip blocks and prototype a
-narrow FM1 load-gate/code-layout improvement with focused differential and
-timing checks. No large rebuild or new playtest needed yet.** Keep acquire
-ordering, bounds/page/permission checks, guards and exact FP behavior. Existing
-full-helper inlining regressed; do not repeat it as a default optimization.
-Require meaningful synthetic evidence before changing the exporter or making
-another separate game candidate. The measured load32/load64 leaf share is a
-target to investigate, not a removable fraction of frame time.
+**First ready task: R06 — attribute native sample positions inside the two busy
+late-dip math blocks, then select a focused FP32 gate/code-layout prototype.**
+No new playtest, recording or large rebuild is needed. E030 completed the
+memory-helper experiment without user input and rejected all four alternatives:
+alignment shortcut adds code and regresses unaligned/mixed loads, reversed and
+combined guards regress, and mask-before-shift compiles to identical helper
+instructions. Core/exporter and all three game module sets remain unchanged.
+Do not retry these alternatives or blanket inlining without new evidence.
+
+The final fixture passed 1,110,900 gate/value/context/callback/offset checks,
+deliberate wrong-value/wrong-callback controls, and guarded-page FM1 comparisons
+against disabled FM1/ABI5 for five variants and two seeds. The first three
+alternatives were timed in three quiet ABBAABBA passes, including reversed
+candidate order. Baseline 32/64-bit helper bytes match the recorded game's
+runtime object except relocations. Keep the reusable experiment under
+tests/recomp_memory_gate and scripts/measure-recomp-memory-gate.ps1; local
+evidence is build/zarvot-perf-prototypes/memory-gate-e030-{checked,final}.
+
+Two mapped late-dip blocks each have 17 guest instructions and 2,356 native
+bytes, with 1,085/198 samples (7.90%/1.44% of all dip samples). Both contain
+six FP32 multiplies, four adds, two pair loads, two scalar loads and a compare.
+These are static source counts; block leaf samples also include entry/guard
+and inlined work. Attribute the linked native instruction ranges before
+claiming FP arithmetic causes the dip or changing FPX. Preserve FPCR/FPSR,
+rounding, NaNs, signed zero, subnormals, side entries and acquire/guard ordering.
 
 E028 is closed: build/zarvot-runs/20261012-122856-ec4dadc0, historical game/
 coverage/CPU PIDs 4312/1692/31848 all exited. Exact-process trace exit was
@@ -235,6 +252,9 @@ the 3.5-hour main build or export unless a source/export change requires it.
   readings in this run and the late 0–9 FPS dip. Lookup binary-search leaves
   disappeared from the samples; memory helpers remain a recomp investigation
   target. No controlled causal speedup or full-game correctness claim.
+- E030: four offline FM1 gate alternatives passed correctness checks; none
+  justified a product change. Existing helpers/builds retained. Reusable harness
+  committed; next attribute the two busy dip math blocks before a new prototype.
 
 ## Active task state
 
@@ -246,7 +266,7 @@ the 3.5-hour main build or export unless a source/export change requires it.
 | R03 | Opening action checked; broader behavior pending | E028 movement/shooting/audio correct by user report; Bluetooth works; saves/death/restart/music fidelity pending |
 | R04 | Pending R03 | Iterative coverage/translation fixes with focused tests |
 | R05 | Pending validated routes | Strict-static zero-fallback tests, then separate no-JIT verification |
-| R06 | Lookup candidate measured; next focused prototype ready | E028/E029 closed combat: median 11 vs prior 8 FPS, causal gain unproven; examine dip blocks and FM1 load gate with focused checks before another export/build |
+| R06 | Memory-helper experiment complete; hot math attribution ready | E030 rejected four FM1 alternatives after semantic/timing/code checks; keep current build and map native work in two busy dip math blocks before a new prototype |
 | R07 | Pending R05 | Reproducible recomp package and endurance checks |
 | R08 | Pending R05 routes | Expand later-level/mode coverage; track full playthrough separately |
 

@@ -57,8 +57,12 @@ shooting and audio, with a late slowdown. E029 confirms combat median 11 versus
 prior 8 FPS and a late 0–9 FPS dip before the Story transition. Inputs/scene mix,
 warm-up/cache history and laptop load prevent a causal speedup claim. The new
 lookup has no sampled binary-search leaves; load32/load64 remain 7.23% of combat
-CPU samples. Next examine mapped dip blocks and narrowly prototype FM1 load-gate
-or code-layout changes with semantic/timing checks before another export/build.
+CPU samples. E030 tested four FM1 gate alternatives offline: all passed scoped
+correctness, but timing/code-size evidence rejected the first three and the
+fourth compiled to unchanged instructions. Current emitter/game builds remain
+intact. Two busy late-dip math blocks are the next attribution target; locate
+their native sample positions before selecting a narrow FP32 gate/code-layout
+prototype. Preserve exact semantics and validate before another export/build.
 No rebuild is needed now. Preserve all three module sets,
 extend behavioral checks and repeat native CPU comparisons. Smaller code is not
 itself a gameplay speedup.
@@ -137,8 +141,11 @@ Use the inherited MK8 approach after checking which mechanisms already exist:
   quiet timings before a separate game candidate. Those synthetic checks passed;
   E026's game build and E027's compiled boot check also passed; E028/E029's
   recorded combat comparison supports the intended removal of sampled search
-  work, with no causal game-speedup claim. Next FM1 load-gate prototypes must
-  preserve acquire ordering and avoid the inherited full-helper inlining loss.
+  work, with no causal game-speedup claim. E030's FM1 alignment/guard-order/
+  combined-guard/masked-offset alternatives did not justify a source change.
+  Keep its harness/results to avoid repeating rejected work. Further memory
+  prototypes must preserve acquire ordering and avoid the inherited full-helper
+  inlining loss. Attribute busy FP32 block instructions before another FPX change.
 - Consider LTO/PGO or narrowly recovered native routines only with a demonstrated
   recomp cost and differential tests for the affected behavior.
 

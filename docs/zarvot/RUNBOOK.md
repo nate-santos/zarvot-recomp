@@ -889,3 +889,34 @@ PERF median 37.7245; they are not a combat comparison. See E029 for separate UI
 metrics, native helper shares and their limits. No frame-percentile or causal
 game-speedup claim. Next work is a focused recomp prototype, not another playtest
 or general emulator tuning.
+
+## E030 offline memory-helper comparisons
+
+No gameplay or new recording is required. From the source checkout:
+
+```powershell
+$experiment = .\scripts\measure-recomp-memory-gate.ps1 -Benchmark
+$experiment.WorkDir
+# Optional quiet repeat, using the same immutable build:
+& (Join-Path $experiment.WorkDir 'build\memory_gate.exe') --bench-reverse
+```
+
+The script snapshots emitter/fixtures into a new build/zarvot-perf-prototypes
+directory, builds synthetic FM1 alternatives with MSVC and runs oracles,
+deliberate failing controls and guarded-page comparisons with disabled FM1/ABI5
+using two seeds. Benchmarking is optional and uses ABBAABBA pointer cycles.
+See tests/recomp_memory_gate/README.md. No exporter, game, profile, recording,
+system setting or product source is changed. The fixture retains all logs.
+
+Completed evidence is memory-gate-e030-checked (three guard alternatives, three
+timing passes) and memory-gate-e030-final (four alternatives, final full checks).
+The final source passes 1,110,900 focused checks plus all five differential units
+with two seeds. Baseline helper object bytes match the E028 game runtime except
+relocations. See E030's native sizes/timing table: aligned 83 vs baseline 72 bytes,
+reversed 72, combined 93, masked 72 with identical baseline instructions. All four
+are rejected for product adoption. Do not re-export/rebuild the game for them.
+
+Current core remains 284f411686 and all three game module sets are unchanged.
+Next work can also proceed offline: attribute the native leaves in the two
+mapped late-dip math blocks before choosing a new FP32/emitter prototype. Raw
+generated source, addresses and object disassemblies remain local.

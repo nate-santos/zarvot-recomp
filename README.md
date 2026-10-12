@@ -54,8 +54,12 @@ transitions. E029 confirms median combat interval FPS about 11 versus prior 8,
 supporting the user's impression of smoother action in this run. A late dip
 still reached 0–9 FPS before a Story transition. Different inputs, phase mix,
 warm-up/cache history and laptop load prevent attributing the FPS change to the
-lookup optimization. Native samples no longer land in its binary-search path;
-guest-memory helpers are the next focused recomp investigation.
+lookup optimization. Native samples no longer land in its binary-search path.
+E030 tested four guest-memory helper alternatives without gameplay input. All
+passed focused correctness checks, but none justified replacing the current
+helpers: three regressed or added code and one compiled to unchanged native
+instructions. The reusable harness and results guide the next offline analysis
+of two busy floating-point math blocks. The playable build remains unchanged.
 All three module sets and recordings are preserved. Save/death/restart
 checks, original music fidelity, strict/no-JIT
 execution and later routes remain open. See the [gameplay checklist](docs/zarvot/PLAYTEST.md).

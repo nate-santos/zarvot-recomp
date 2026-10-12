@@ -1296,6 +1296,88 @@ statements remain historical and do not override the current STATUS queue.
   evidence warrants another recomp candidate. Save/death/restart, original
   music fidelity, later routes and strict/no-JIT checks remain separate/open.
 
+## E030 — Offline FM1 memory-helper experiment (2026-10-12 local)
+
+- Task: R06. User requested continuation while unavailable. Completed without
+  gameplay, new recording, administrator prompts or user assistance. Core
+  remains 284f411686, emitter SHA-256
+  6b128794061a1d37aa3f735baa8c72a438848844b7a8361fdd1aff761ecb4ead.
+  All existing game images/profiles stay intact; no exporter/game rebuild.
+- Hypothesis: a narrower or differently scheduled FM1 gate may reduce the
+  load32/load64 leaf work measured in E029. Actual generated FM1 helpers are
+  snapshotted and compiled unchanged alongside generic alternatives; no game
+  code is used. ABI6/FM1 and GG1 use the same load gate, checked by the generator.
+  No acquire fence, guard, FP, callback or ABI/layout changes are applied.
+- Alternatives: omit crossing comparison for naturally aligned accesses;
+  reverse range/crossing guards; combine the predicates with boolean bitwise OR;
+  mask page-offset bits before shifting to form the table offset. The last
+  identity is checked for 64-bit and 32-bit arithmetic; cast follows the shift
+  so high address bits are not prematurely truncated. All FM1 widths are powers
+  of two. These are fixture variants only, not product source changes.
+- Final fixture: 1,110,900 checks across gate eligibility, null-table disabled
+  state, values, ordered callback arguments, full context and offset identities.
+  Independent byte/gate oracles and the existing ABI5/disabled-FM1 comparisons
+  prevent the candidate from becoming its own oracle. Deliberately corrupted
+  value and callback cases exit 1; unknown CLI option exits 2. All controls passed.
+- Guarded-page FM1 differential test ran for baseline plus all four alternatives:
+  20,000,768 operations per leg with seed 1, plus 1,048,576 per leg with seed
+  3735928559, each against disabled FM1 and ABI5 (three legs). Zero mismatches
+  in values, final memory or callback logs. Covers every load/store/pair width,
+  partial limits, unaligned/page-crossing accesses, tracked/unmapped pages,
+  tagged/high addresses and wrap-around. Fault pages expose accidental overreads.
+  These synthetic results are not full-game correctness or a new gameplay verdict.
+- MSVC 19.44 x64, /O2 /Ob2 /bigobj /fp:precise /MD, Release, separate compilation
+  and no LTO. Baseline load32/load64 full COFF extents are 72 bytes each; every
+  nonrelocation byte matches the verified E028 runtime object. Native inspection:
+  aligned 83 bytes adds an alignment branch/register moves, reversed 72 changes
+  guard order, combined 93 introduces setcc/OR/register moves. Masked is 72 with
+  exactly the same code bytes/relocation pattern as baseline for both widths;
+  MSVC canonicalizes the equivalent expression. No reason to change product C.
+- First three alternatives: three quiet ABBAABBA timing passes, with candidate
+  order reversed in the second, optimized dependent pointer cycles and validated
+  endpoints. Hot/spread working sets, aligned/unaligned/50%-mixed loads and
+  disabled FM1, for both widths. Ratios below 1 mean faster; medians of the three
+  per-pass ratios:
+
+  | Alternative | Hot aligned 32/64 | Hot unaligned 32/64 | Spread mixed 32/64 | Disabled 32/64 |
+  |---|---|---|---|---|
+  | alignment shortcut | 0.976 / 0.968 | 1.037 / 1.028 | 1.017 / 1.016 | 1.007 / 0.998 |
+  | reversed guards | 1.053 / 1.055 | 1.052 / 1.062 | 1.044 / 1.044 | 1.089 / 1.103 |
+  | combined predicates | 1.041 / 1.058 | 1.056 / 1.055 | 1.001 / 1.002 | 1.085 / 1.082 |
+
+- Alignment shortcut hot-aligned ratios range 0.949–0.990 for 32-bit and
+  0.965–0.987 for 64-bit across passes, but larger/spread workloads are near
+  neutral or worse and unaligned cases regress. Some baseline groups vary by
+  about 10%; don't claim the small hot-only gain is transferable to Zarvot.
+  Actual game alignment mix is unknown. Reversed/combined guards provide no
+  general benefit. The final four-alternative run also passed all checks;
+  masked timing is near neutral, as expected from its identical instructions.
+  It does not need additional timing to establish the absence of a code change.
+- Local evidence: build/zarvot-perf-prototypes/memory-gate-e030-checked holds
+  immutable fixture/header, three timing logs and results.json for the first
+  three alternatives. memory-gate-e030-final holds the final five-unit comparison,
+  all differential/control logs, generated fixtures, object disassemblies,
+  results.json and hashes. Earlier first-pass output is retained. The initial
+  fourth-variant setup missed a fixture link library; corrected before the final
+  run, with the failed directory retained separately. No product failure.
+  Local analysis scripts: build/e030-summarize.py and e030-hot-blocks.py;
+  workspace reports/e030-memory-{summary,final-summary}.json and logs.
+- Reviewed the two hottest indexed main blocks in the dip mapping against local
+  generated source: each 17 guest instructions/2,356 native bytes; 1,085 and 198
+  leaf samples (7.90%/1.44% of the 13,734 dip samples). Each contains six FP32
+  multiplies, four adds, two pair-load and two scalar-load sites, plus a compare.
+  These are static call-site counts, not dynamic helper counts. Native block
+  samples also include FPX gates, entry/guard checks and inlined work; this does
+  not establish the operation causing the stall. Private labels/source hashes
+  and inventory are in final/hot-dip-blocks.json; no game code/PCs published.
+- Decision: reject all four alternatives for product adoption and keep the
+  validated lookup candidate unchanged. Commit the reusable synthetic harness
+  and sanitized results; avoid spending a large rebuild or another user playtest
+  on these changes. Next attribute native IPs within the two busy dip math
+  blocks, then choose a narrowly tested FP32 gate/code-layout prototype if
+  warranted. Preserve rounding, FPCR/FPSR, NaNs, signed zero, subnormals,
+  side entries, guards/acquire ordering and original gameplay/music timing.
+
 ## Template for the next experiment
 
 - ID / R task / date:
