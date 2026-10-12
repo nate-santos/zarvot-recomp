@@ -60,8 +60,14 @@ E023 subsequently repeated opening action with the E017 host, E016 initial
 profile and verified recorders. The user confirmed Bluetooth works, shooting
 and audio were fine, and performance felt about the same. Both recorders saved
 on normal exit. E024 reviewed capture-bounded combat and mapped the native trace;
-E025's lookup prototype subsequently passed focused and full synthetic checks;
-its separate game export/build is next, before another playtest.
+E025's lookup prototype subsequently passed focused and full synthetic checks.
+E026 completed the separate zarvot-lookup-miss build and staged an unused profile;
+E027 verified compiled boot/title with advancing counts and zero observed
+fallbacks, then closed normally. No gameplay input was sent in that check.
+The next future test should use this target and the preserved E017 host/E016
+initial profile, with coverage and owned CPU recording verified before play.
+No rebuild is needed. Connect Stadia before launch. The new candidate has no
+combat performance or gameplay verdict yet; retain the earlier module sets.
 Save/death/restart, detailed collisions and original music fidelity remain open.
 Keep the initial candidate profile and all existing saves intact.
 

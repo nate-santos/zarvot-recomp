@@ -1,6 +1,6 @@
 # Zarvot recomp handoff
 
-Updated: 2026-10-11. E026 exported the lookup candidate; separate build running.
+Updated: 2026-10-12. Lookup candidate built, staged and compiled boot verified.
 
 ## Objective and next action
 
@@ -8,30 +8,45 @@ Work only on the recomp: build, coverage, correctness and execution improvements
 Reuse the compatibility stack. Do not resume general emulator performance,
 settings or GPU tuning. JIT is a reference and temporary hybrid fallback.
 
-**First ready task: R06 — let the existing zarvot-lookup-miss build finish,
-then verify/stage it for a future session.** E026 rebuilt the exporter from
-core 284f411686 and completed the separate export. All 186 module files were
-compared with the FP32 candidate: 182 are identical and only the four dispatch
+**First ready task: R03/R06 — user-led opening Story combat comparison with
+zarvot-lookup-miss when the user is ready. No rebuild needed.** E026 completed
+all four modules from core 284f411686. Main took 69.7 minutes; all recorded DLL
+hashes/sizes, ABI6/features7, exported metadata and 4,280 lookup/rebase checks
+passed. A preserved unused stage is build/zarvot-runs/20261012-024145-1a00cba2,
+using the E017 host and E016 initial profile. Future normal launch creates a
+new copy; StageOnly is not a resumable session. Connect Stadia before launch,
+then verify coverage attachment and the owned CPU recorder before inviting play.
+The user requested readiness for a future session; no gameplay was automated.
+
+E027 separately verified actual compiled boot/title at
+build/zarvot-runs/20261012-121811-3ca1b234. All four images loaded with guard-v2,
+generation guard, fastmem and FPX negotiation/runtime-on. 88 complete reports
+advance compiled counts 52,851,771 -> 9,287,923,552 with zero UI/file fallbacks,
+import traps, disagreements or regressions. The complete Press Any Button title
+rendered after startup transitions. No controller input was sent. Owned game
+and coverage recorder exited normally; no CPU trace was requested for this
+boot-only check. Hybrid remains JIT-capable, and no combat FPS/behavior gain is
+established. Keep the future stage and all earlier profiles intact.
+
+E026 rebuilt the exporter and completed the separate export. All 186 module
+files were compared with the FP32 candidate: 182 are identical and only the four dispatch
 C files contain exactly E025's validated lookup change. Manifest/coverage,
-ABI6/features7 and game/module inventory are unchanged. The sequential runner
-started at 2026-10-12T01:24:22 UTC (October 11 locally), recorded PID 11980;
-check build/recomp/zarvot-lookup-miss/build-status.json, workspace
-reports/e026-module-runner.json, logs and actual desktop compiler processes.
-Do not start a duplicate or infer completion from a quiet compiler. The user
-requested a rebuild for later testing; stage without starting gameplay.
+ABI6/features7 and game/module inventory are unchanged. Build evidence is in
+build/recomp/zarvot-lookup-miss/build-status.json and workspace
+reports/e026-module-runner.json. Build/preparation PIDs 11980/30768 exited.
+Main DLL is 807,949,824 bytes, SHA ca6976b4...; full identities are in E026.
 
 E025's indexed early-NULL
 change passed 1,616,528 differential lookup checks, a deliberate failing control,
 quiet synthetic timings and the complete five-variant runtime smoke suite.
 Only generated dispatch changes; valid index hits/holes and allocation-failure
-search remain intact. Existing playable modules still use core 84568fcadc and
-do not contain this change. Do not mix/relabel them as the new candidate.
-Preserve zarvot and zarvot-fp32-outline plus E017/E023 profiles. Verify the new
-four-module DLL hashes and load metadata after compilation, and allow
-healthy sequential builds to finish without an arbitrary overall timeout.
+search remain intact. Earlier zarvot-fp32-outline images use core 84568fcadc and
+do not contain this change. Preserve all three module sets and E017/E023
+profiles. For any future affected rebuild, allow healthy sequential compilation
+to finish without an arbitrary overall timeout; retain the memory-aware pool.
 Keep ABI/layout, guards, FP and gameplay timing unchanged. Reuse the E017 host
-and E016 initial profile for a later user-led comparison once all images load
-and both recorders are verified. FM1 load-gate experiments remain later leads;
+and E016 initial profile for the user-led comparison with both recorders
+verified. FM1 load-gate experiments remain later leads;
 inherited full-helper inlining regressed and acquire ordering must survive.
 
 E023 is closed: build/zarvot-runs/20261012-003140-dc25d36d (October 11 locally).
@@ -177,6 +192,10 @@ the 3.5-hour main build or export unless a source/export change requires it.
   when the full block index exists. Synthetic miss timings improve; total
   fixture lookup code shrinks 281 -> 273 bytes. All five runtime smoke variants,
   guards/races and coverage loop pass. No game export/build or FPS result yet.
+- E026/E027: four lookup-candidate modules completed and verified; unused future
+  stage preserved. Separate boot/title check loads/negotiates every image and
+  advances compiled counts with zero observed fallbacks. Both owned test
+  processes are closed. New candidate combat performance/correctness is pending.
 
 ## Active task state
 
@@ -188,7 +207,7 @@ the 3.5-hour main build or export unless a source/export change requires it.
 | R03 | Opening action checked; broader behavior pending | E021 movement/effects good; E023 Bluetooth/shooting/audio fine; saves/death/restart/music fidelity pending |
 | R04 | Pending R03 | Iterative coverage/translation fixes with focused tests |
 | R05 | Pending validated routes | Strict-static zero-fallback tests, then separate no-JIT verification |
-| R06 | Indexed lookup candidate exported; build running | E025 checks pass; E026 verifies only four dispatch changes; wait for existing zarvot-lookup-miss runner, verify/stage images |
+| R06 | Lookup candidate built; compiled boot checked; combat comparison pending | E025 checks, E026 four-image verification/staging and E027 advancing AOT counts pass; user-led recorded route next |
 | R07 | Pending R05 | Reproducible recomp package and endurance checks |
 | R08 | Pending R05 routes | Expand later-level/mode coverage; track full playthrough separately |
 
@@ -203,7 +222,9 @@ A/B and logging/cache tuning are no longer next actions.
    Preserve subsequent changes and check current ahead/behind state afresh.
 3. Inspect existing generated export and build artifacts at the identities in
    RUNBOOK. Baseline source is 5949cab3ba; playable FP32 source is 84568fcadc;
-   lookup candidate source is 284f411686 (exported; build running in E026).
+   lookup candidate source is 284f411686 (built/staged E026, compiled boot E027).
+   Its build/recomp/zarvot-lookup-miss/build-status.json is complete. Do not
+   rebuild it or confuse it with the earlier FP32 target.
    The sequential runner records its PID and module completion/hash evidence in
    build/recomp/zarvot/build-status.json. Check that process and compiler activity
    before restarting; reports/r02-module-set-build.log holds raw progress.

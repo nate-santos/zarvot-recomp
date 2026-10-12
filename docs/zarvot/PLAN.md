@@ -1,6 +1,6 @@
 # Zarvot recomp roadmap
 
-Updated: 2026-10-11. This supersedes the emulator optimization roadmap.
+Updated: 2026-10-12. This supersedes the emulator optimization roadmap.
 
 ## Objective
 
@@ -48,11 +48,12 @@ E023 repeated the route with the preserved host/pre-combat profile and verified
 recorders; Bluetooth, shooting and audio worked, performance felt about the same.
 E024 maps the closed combat trace: compiled lookup/load helpers remain measurable
 targets. E025's indexed early-NULL lookup passed focused differential/timing
-checks and all runtime smoke variants. E026 rebuilt the exporter and verified
-the separate zarvot-lookup-miss export; its sequential module build is running.
-Wait for that runner, verify all four images and stage for the requested future
-session. Existing playable images predate the lookup change.
-Preserve both module sets and extend behavioral checks
+checks and all runtime smoke variants. E026 completed/verified all four separate
+zarvot-lookup-miss images and staged an unused future profile. E027's independent
+boot/title check loaded every image and advanced compiled counts with zero
+observed fallbacks; game/recorder are closed. Next is a user-led opening Story
+combat comparison with verified coverage/CPU recording when the user is ready.
+No rebuild is needed. Preserve all three module sets and extend behavioral checks
 and repeated native CPU comparisons. Smaller code is not itself a gameplay speedup.
 Do not wait for general emulator bottleneck classification or a fresh JIT
 benchmark before R00-R02. Do not wait for a full playthrough before fixing
@@ -127,7 +128,8 @@ Use the inherited MK8 approach after checking which mechanisms already exist:
   allocation-failure search unchanged. Compare generated old/new lookup across
   edge/random PCs, successful/failed allocation, negative controls and repeated
   quiet timings before a separate game candidate. Those synthetic checks passed;
-  game build/validation remain next. Later FM1 load-gate work must
+  E026's game build and E027's compiled boot check also passed; a recorded combat
+  comparison remains next. Later FM1 load-gate work must
   preserve acquire ordering and avoid the inherited full-helper inlining loss.
 - Consider LTO/PGO or narrowly recovered native routines only with a demonstrated
   recomp cost and differential tests for the affected behavior.

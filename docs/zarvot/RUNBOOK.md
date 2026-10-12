@@ -196,8 +196,8 @@ edit the active config while suyu is running: shutdown may overwrite it.
   this fork; its history includes the baseline. Do not mix current host files
   with old launch records silently; E017 retains the baseline host and DLLs.
 - Current lookup source: `284f411686160ceaf7ecaead936148c7de5cfe53` (E025).
-  E026 rebuilt its exporter and exported a separate candidate; compilation is
-  running. Existing playable images still use the earlier FP32 source.
+  E026 completed/verified its separate four-module candidate; E027 verified
+  actual compiled boot/title. Existing FP32 and baseline images stay preserved.
 - Downloaded Windows release asset v0.0.12 SHA-256:
   `415e68c9aaf5374dd7f4864c8f267ce4833e13a2cbb2cc9cdf299ed06634ff2a`.
 - Installed suyu.exe SHA-256:
@@ -793,7 +793,7 @@ negotiation; use the preserved E017 host/E016 initial profile and verified
 recorders for a later user-led comparison. Synthetic miss gains do not establish
 game FPS, and the sampled search portion was only 1.05% of combat CPU leaves.
 
-## E026 lookup export and running build
+## E026 completed lookup build; E027 compiled boot
 
 The rebuilt exporter completed the new export; all 186 module files were
 compared and only the four dispatch C files changed, exactly as validated in
@@ -808,16 +808,43 @@ through trigger_ui_action/aot_test_export. export-recomp.py uses Path.resolve,
 which expands that junction and restores the warning; do not retry it blindly.
 The generated projects use relative sources and were verified byte-for-byte.
 
-The existing hidden sequential runner started at 01:24:22 UTC, recorded PID11980.
-Before any resume, inspect actual desktop process identity, status and compiler
-activity. Logs are workspace reports/e026-module-build.log and stderr.log;
+The hidden sequential runner completed at 02:41:23 UTC (October 11 locally),
+recorded PID 11980. Main took 69.7 minutes. Build/preparation processes have exited;
+all four completed image identities are in E026. Logs are workspace
+reports/e026-module-build.log and e026-module-build.stderr.log;
 completion metadata is reports/e026-module-runner.json and
-build/recomp/zarvot-lookup-miss/build-status.json. Let healthy compilation finish.
-Only after it exits, an incremental resume uses the normal build-zarvot command
-above. No clean rebuild, extra parallel compile or second runner is needed.
+build/recomp/zarvot-lookup-miss/build-status.json. No rebuild is needed. Preserve
+the one-compile pool and sequential modules for any later affected rebuild.
 
-User requested readiness for a future session. Once all images verify, use
-start-zarvot-recomp.ps1 -StageOnly with the preserved E017 host/E016 initial
-profile and -AllowSameGameProfileReuse. Do not start gameplay during preparation.
-StageOnly records no compiled execution or gameplay verdict; a later ordinary
-launch makes another isolated copy and needs both recorders verified.
+Automatic preparation verified hashes/sizes, ABI6/features7, required exports
+and 4,280 index/miss/rebase probes without executing guest blocks. Local evidence:
+reports/e026-{image-verification,preparation,stage-verification}.json. Unused stage:
+build/zarvot-runs/20261012-024145-1a00cba2 with E017 host/E016 initial profile.
+StageOnly records no compiled execution and cannot resume a running session.
+
+E027 independently booted the candidate in
+build/zarvot-runs/20261012-121811-3ca1b234 with the same host/initial profile,
+Capture and RecordCoverage. All four images negotiated ABI6, guard-v2,
+generation guards, fastmem and FPX/runtime-on. Full Press Any Button title was
+visually inspected; startup included transient black captures. 88 complete
+reports advance counts 52,851,771 -> 9,287,923,552 with zero observed transitions,
+traps or counter disagreements/regressions. No controller input or CPU trace.
+Owned game PID 21612 closed through normal window close; recorder PID 19600 ended
+process_exited without error. Exit code was unavailable, not assumed 0.
+Evidence: reports/e027-{active-run,closure,coverage-summary}.json plus the run's
+unique observations/captures/log. The original future stage is still unused.
+
+For the next user-led opening Story comparison, from the workspace root:
+
+```powershell
+$run = .\source\scripts\start-zarvot-recomp.ps1 -Target zarvot-lookup-miss `
+  -HostRoot .\source\build\zarvot-runs\20261011-030031-b40a1ca6 `
+  -ProfileFromRun .\source\build\zarvot-runs\20261006-035803-2d087b29 `
+  -AllowSameGameProfileReuse -Capture -Visible -SamplePc -RecordCoverage
+```
+
+Connect Stadia before launch. Verify coverage attached and separately start/
+verify the owned CPU recorder before inviting play. This creates a new profile;
+do not relaunch the completed boot check or alter the unused stage. Compare the
+named combat route and helper samples; no FPS gain or broader correctness has
+been established for the lookup candidate. Keep strict/no-JIT checks separate.

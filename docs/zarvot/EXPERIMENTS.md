@@ -1077,17 +1077,88 @@ statements remain historical and do not override the current STATUS queue.
   dispatch C files differ by the validated early-NULL replacement. Runtime,
   block bodies, image exports and CMake settings are identical. Generated data
   and detailed per-file identities remain local.
-- Sequential jobs2 build started at 2026-10-12T01:24:22 UTC (October11 local),
-  runner PID11980. Generated compile pool remains1; no overall timeout. rtld
+- Sequential jobs 2 build started at 2026-10-12T01:24:22 UTC (October 11 local),
+  runner PID 11980. Generated compile pool remains 1; no overall timeout. rtld
   completed; SDK is compiling. Main and subsdk0 are pending at this checkpoint.
   Local evidence: workspace reports/e026-{exporter-build.log,exporter.json,
   export-status.json,export-verification.json,generated-comparison.json,
   build-start.json,module-runner.json,module-build.log,module-build.stderr.log};
   build/recomp/zarvot-lookup-miss/build-status.json.
-- Next: let this owned build finish, verify all four DLL hashes/load metadata,
-  stage with E017 host/E016 initial profile without launching gameplay, and
-  update this entry with final identities. No new game execution, correctness
-  or FPS result yet. Future user-led comparison still needs verified recorders.
+- Completion: all four modules finished at 2026-10-12T02:41:23.928Z (October 11
+  locally). Main took 4,187.46 seconds (69.7 minutes); whole runner about 77
+  minutes. Both build and preparation exited successfully, with empty stderr.
+  A large unit temporarily left only 4 MiB physical/1,128 MiB virtual free in a
+  single memory snapshot; compilation continued and succeeded. Retain pool 1,
+  sequential modules and ample time. Do not infer a stall from a quiet log or
+  increase concurrency. These are build resource observations, not game timing.
+- Final images, sizes and SHA-256:
+
+  | Module | Bytes | SHA-256 |
+  |---|---:|---|
+  | rtld | 150,016 | 6d7699fc9c76148528d5826690ae076aa7576ea7c157f57191d00eddbf04575c |
+  | sdk | 103,827,456 | f35d53fa4ae5e6ff13a75c1ac6fc92c7a6ea0812ea8dfca8c1cde0fb3fc83d38 |
+  | subsdk0 | 67,309,568 | 7f0403a7edfd86f9b12f7fee35ae891806e91da4f72bb03b199ce54d5da629e8 |
+  | main | 807,949,824 | ca6976b45808f7ce106e5b82b6375a801dba14a6c8f0c365884d656876a533df |
+
+- Automatic readiness check verified all recorded hashes/sizes, loaded all four
+  DLLs and read ABI6/features7 plus required negotiation/dispatch exports.
+  4,280 metadata lookup checks passed across sampled index results,
+  misalignment/outside probes and two load bases; no guest block was invoked.
+  This checks image readiness, not gameplay or host negotiation. Detailed local
+  evidence: reports/e026-image-verification.json and preparation logs.
+- Staged build/zarvot-runs/20261012-024145-1a00cba2 with E017 host SHA 43ae6250...
+  and a fresh E016 profile clone, same-game identity validation and no game or
+  recorder launch. Preparation state is ready_for_future_test. On October 12,
+  independently rehashed staged host/images; identities still match. Original
+  builds/profiles remain intact. Its six NAND files match the E016 initial
+  profile by hash; this is copy integrity, not a save-persistence verdict.
+  This stage remains unused; E027 is separate.
+- Decision: build complete; no rebuild needed. E027 checks actual compiled boot
+  separately. Opening-combat performance/correctness comparison remains pending
+  the user's future session and verified coverage/CPU recorders. Do not claim a
+  gameplay benefit from identical image sizes or synthetic lookup timing.
+
+## E027 — Lookup candidate compiled boot/title (2026-10-12 local)
+
+- Tasks: R02/R06 readiness. User reported compilation finished and requested
+  continuation. All E026 build/preparation processes were verified exited;
+  all four images had completed and automatic staging succeeded. Independently
+  rehashed the staged host/images before this separate boot. Core 284f411686,
+  ABI6/features7 and E026 image identities; preserved E017 host SHA 43ae6250...
+  with a new E016 initial-profile clone. Original future stage remains unused.
+- Run build/zarvot-runs/20261012-121811-3ca1b234. Historical game PID 21612,
+  started 12:18:12.8300599 UTC; coverage PID 19600 confirmed attached before
+  observation. Used Capture/RecordCoverage, hybrid policy, no PC-sampling or
+  CPU recorder for this boot-only check. No controller input or gameplay was
+  automated. A CPU trace remains required for the future combat comparison.
+- All four candidate DLLs loaded with ArmRecomp active. Guard-v2 ready, ABI6
+  fastmem negotiation, four generation-guard modules and FPX handshake 0x102
+  succeeded. Runtime confirms FPX/fastmem on and generation guard active.
+  Source version text in the preserved host remains historical; recorded
+  image/export/host identities establish which build actually executed.
+- Title animation rendered; two later captures were black during startup.
+  Subsequent captures show the full Zarvot Press Any Button title, visually
+  inspected before closure. Those transient captures do not establish a new
+  graphics defect. No gameplay, input/audio, save or FPS comparison was made.
+- Lifetime coverage finalized process_exited with no error: 93 polls, 88 complete
+  reports; compiled blocks 52,851,771 -> 9,287,923,552. Zero UI/file transitions,
+  lookup misses, unhandled opcodes, unresolved import traps, disagreements or
+  counter regressions. This proves actual compiled boot/title for this new
+  candidate, not complete game coverage, strict-static or no-JIT execution.
+- Closed only the exact PID/path/start-verified game through normal window
+  close at 12:21:20.0919407 UTC. Game and recorder exited; exit code unavailable,
+  not assumed 0. No forced stop or input was needed. Active pointer now records
+  closure; retain all profiles/captures and the separate unused stage.
+- Local evidence: workspace reports/e027-{active-run,closure,coverage-summary}.json;
+  run launch.json, user/log/suyu_log.txt, coverage.txt, captures and unique
+  observations/launch-a5948af47f104983a0dc1927ec711a25. Raw addresses/data remain
+  local. Only sanitized findings and the handoff are published.
+- Decision: candidate is built and ready for a future user-led first Story
+  combat comparison. Keep host/initial profile/diagnostics constant, verify
+  coverage plus owned CPU recording before play, and compare the saved route
+  against E023 with its phase/input limitations. Do not make another source
+  change or repeat the large build before measuring this candidate. No causal
+  gameplay performance improvement or broader correctness claim yet.
 
 ## Template for the next experiment
 
