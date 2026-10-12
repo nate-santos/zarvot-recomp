@@ -1,6 +1,6 @@
 # Zarvot recomp handoff
 
-Updated: 2026-10-12. Lookup candidate built, staged and compiled boot verified.
+Updated: 2026-10-12. Lookup candidate recorded combat test in progress (E028).
 
 ## Objective and next action
 
@@ -8,8 +8,25 @@ Work only on the recomp: build, coverage, correctness and execution improvements
 Reuse the compatibility stack. Do not resume general emulator performance,
 settings or GPU tuning. JIT is a reference and temporary hybrid fallback.
 
-**First ready task: R03/R06 — user-led opening Story combat comparison with
-zarvot-lookup-miss when the user is ready. No rebuild needed.** E026 completed
+**First ready task: R03/R06 — finish and analyze the active E028 user-led opening
+Story combat comparison. No rebuild or duplicate launch.** The user connected
+Stadia before launch and confirmed readiness. Active run is
+build/zarvot-runs/20261012-122856-ec4dadc0: game PID 4312, coverage PID 1692 and
+owned elevated CPU recorder PID 31848 were verified against the exact game
+path/start identity. Both recorders are recording; the user has been invited to
+play and exit normally. CPU profile is cpu-profiles/20261012-122901-7eff4fae;
+coverage observation is observations/launch-1ff88e83acf64f6c899ba13150e7f624.
+Check workspace reports/e028-active-run.json and actual desktop processes before
+acting. The CPU recorder has a 900-second cap; coverage continues until exit.
+Do not stop the game or analyze a live trace. After exit, verify final recorder
+states/errors, bound combat using captures, and compare the verified lookup
+candidate with E023. Collect the user's behavior/stutter report independently.
+At 12:33:20 UTC, 126 complete reports advance compiled counts
+53,114,023 -> 10,755,802,960 with zero UI/file fallbacks, import traps,
+disagreements or regressions. This is an interim execution checkpoint, not a
+combat performance or correctness verdict.
+
+E026 completed
 all four modules from core 284f411686. Main took 69.7 minutes; all recorded DLL
 hashes/sizes, ABI6/features7, exported metadata and 4,280 lookup/rebase checks
 passed. A preserved unused stage is build/zarvot-runs/20261012-024145-1a00cba2,
@@ -196,6 +213,9 @@ the 3.5-hour main build or export unless a source/export change requires it.
   stage preserved. Separate boot/title check loads/negotiates every image and
   advances compiled counts with zero observed fallbacks. Both owned test
   processes are closed. New candidate combat performance/correctness is pending.
+- E028: separate lookup-candidate comparison launched with the preserved E017
+  host and E016 initial profile. Exact-process coverage and elevated CPU
+  recording verified before inviting play. User-led action/final evidence pending.
 
 ## Active task state
 
@@ -207,7 +227,7 @@ the 3.5-hour main build or export unless a source/export change requires it.
 | R03 | Opening action checked; broader behavior pending | E021 movement/effects good; E023 Bluetooth/shooting/audio fine; saves/death/restart/music fidelity pending |
 | R04 | Pending R03 | Iterative coverage/translation fixes with focused tests |
 | R05 | Pending validated routes | Strict-static zero-fallback tests, then separate no-JIT verification |
-| R06 | Lookup candidate built; compiled boot checked; combat comparison pending | E025 checks, E026 four-image verification/staging and E027 advancing AOT counts pass; user-led recorded route next |
+| R06 | Lookup candidate combat recording active (E028) | E025-E027 readiness passes; finalize owned recordings after normal exit, then compare capture-bounded combat with E023 before another emitter change |
 | R07 | Pending R05 | Reproducible recomp package and endurance checks |
 | R08 | Pending R05 routes | Expand later-level/mode coverage; track full playthrough separately |
 
@@ -225,6 +245,8 @@ A/B and logging/cache tuning are no longer next actions.
    lookup candidate source is 284f411686 (built/staged E026, compiled boot E027).
    Its build/recomp/zarvot-lookup-miss/build-status.json is complete. Do not
    rebuild it or confuse it with the earlier FP32 target.
+   E028 is now the active user-led comparison, not E027 or the unused stage.
+   Inspect reports/e028-active-run.json and actual processes before any launch.
    The sequential runner records its PID and module completion/hash evidence in
    build/recomp/zarvot/build-status.json. Check that process and compiler activity
    before restarting; reports/r02-module-set-build.log holds raw progress.

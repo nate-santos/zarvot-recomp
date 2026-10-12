@@ -1160,6 +1160,43 @@ statements remain historical and do not override the current STATUS queue.
   change or repeat the large build before measuring this candidate. No causal
   gameplay performance improvement or broader correctness claim yet.
 
+## E028 — Recorded lookup-candidate opening Story comparison (2026-10-12 local)
+
+- Tasks: R03/R06. User confirmed Stadia was connected and ready before launch.
+  This is the first user-led combat comparison for zarvot-lookup-miss; E027
+  remains a separate boot/title check. No rebuild, gameplay automation or
+  emulator settings tuning. Preserve all three module sets and all profiles.
+- Run build/zarvot-runs/20261012-122856-ec4dadc0, game PID 4312 started
+  12:28:57.7043922 UTC. Core 284f411686, E026 image identities, ABI6/features7;
+  preserved E017 host SHA-256
+  43ae62506a513097acbc0a39f3af3891b103fd159bc67686027311a6833f0e5f,
+  with a fresh E016 initial-profile clone. Same host, profile source and
+  Capture/SamplePc/RecordCoverage setup as the controlled FP32 comparison;
+  laptop load, action phase mix and actual inputs remain uncontrolled.
+- Coverage PID 1692 attached with exact game PID/path/start metadata. Owned
+  elevated CPU recorder PID 31848 started 12:29:00.5606581 UTC; its unique WPR
+  instance reports state recording, recording_started true and no error or
+  cleanup error. Both processes and metadata verified before inviting play.
+  CPU.Verbose/file recording is capped at 900 seconds or game exit; coverage
+  continues until exit. Never cancel another session or analyze a live ETL.
+- Interim checkpoint at 12:33:20 UTC: 131 polls, 126 complete reports;
+  compiled blocks 53,114,023 -> 10,755,802,960. Zero UI/file transitions,
+  lookup misses, unhandled opcodes, unresolved import traps, disagreements or
+  counter regressions. CPU state remains recording. These are execution and
+  recorder-readiness observations, not combat speed or gameplay verdicts.
+- Local evidence: workspace reports/e028-{active-run,recorders,ready}.json;
+  run launch.json, observations/launch-1ff88e83acf64f6c899ba13150e7f624 and
+  cpu-profiles/20261012-122901-7eff4fae/cpu-profile.json. Active pointer is
+  reports/r03-active-run.json. Logs, captures, samples and raw traces stay local.
+- Next: user plays opening Story action and exits normally. Verify both final
+  recorder states, trace save/identity and no errors; retain the user's
+  stutter/input/audio observations separately. Bound combat with captures,
+  export the exact-process samples and map against this candidate's verified
+  images/objects. Compare lookup leaf work and interval FPS with E023, with
+  scene/input/load limitations. No game speedup, strict-static/no-JIT or
+  broader correctness claim before reviewing that evidence. Do not make
+  another source change or repeat compilation while this comparison is pending.
+
 ## Template for the next experiment
 
 - ID / R task / date:

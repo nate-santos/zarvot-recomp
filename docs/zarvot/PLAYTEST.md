@@ -64,10 +64,15 @@ E025's lookup prototype subsequently passed focused and full synthetic checks.
 E026 completed the separate zarvot-lookup-miss build and staged an unused profile;
 E027 verified compiled boot/title with advancing counts and zero observed
 fallbacks, then closed normally. No gameplay input was sent in that check.
-The next future test should use this target and the preserved E017 host/E016
-initial profile, with coverage and owned CPU recording verified before play.
-No rebuild is needed. Connect Stadia before launch. The new candidate has no
-combat performance or gameplay verdict yet; retain the earlier module sets.
+E028 now uses this target and the preserved E017 host/E016 initial profile in
+build/zarvot-runs/20261012-122856-ec4dadc0. The user connected Stadia before
+launch; coverage PID 1692 and owned CPU recorder PID 31848 were verified
+recording for game PID 4312 before inviting opening Story action. The user
+handles inputs and normal exit. Inspect actual processes and the active pointer
+before acting; do not launch another session. After exit, finalize recordings,
+collect the behavior/stutter report and bound combat using captures.
+No rebuild is needed. The new candidate has no final combat performance or
+gameplay verdict yet; retain the earlier module sets.
 Save/death/restart, detailed collisions and original music fidelity remain open.
 Keep the initial candidate profile and all existing saves intact.
 
