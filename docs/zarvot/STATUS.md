@@ -8,8 +8,18 @@ Work only on the recomp: build, coverage, correctness and execution improvements
 Reuse the compatibility stack. Do not resume general emulator performance,
 settings or GPU tuning. JIT is a reference and temporary hybrid fallback.
 
-**First ready task: R06 — capture the optimized candidate's native CPU work on
-the same user-led opening Story combat route.** All four candidate modules are
+**First ready task: R06 — complete the active controlled candidate recording,
+then analyze its closed combat trace.** E023 is open at
+build/zarvot-runs/20261012-003140-dc25d36d (October 11 locally), game PID 24476.
+Automatic lifetime coverage attached (recorder PID 29464); owned CPU recorder
+PID 21416 is recording, verified from
+cpu-profiles/20261012-003248-38053670/cpu-profile.json. User connected the Stadia
+controller over Bluetooth before this retry; F12 panel detects it and saved
+bindings use its Bluetooth identifier. User asked to confirm controls, repeat
+opening Story action and exit normally. Check actual metadata/heartbeats;
+do not launch another game or analyze a live trace. Use the existing active
+pointer and exact PID/path/start identity; never operate on another WPR instance.
+All four candidate modules are
 complete and hash-verified; do not rebuild them. E021 reached the first action
 sequence. The user reported improvement, good movement/effects and remaining
 stutter. Its final report contains 9,340,755,870 compiled blocks and zero fallback
@@ -153,7 +163,7 @@ the 3.5-hour main build or export unless a source/export change requires it.
 | R03 | In progress; candidate first Story action played | E021 movement/effects reported good, some stutter; audio/save/death/restart checks pending |
 | R04 | Pending R03 | Iterative coverage/translation fixes with focused tests |
 | R05 | Pending validated routes | Strict-static zero-fallback tests, then separate no-JIT verification |
-| R06 | FP32 candidate built and exercised; controlled profiling next | E021: smaller actual hot blocks and initial improved impression; capture candidate CPU work with E017 host/E016 profile |
+| R06 | Controlled candidate retry recording; user-led action pending | E023 uses E017 host/E016 profile; Stadia Bluetooth bindings detected; coverage and CPU recording verified |
 | R07 | Pending R05 | Reproducible recomp package and endurance checks |
 | R08 | Pending R05 routes | Expand later-level/mode coverage; track full playthrough separately |
 
@@ -204,6 +214,15 @@ A/B and logging/cache tuning are no longer next actions.
    rebuilt host and post-E017 profile, so it is an exploratory comparison.
    Preserved-baseline host plus E016 profile is verified/staged separately at
    build/zarvot-runs/20261011-152125-1090520b; no game/recorders started there.
+   E022 closed before combat because the Bluetooth controller did not control
+   the game. Run build/zarvot-runs/20261012-002546-8ac4669a retains 84 complete
+   UI/file reports with zero transitions and a successfully saved 809,500,672-byte
+   CPU trace; it is startup evidence, not a combat comparison. Recorders finished.
+   E023 is the user-requested retry after connecting Stadia before launch:
+   build/zarvot-runs/20261012-003140-dc25d36d. Read reports/e023-active-run.json
+   and reports/e023-recorders.json; verify current game and recorder state.
+   CPU profile is cpu-profiles/20261012-003248-38053670; it is recording with
+   no error. No saved trace or completed combat/input claim yet.
    Do not tune general emulator settings or
    assume that a synthetic gain is a gameplay gain.
    Collect the user's observations before marking any gameplay/audio check passed.

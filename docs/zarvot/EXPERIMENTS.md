@@ -835,6 +835,66 @@ statements remain historical and do not override the current STATUS queue.
   Repeat equivalent routes before any gameplay speedup claim. No graphics,
   timing, accuracy, music or general emulator tuning is part of this work.
 
+## E022 — Controlled startup recorded; stopped for controller (2026-10-11 local)
+
+- Task: R03/R06. User asked to continue after the exploratory action result.
+  Committed/pushed E021 findings and tested automatic recorder in `b78135a`.
+  Launched a new isolated candidate from the preserved E017 host and E016
+  pre-combat profile, with same game/coverage identities and unchanged settings.
+  No rebuild or controller input. All four candidate files verified again.
+- Recorded run: build/zarvot-runs/20261012-002546-8ac4669a (UTC ID; October 11
+  locally), game PID 31080. Hybrid, Capture, SamplePc after120/shift18 and
+  RecordCoverage enabled. Coverage recorder PID 27972 confirmed matching
+  game/recorder identity at launch; observation is recorded in launch.json and
+  workspace reports/e022-active-run.json. This live attachment validates the
+  new launch path independently of synthetic tests.
+- Owned CPU recorder requested with the same CPU.Verbose/900-second configuration
+  as E017. User approved Windows administrator consent; recorder PID 18828
+  entered recording at 00:27:17 UTC, with recording_started=true, fresh heartbeat
+  and no error. Local profile cpu-profiles/20261012-002717-f6e1631b.
+  Coverage also advanced 103,643,028 -> 5,714,439,554 across 50 complete early
+  UI/file reports with zero transitions. Both recorder states were checked before
+  inviting action. No combat occurred before the closure recorded below.
+  User invited to repeat opening Story combat and exit normally to finalize evidence.
+  Do not analyze a live trace or launch another game. The staging-only E021 copy,
+  E017 profiled baseline and all saves remain intact.
+- User exited before combat because a Bluetooth controller did not control the
+  game; earlier play used wired input. Identified as Stadia, recognized by Windows.
+  Final coverage: 90 polls, 84 complete reports; AOT advanced 103,643,028 ->
+  8,014,253,978, zero UI/file transitions, no recorder error. Native recorder
+  saved successfully on process_exited: 809,500,672-byte cpu.etl, no error or
+  cleanup error. Normal game/recorder closure verified. This is startup evidence,
+  not candidate combat data; do not spend a conversion treating it as combat.
+- Log shows no initial controller motion-device notices, then device arrival
+  around 138 seconds. Saved bindings still referenced the wired connection.
+  A transport/binding mismatch is plausible; exact cause not established. User
+  asked to retry with Stadia connected before launch. Keep all saves/evidence.
+
+## E023 — Stadia Bluetooth retry with controlled recording (2026-10-11 local)
+
+- Tasks: R03/R06. User explicitly requested another test with the Stadia
+  controller connected first. Confirmed prior game/recorders closed; retained
+  E022 trace and profile. Fresh candidate again uses E017 host and E016 initial
+  save/cache with original timing/graphics/audio settings. No export/rebuild.
+- Active run: build/zarvot-runs/20261012-003140-dc25d36d (UTC ID; October 11
+  locally), game PID 24476; coverage recorder PID 29464 attached at launch.
+  Owned native recorder PID 21416 entered recording with no error under
+  cpu-profiles/20261012-003248-38053670. Verified both before inviting action.
+  Hybrid, captures, PC sampling after120/shift18 and CPU.Verbose/900-second limit
+  match the intended diagnostic comparison. Live AOT counts advance, no observed
+  UI/file transitions. No saved trace or completed gameplay result yet.
+- F12 controls panel actually lists Google Stadia Controller 0. Current persisted
+  Player 1 button/stick bindings use its Bluetooth transport identifier rather
+  than the prior wired identifier. Panel subsequently closed; no gameplay inputs
+  sent by tooling. Detection/binding is not a successful user input verdict.
+  This controller check is required for the recomp playtest.
+  Connection transport differs from E017; retain it as a comparison limitation.
+- User invited to confirm menu control, repeat first Story action, report
+  stutter/movement/shooting/audio and exit normally. Next inspect actual process
+  and recorder state, verify saved trace/errors, then bound combat and map the
+  remaining candidate compiled CPU work. Do not launch a duplicate or infer
+  combat from the launch. Preserve source profiles and test saves.
+
 ## Template for the next experiment
 
 - ID / R task / date:

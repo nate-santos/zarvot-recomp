@@ -385,6 +385,18 @@ and use the same desktop context for launch and recording.
 Start the owned CPU recorder described below and verify recording_started/state
 before inviting combat. Coverage attachment alone does not imply CPU recording.
 
+E022 used that configuration but closed before combat because Bluetooth input
+did not control the game. It retains successful startup coverage and an owned
+809,500,672-byte CPU trace; both recorders finished. E023 is the requested retry
+with Stadia connected before launch: build/zarvot-runs/20261012-003140-dc25d36d
+(October 11 locally). Automatic coverage attached; owned CPU recorder PID 21416
+is recording under cpu-profiles/20261012-003248-38053670, with no error.
+F12 detects Google Stadia Controller 0 and current bindings use Bluetooth.
+Both recorders were verified before inviting action; actual control remains a
+user check. Inspect metadata/heartbeats and the active pointer before proceeding,
+rather than starting another game or duplicate recorder. Keep transport-specific
+bindings in test profiles; preserve original wired settings and saves.
+
 E021 main completed at 15:02:11 UTC after 4,051.7 seconds (67.5 minutes).
 Its 807,949,824-byte DLL SHA-256 is
 `88c28454edb7ace30d0d9c9633009ca473be3f7da9e3ea605c2be8ed1cd5e386`.
@@ -598,6 +610,13 @@ time and actual combat interval before drawing conclusions. Retain raw ETLs
 locally. Matching host symbols are in build/suyu/bin/suyu-cmd.pdb and .map;
 the four generated DLLs have no PDB/maps, so initial AOT attribution is by module
 and native address. Do not confuse helper stacks with guest-PC execution counts.
+
+E020 rebuilt build/suyu/bin, including host symbols. Those current symbols may
+not match the preserved E017 host used in E022/E023. Require the EXE hash and PE/PDB
+GUID/age before applying labels. E018 retains verified baseline host label/range
+evidence in E017's host-attribution directory. The exact-process analyzer below
+exports native addresses/module identities without host symbol resolution;
+module shares and generated-image mapping do not require a host PDB.
 
 Portable Microsoft PerfView 3.2.8 is prepared under ignored local/tools/PerfView;
 provenance.json records its official release, SHA-256 and valid Microsoft
