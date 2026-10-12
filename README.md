@@ -16,32 +16,26 @@ correctness, full-game coverage, strict-static/no-JIT execution or a speedup.
 The existing JIT runtime reaches controllable opening Story gameplay.
 Later levels, full-game correctness and music fidelity remain unverified.
 
-User-led recomp combat rendered, but severe slowdowns around hit effects were
-reported. All 299 complete recorder reports showed zero fallback transitions;
-the user's earlier visible-transition recollection is now uncertain. Some hitches
-coincided with graphics-pipeline creation; compiled CPU cost remains unprofiled (E015).
+The first Story action sequence had severe slowdowns despite zero observed
+fallbacks (E017). Native CPU sampling placed 71.64% of combat samples in compiled
+modules. E019 mapped 97.49% of main samples and found very large repeated FP32
+exact fallback bodies in busy blocks. E020 shares those bodies while retaining
+inline native FPX checks and exact semantics. It passed 76,477,440 value/flag
+comparisons and 458,752 whole-context alias checks. A large synthetic block took
+74.7% less elapsed CPU time; this is not a game FPS result.
 
-**Next: finish the separate optimized recomp build, then compare matched combat.**
-E016 adds process-lifetime recording of the actual window caption and coverage
-independently. All 146 samples showed zero transitions; compiled-PC sampling
-worked. Story room/dialogue rendered, but the user confirmed no combat in this
-run. Repeat combat before attributing its cost; no fallback gap is corroborated.
-E017 repeated the first Story action sequence: the user reported severe slowdowns,
-while all 232 coverage samples showed zero transitions. E018 native sampling
-places 71.64% of combat CPU samples in compiled modules, including 65.01% in main.
-E019 maps 97.49% of main samples to generated block extents, matched object
-helpers or the run-slice export. Several busy blocks have very large repeated
-FP32 fallback bodies. A candidate shares those exact bodies while keeping native
-FPX checks inline. E020 passed 76,477,440 value/flag comparisons and 458,752
-whole-context alias checks. A generic large-block benchmark reduced native code
-from 587,035 to 13,792 bytes and median elapsed CPU work by 74.7%; this is not a
-game FPS result. The source change is published in the project's core fork.
-The matching candidate export completed; its separate four-module build is active.
-These samples locate CPU work without establishing the slowdown's cause or a game speedup.
-Behavioral correctness checks remain pending.
-The main MSVC build took 210.9 minutes and produced a roughly 1.5 GB DLL.
-Build cost and generated-code efficiency remain recomp work. See E013 for
-execution evidence and the [gameplay checklist](docs/zarvot/PLAYTEST.md).
+E021 completed and exercised the separate optimized module set. Main built in
+67.5 minutes and shrank from 1,509,548,544 to 807,949,824 bytes. The same five hot
+block extents shrank 95.78% in total. The user replayed the first Story action,
+reported improvement and good movement/effects, with some stutter remaining.
+The final report recorded 9.34 billion compiled blocks and zero fallback/import
+traps. Initial combat interval readings are encouraging, but differing host,
+profile state and recording overhead prevent a controlled speedup claim.
+
+**Next: profile the candidate on the same combat route using the preserved host
+and pre-combat profile, with recorders attached before play.** Both module sets
+are preserved; no rebuild is needed. Audio/save/death/restart checks, strict/no-JIT
+execution and later routes remain open. See the [gameplay checklist](docs/zarvot/PLAYTEST.md).
 
 ## Development sequence
 

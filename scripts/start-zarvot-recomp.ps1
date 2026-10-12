@@ -9,6 +9,7 @@ param(
     [switch]$Strict,
     [switch]$Capture,
     [switch]$Visible,
+    [switch]$RecordCoverage,
     [switch]$SamplePc,
     [ValidateRange(0, 86400)][int]$SampleAfterSeconds = 120,
     [string]$ProfileFromRun,
@@ -17,6 +18,7 @@ param(
 )
 
 $ErrorActionPreference = 'Stop'
+if ($RecordCoverage -and $StageOnly) { throw 'RecordCoverage requires a running game; it cannot be combined with StageOnly' }
 . (Join-Path $PSScriptRoot 'zarvot-profile.ps1')
 $root = Split-Path -Parent $PSScriptRoot
 if ($AllowSameGameProfileReuse -and -not $ProfileFromRun) {
@@ -252,6 +254,12 @@ $launch = [ordered]@{
     pc_sampling_requested = [bool]$SamplePc
     pc_sample_after_seconds = if ($SamplePc) { $SampleAfterSeconds } else { $null }
     pc_sample_shift = if ($SamplePc) { 18 } else { $null }
+    coverage_recording_requested = [bool]$RecordCoverage
+    coverage_recorder_state = if ($RecordCoverage) { 'pending' } else { 'not_requested' }
+    coverage_recorder_pid = $null
+    coverage_recorder_started_utc = $null
+    coverage_observation_path = $null
+    coverage_recorder_error = $null
     profile_source_run_id = if ($profileRoot) { Split-Path -Leaf $profileRoot } else { $null }
     profile_source_manifest_sha256 = $oldManifestHash
     profile_reuse_mode = if (-not $profileRoot) { $null } elseif ($AllowSameGameProfileReuse) { 'same-game-cross-build' } else { 'same-build' }
@@ -289,10 +297,70 @@ if (-not $StageOnly) {
         $launch.process_started_utc = $process.StartTime.ToUniversalTime().ToString('o')
         $launch.state = 'started'
         Save-Launch
+        if ($RecordCoverage) {
+            # Establish the recorder from this same launch context, before the
+            # user can finish a short test. A unique file cannot match an old run.
+            $launch.coverage_observation_path = Join-Path $runRoot ('observations/launch-' + [Guid]::NewGuid().ToString('N') + '/observation.json')
+            $stdout = Join-Path $runRoot 'coverage-recorder.stdout.log'
+            $stderr = Join-Path $runRoot 'coverage-recorder.stderr.log'
+            Save-Launch
+            try {
+                $shell = [Diagnostics.Process]::GetCurrentProcess().MainModule.FileName
+                $helper = Join-Path $PSScriptRoot 'measure-zarvot-coverage.ps1'
+                # Start-Process joins ArgumentList as native command text. All
+                # paths are quoted, and none ends with a backslash before its quote.
+                $arguments = '-NoLogo -NoProfile -NonInteractive -File "{0}" -RunRoot "{1}" -ObservationPath "{2}" -UntilExit' -f $helper,$runRoot,$launch.coverage_observation_path
+                $recorder = Start-Process -FilePath $shell -ArgumentList $arguments -WorkingDirectory $runRoot `
+                    -WindowStyle Hidden -RedirectStandardOutput $stdout -RedirectStandardError $stderr -PassThru
+                $launch.coverage_recorder_pid = $recorder.Id
+                $launch.coverage_recorder_started_utc = $recorder.StartTime.ToUniversalTime().ToString('o')
+                $launch.coverage_recorder_state = 'starting'
+                # The child reads launch.json once at startup. Do not rewrite it
+                # concurrently; persist its PID after attachment or failure.
+                $ready = [Diagnostics.Stopwatch]::StartNew()
+                while ($ready.Elapsed.TotalSeconds -lt 8) {
+                    $recorder.Refresh()
+                    if ($recorder.HasExited) { throw "Coverage recorder exited during startup (exit $($recorder.ExitCode)); see $stderr" }
+                    if (Test-Path -LiteralPath $launch.coverage_observation_path) {
+                        # A concurrent initial write may be incomplete; only a
+                        # parsed report establishes attachment, within the bound.
+                        $observation = $null
+                        try { $observation = Get-Content -LiteralPath $launch.coverage_observation_path -Raw | ConvertFrom-Json }
+                        catch { }
+                        if ($observation) {
+                            if ($observation.pid -ne $launch.pid -or
+                                ([DateTime]$observation.process_started_utc).ToUniversalTime().ToString('o') -ne $launch.process_started_utc -or
+                                $observation.recorder_pid -ne $recorder.Id -or $observation.run_root -ne $runRoot -or
+                                -not $observation.until_exit -or $observation.end_reason -ne 'recording' -or $observation.error) {
+                                throw 'Coverage recorder reported a different process identity or failed attachment'
+                            }
+                            $recorder.Refresh()
+                            if ($recorder.HasExited) { throw "Coverage recorder exited during startup (exit $($recorder.ExitCode)); see $stderr" }
+                            $launch.coverage_recorder_state = 'attached'
+                            break
+                        }
+                    }
+                    Start-Sleep -Milliseconds 100
+                }
+                if ($launch.coverage_recorder_state -ne 'attached') {
+                    throw "Coverage recorder did not confirm attachment within 8 seconds; see $stderr"
+                }
+            } catch {
+                # Preserve the running game and the one recorder attempt. The
+                # launch result explicitly distinguishes a failed recorder start.
+                $launch.coverage_recorder_state = 'startup_failed'
+                $launch.coverage_recorder_error = $_.Exception.Message
+            }
+            Save-Launch
+        }
     } finally {
         Get-ChildItem Env: | Where-Object { $_.Name -like 'SUYU_RECOMP_*' -or $_.Name -like 'SUYU_CMD_*' } |
             ForEach-Object { Remove-Item -LiteralPath "Env:\$($_.Name)" }
         foreach ($name in $previous.Keys) { Set-Item -LiteralPath "Env:\$name" -Value $previous[$name] }
     }
 }
-[pscustomobject]@{ RunRoot = $runRoot; Pid = $launch.pid; StrictRequested = [bool]$Strict; State = $launch.state }
+[pscustomobject]@{
+    RunRoot = $runRoot; Pid = $launch.pid; StrictRequested = [bool]$Strict; State = $launch.state
+    CoverageRecorderState = $launch.coverage_recorder_state; CoverageRecorderPid = $launch.coverage_recorder_pid
+    CoverageObservation = $launch.coverage_observation_path; CoverageRecorderError = $launch.coverage_recorder_error
+}

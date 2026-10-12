@@ -7,8 +7,8 @@ remain separate. A visible title and zero fallbacks establish only that route.
 | Check | Current state | Required observation |
 |---|---|---|
 | P00: boot/title | Complete for E013 smoke scope | Four matching images; advancing AOT counts; visible title |
-| P01: menus / Story entry | Menu/arena rendered (E015); Story room/dialogue rendered (E016); exact route and correctness pending | Buttons respond; menus/text render; opening Story loads |
-| P02: opening movement / shooting | First Story action sequence played; severe slowdowns reproduced with zero observed fallbacks (E017); correctness pending | Movement and shots behave correctly; no stuck input or visual corruption |
+| P01: menus / Story entry | User reached first Story level/action again in candidate E021; broader menu checks pending | Buttons respond; menus/text render; opening Story loads |
+| P02: opening movement / shooting | E021 user reported good movement/effects in first action, with some stutter; detailed shooting/collision checks pending | Movement and shots behave correctly; no stuck input or visual corruption |
 | P03: pause / restart / death | Pause menu rendered (E015); resume/restart/death pending | Pause/resume and restart/death flow behave correctly |
 | P04: next scene / level | Different scene rendered (E015); transition correctness pending | Transition/load completes with correct visuals/input |
 | P05: save / exit / relaunch | Untested in recomp | Reuse the same test profile; expected progress persists |
@@ -27,9 +27,10 @@ prior closed test profile; compiled-PC sampling worked. Both game and recorder
 have exited. Repeat combat and record its mode/level; E016 does not revalidate
 combat cost or correctness, or disprove a historical transient observation.
 
-Launch a fresh isolated Hybrid run using scripts/start-zarvot-recomp.ps1 -Visible;
-use scripts/measure-zarvot-coverage.ps1 against its returned run directory while the
-user plays. The CLI title displays the active backend and fallback transitions;
+Launch a fresh isolated Hybrid run using scripts/start-zarvot-recomp.ps1 with
+-Visible -RecordCoverage; require CoverageRecorderState=attached before inviting
+play. For CPU comparisons, separately verify the owned CPU recorder is recording.
+The CLI title displays the active backend and fallback transitions;
 F12 opens its existing controls panel. The recorder sends no input and makes no
 gameplay or performance verdict.
 
@@ -47,8 +48,16 @@ E017 recorded this route: the user played the first action sequence and reported
 many slowdowns/bad frame rates. Captures show the Story menu, opening jar arena
 with Pew Pew prompt, combat effects/score and a Story transition. All 232 complete
 UI/file samples had zero fallback/import traps; CPU trace saved on normal exit.
-This does not establish input, restart/death, save or audio correctness. Analyze
-the trace before another performance run.
+This does not establish input, restart/death, save or audio correctness. E018/E019
+analyzed the trace and E020 produced a separately validated FP32 candidate.
+
+E021 exercised that candidate on the first Story level/action. The user said it
+seemed better and movement/effects looked good, with some frame-rate stutter.
+Screenshots confirm the jar-arena/Chomp action; the final report records zero
+fallback/import traps. Separate UI/native CPU recorders missed that short run.
+Audio and save/death/restart behavior remain unconfirmed. Next repeat with the
+E017 host, E016 initial profile and verified recorders before combat. Keep the
+initial candidate profile and all existing saves intact.
 
 For a future focused repeat, start Story and reach the first
 action sequence; report when combat begins and which room/tutorial name appears.
@@ -67,6 +76,8 @@ Strict testing must repeat an already checked named route with zero fallback
 attempts and advancing counts. Prove no-JIT separately with its build graph,
 symbol audit and runtime availability telemetry. Neither is established by E013.
 
-No recomp speedup has been measured. E013 title rates were interval observations,
-with uncontrolled startup/caches/focus, and do not support a comparative claim.
+No controlled gameplay speedup has been established. E021's exploratory combat
+readings and the user's impression are encouraging; host/profile/diagnostic
+differences and one confirmed combat capture limit the comparison. E013 title
+rates were interval observations with uncontrolled startup/caches/focus.
 Preserve original timing/music behavior when investigating compiled-code cost.

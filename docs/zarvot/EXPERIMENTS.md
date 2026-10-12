@@ -754,6 +754,87 @@ statements remain historical and do not override the current STATUS queue.
   execution and compare the same user-led opening combat route. Revert by
   selecting preserved baseline artifacts; do not overwrite them.
 
+## E021 — Completed FP32 candidate and first Story action check (2026-10-11)
+
+- Tasks: R02/R03/R06. Resumed by inspecting actual status/processes, without a
+  duplicate build. E020's four-module runner completed at 15:02:11 UTC. Main
+  took 4,051.7 seconds (67.5 minutes); its DLL shrank 1,509,548,544 -> 807,949,824
+  bytes (46.48%). Baseline's 210.9-minute duration had different resume/resource
+  conditions; this is not a controlled compiler-speed measurement.
+- Candidate core remains `84568fcadc2b8f062022180b6492d0d8975f4d34`, ABI6/features7,
+  identical game/coverage manifest hash
+  `29f3a9cb0aeec129475a94835cf165dfc48578b7a3e8a372e37d6dfac99cdb47`.
+  Main SHA-256 `88c28454edb7ace30d0d9c9633009ca473be3f7da9e3ea605c2be8ed1cd5e386`;
+  rtld `e98a84bf4cea30fea44247e00eba3a2fa19e8139ae9847a012c6a23ded36e732`.
+  SDK/subsdk0 hashes remain those recorded in E020. All four files matched their
+  completed build record before staging/launch. Original exports/images intact.
+- Metadata-only comparison matched the five E019 hot blocks by identical index
+  and guest side-entry spans. Verified native unwind boundaries and every
+  nonrelocated generated COFF byte against both hash-verified DLLs. No game
+  block or timing benchmark executed in this comparison. Native block extents
+  by baseline heat rank: 602,112 -> 25,884; 957,092 -> 26,836; 759,360 -> 33,252;
+  106,544 -> 13,900; 28,576 -> 3,736 bytes. Total 2,453,684 -> 103,608 (95.78%
+  smaller). Explicit stack allocations: 66,024/113,064/83,448/240/352 ->
+  112/144/144/64/56 bytes, independently checked against prologue encodings.
+  These exclude callee frames and do not measure peak stack or execution time.
+- Initial visible Hybrid run: build/zarvot-runs/20261011-151415-850d42f2,
+  historical PID 31416, start identity recorded in launch.json. Used rebuilt
+  host SHA-256 `25eb2acefb24009a814c3392a526b59dcd846f4a3bcd08b67074cc0a49e17c9c`
+  and a cloned post-E017 profile, with original settings. Four images loaded;
+  ABI6, instruction/generation guards, fastmem and FPX handshake 0x102/runtime-on
+  observed. No controller input sent by tooling. User replayed the first Story
+  level to its opening action sequence, said it seemed better and movement/effects
+  looked good, with some frame-rate stutter. Audio/save/death/restart remain open.
+- Game exited normally after about 223 seconds; log ends in coverage/config
+  shutdown, and actual process closure was checked. Final complete report:
+  9,340,755,870 compiled blocks (an earlier live read had 7,482,912,865), zero
+  JIT transitions, lookup misses, unhandled
+  opcode or unresolved-import traps. The initial recorder launched in an isolated
+  process context could not see the desktop game; the subsequent desktop recorder
+  attempt arrived after exit. No lifetime independent UI or native CPU evidence
+  exists for this run. Preserve the game-owned log, coverage and seven captures.
+  Hybrid remains JIT-capable; this is neither strict nor no-JIT evidence.
+- Visually inspected candidate frame 7 (15:17:50.584 UTC) and E017 frame 14
+  (03:07:40.679 UTC): both show the blue jar-arena/Chomp action with effects and
+  similar scores, but different player/enemy positions. Ten-second neighborhoods
+  centered on those captures contain ten one-second PERF log readings each:
+  candidate median 13.9945 FPS (11.498-16.494), baseline 6.9965 (4.997-7.994).
+  None of the ten candidate readings is below 10; all ten baseline readings are.
+  This supports the user's impression, not a causal or repeated A/B speedup.
+  Only one candidate capture confirms active combat; preceding captures show
+  letterboxed introduction. Host binary, initial save/cache, inputs/effects and
+  profiling overhead differ (baseline had WPR, candidate did not). Interval
+  readings cannot establish frame percentiles or exact hit latency.
+- Controlled candidate staged, not launched: build/zarvot-runs/
+  20261011-152125-1090520b, using the preserved E017 host and E016 profile that
+  E017 originally cloned. Same host holds executable identity constant; E016
+  holds pre-combat save/cache state constant. Existing launcher verifies all
+  game/module identities and copies/rebases a new profile. Candidate negotiation
+  exports are byte-identical to baseline; runtime header adds only three helper
+  declarations, runtime C appends those helpers, compiler flags and ABI unchanged.
+  Helpers are DLL-internal. No compatibility concern found for preserved host.
+- Local evidence: build/recomp/zarvot-fp32-outline/build-status.json;
+  workspace reports/e020-module-build.log; build/e021-native-layout;
+  initial run analysis/20261011-152207-1bfa7318/{REPORT.md,summary.json,*csv};
+  workspace reports/e021-controlled-staging.json. Raw addresses, generated code,
+  binaries, captures, keys and saves remain ignored/local.
+- Added optional launcher RecordCoverage: start one hidden lifetime helper in
+  the same PowerShell context, verify its unique observation's game PID/start,
+  recorder PID, run root and active state within eight seconds, and report
+  attachment/failure in launch metadata/return. Never stop the game or retry a
+  failed recorder automatically. StageOnly conflict is rejected. Existing helper
+  usage remains compatible; explicit observation paths must stay under the run
+  and cannot overwrite evidence. Twenty-seven staging/isolation and sixteen
+  startup/helper checks passed, including a real child with spaced paths,
+  synthetic real-helper polling, legacy invocation, identity/path rejection and
+  failed-start preservation. Profile rebasing and telemetry parser checks pass.
+- Decision: keep the candidate, with the baseline selectable for rollback.
+  Next attach/verify lifetime UI and owned native CPU recorders before user-led
+  play, repeat the same action with preserved host/pre-combat profile, and map
+  remaining compiled CPU work before selecting the next recomp optimization.
+  Repeat equivalent routes before any gameplay speedup claim. No graphics,
+  timing, accuracy, music or general emulator tuning is part of this work.
+
 ## Template for the next experiment
 
 - ID / R task / date:

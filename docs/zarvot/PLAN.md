@@ -1,6 +1,6 @@
 # Zarvot recomp roadmap
 
-Updated: 2026-10-05. This supersedes the emulator optimization roadmap.
+Updated: 2026-10-11. This supersedes the emulator optimization roadmap.
 
 ## Objective
 
@@ -41,8 +41,11 @@ New R IDs avoid changing the meaning of historical Z IDs in the ledger.
 First deliverable: a compiled Zarvot module set whose execution is observable.
 Next: a correct hybrid gameplay route, then the same route in strict static.
 The first deliverable was achieved in E013: all four images loaded and AOT counts
-advanced during rendered boot/title tests. The active work is now R03; preserve
-the completed export/build and extend correctness/coverage evidence.
+advanced during rendered boot/title tests. R03 and R06 are active. E021's separate
+FP32 outlining candidate built and executed the first Story action with zero
+recorded fallbacks; movement/effects looked good to the user, with some stutter.
+Preserve both module sets and extend behavioral checks and controlled native CPU
+comparisons. Smaller generated/native code is not itself a gameplay speedup.
 Do not wait for general emulator bottleneck classification or a fresh JIT
 benchmark before R00-R02. Do not wait for a full playthrough before fixing
 known recomp defects or improving a validated compiled path.

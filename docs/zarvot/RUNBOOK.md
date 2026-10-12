@@ -305,9 +305,9 @@ original speed/graphics/audio settings for comparisons.
 ## Slow-laptop module builds
 
 E020's separate target is `zarvot-fp32-outline`. Its exporter rebuild and export
-completed, and the sequential runner is active. Check
+completed, and E021 verified the completed four-module build. Check
 build/recomp/zarvot-fp32-outline/build-status.json and actual processes before
-resuming. Raw logs: workspace reports/e020-host-build.log and
+resuming any build. No rebuild is needed. Raw logs: workspace reports/e020-host-build.log and
 reports/e020-module-build.log. The original `zarvot` export/build stays intact.
 The candidate manifest is byte-identical to baseline because its game, coverage
 and ABI are unchanged; it does not identify emitted C. Candidate emitter SHA-256
@@ -321,12 +321,15 @@ Run only when project builds/tests/games are idle. Its synthetic speed result
 does not establish a Zarvot frame-rate gain. E020 retains the measured prototype
 and complete semantic/smoke logs under build/; generated artifacts stay local.
 
-After all candidate modules finish, stage a separate profile from the closed
-E017 run (workspace-root commands; this sends no input and starts no game):
+Stage the candidate with the preserved E017 host and the E016 pre-combat profile
+(workspace-root commands; this sends no input and starts no game). E017 originally
+cloned E016, then changed its save/cache state during combat. Using E016 holds
+that starting state constant; using E017's host holds the host binary constant:
 
 ```powershell
 .\source\scripts\start-zarvot-recomp.ps1 -Target zarvot-fp32-outline `
-  -ProfileFromRun .\source\build\zarvot-runs\20261011-030031-b40a1ca6 `
+  -HostRoot .\source\build\zarvot-runs\20261011-030031-b40a1ca6 `
+  -ProfileFromRun .\source\build\zarvot-runs\20261006-035803-2d087b29 `
   -AllowSameGameProfileReuse -StageOnly
 ```
 
@@ -340,13 +343,55 @@ Choose the preserved baseline host explicitly when staging a matching control:
 ```powershell
 .\source\scripts\start-zarvot-recomp.ps1 -Target zarvot `
   -HostRoot .\source\build\zarvot-runs\20261011-030031-b40a1ca6 `
-  -ProfileFromRun .\source\build\zarvot-runs\20261011-030031-b40a1ca6 -StageOnly
+  -ProfileFromRun .\source\build\zarvot-runs\20261006-035803-2d087b29 -StageOnly
 ```
 
-No real candidate/control profiles have been staged by E020 yet. Inspect saves
-and route availability before the user-led comparison; a shared save does not
-prove identical actions or enemy/effect phases. Use the existing coverage/CPU
-recorders after staging and keep gameplay/audio correctness open until observed.
+E021 staged that controlled candidate at build/zarvot-runs/20261011-152125-1090520b;
+it has not launched. The earlier exploratory candidate run
+20261011-151415-850d42f2 is closed and retains the user's first-level playtest.
+It used the rebuilt host and post-E017 profile, so its apparent improvement is
+not a controlled A/B result. All four candidate negotiation exports are unchanged
+and ABI6/features7 compatible with E017's host; helpers remain internal to DLLs.
+Inspect route availability before play; a shared save does not prove identical
+actions or enemy/effect phases. StageOnly creates a verification copy, not a
+resumable running session; a later normal launch creates another isolated copy.
+Start/verify both recorders before inviting the user to play. Keep behavior checks
+open until observed.
+
+For the controlled launch, replace StageOnly with the recording/visibility
+switches (from the workspace root):
+
+```powershell
+$run = .\source\scripts\start-zarvot-recomp.ps1 -Target zarvot-fp32-outline `
+  -HostRoot .\source\build\zarvot-runs\20261011-030031-b40a1ca6 `
+  -ProfileFromRun .\source\build\zarvot-runs\20261006-035803-2d087b29 `
+  -AllowSameGameProfileReuse -Capture -Visible -SamplePc -RecordCoverage
+$run
+```
+
+RecordCoverage starts one hidden lifetime coverage recorder in the launcher's
+PowerShell context and waits at most eight seconds for a matching game/recorder
+identity. Require CoverageRecorderState=attached before inviting play. The return
+value and launch.json retain the recorder PID, unique observation path and any
+startup error. A failed attachment leaves the game running and does not retry;
+inspect that attempt before starting another recorder. StageOnly+RecordCoverage
+is rejected. Existing standalone recorder commands still work. Twenty-seven
+staging/isolation checks and sixteen startup/recorder checks pass, including a
+real hidden child with paths containing spaces and explicit startup failures.
+An isolated agent process view may not include the desktop game: an empty list
+there does not prove closure. Verify the desktop-visible PID/path/start identity
+and use the same desktop context for launch and recording.
+
+Start the owned CPU recorder described below and verify recording_started/state
+before inviting combat. Coverage attachment alone does not imply CPU recording.
+
+E021 main completed at 15:02:11 UTC after 4,051.7 seconds (67.5 minutes).
+Its 807,949,824-byte DLL SHA-256 is
+`88c28454edb7ace30d0d9c9633009ca473be3f7da9e3ea605c2be8ed1cd5e386`.
+All module size/hash records were verified by the launcher. Main is 46.48% smaller
+than baseline; five E019 hot block extents total 2,453,684 -> 103,608 native bytes.
+Their explicit stack allocations exclude shared helper/callee frames. Observed
+build durations are not a controlled compiler-speed comparison.
 
 Build the four exported modules sequentially from the workspace root:
 
@@ -369,7 +414,8 @@ process. Allow an active compiler time to finish even if it emits no new lines.
 Record real errors/resource exhaustion separately from elapsed time. Preserve
 the existing build trees; no forced clean is needed for an ordinary resume.
 
-E011/E012 completed SDK and subsdk0; main is building. Additional DLL hashes:
+E011/E012 completed SDK and subsdk0; E013 subsequently completed baseline main.
+Additional baseline DLL hashes:
 
 - SDK: `da0fb0ddb7496dc61f84a04459e3023e3712ba6d6137f87d0431c938f393bf45`
 - subsdk0: `3f1d06e16fd61446d11d838e7c7bc0c04dc35f886fa5f1d7356ace47c3010ec8`
@@ -646,10 +692,10 @@ index pointers bound block labels; object relocation masks preserve aliases.
 Guest spans identify possible side entries, not the executing guest instruction.
 
 E019 assigns 97.49% of main samples to block extents, object helpers or the
-run-slice export. Six synthetic tests passed. The next candidate shares exact
-FP32 add/sub/multiply fallback bodies while retaining inline native FPX checks.
-Validate semantics and repeat quiet synthetic timings first; game speed remains
-unmeasured. Keep a separate target for the eventual candidate export/build:
+run-slice export. Six synthetic tests passed. E020 validated sharing exact FP32
+add/sub/multiply fallback bodies while retaining inline native FPX checks; E021
+built and exercised the separate candidate. A controlled gameplay comparison is
+pending. Its preserved separate build target is:
 
 ```powershell
 .\scripts\build-zarvot.ps1 -Target zarvot-fp32-outline -ParallelJobs 2

@@ -1,6 +1,6 @@
 # Zarvot recomp handoff
 
-Updated: 2026-10-11. R00/R01/R02 complete. FP32 outlining validated; candidate building (E020).
+Updated: 2026-10-11. R00/R01/R02 complete. FP32 candidate built and played (E021).
 
 ## Objective and next action
 
@@ -8,12 +8,24 @@ Work only on the recomp: build, coverage, correctness and execution improvements
 Reuse the compatibility stack. Do not resume general emulator performance,
 settings or GPU tuning. JIT is a reference and temporary hybrid fallback.
 
-**First ready task: R06 — let the separate FP32 outlining candidate finish
-building, then compare the same user-led combat route.** Check actual runner
-and compiler activity before resuming. Candidate status is
-build/recomp/zarvot-fp32-outline/build-status.json; raw progress is in workspace
-reports/e020-module-build.log. Do not start a duplicate build or overwrite the
-E013/E017 baseline. E019 recovered
+**First ready task: R06 — capture the optimized candidate's native CPU work on
+the same user-led opening Story combat route.** All four candidate modules are
+complete and hash-verified; do not rebuild them. E021 reached the first action
+sequence. The user reported improvement, good movement/effects and remaining
+stutter. Its final report contains 9,340,755,870 compiled blocks and zero fallback
+or import traps. The game log/screenshots survived normal exit; separate UI and
+native CPU recorders missed this short session. Do not imply they recorded it.
+Use the preserved E017 host and the E016 pre-combat profile for the next comparison
+to hold both host and initial save/cache state constant. A candidate with those
+identities is staged at build/zarvot-runs/20261011-152125-1090520b (not launched).
+Check workspace reports/r03-active-run.json and actual desktop processes before
+launching; preserve all profiles. Start and verify recorders before inviting play.
+Use -RecordCoverage and require CoverageRecorderState=attached, then separately
+verify the owned CPU recorder. New startup/helper checks and existing staging,
+profile and telemetry checks pass; see RUNBOOK.
+Candidate status is build/recomp/zarvot-fp32-outline/build-status.json; raw build
+progress is in workspace reports/e020-module-build.log. Preserve E013/E017.
+E019 recovered
 the existing main image's block index without rebuilding or executing game blocks.
 Of 102,371 main combat samples, 77,755 map to indexed block function extents,
 19,789 to byte-matched runtime/dispatch object functions, 2,256 to the run-slice
@@ -27,8 +39,11 @@ quiet repeated timing was 2,828.015 -> 715.658 ns per call (74.7% less elapsed).
 The small normal-path model was near neutral. These are synthetic results,
 not gameplay speed or correctness evidence. Core commit 84568fcadc is pushed to
 nate-santos/suyu-zarvot-recomp, preserving the pinned baseline history. Exporter
-rebuild and separate candidate export completed. Candidate game execution and
-matched combat performance remain untested; preserve R03 checks independently.
+rebuild and separate candidate export completed. E021's main DLL is 807,949,824
+bytes (46.48% smaller), built in 67.5 minutes. The same five hot block extents
+shrank from 2,453,684 to 103,608 native bytes (95.78%). These are footprint
+results, not frame-rate or peak-stack claims. A controlled repeated combat
+comparison and candidate CPU attribution remain pending; preserve R03 checks.
 
 E017 used
 an isolated clone of E016 for the requested first Story action sequence. The
@@ -112,12 +127,21 @@ the 3.5-hour main build or export unless a source/export change requires it.
   and deliberate mismatch detection; 122-op native extent fell 97.65%, explicit
   stack allocation 65,176 -> 48 bytes. Separate candidate export has the same
   game/module/coverage manifest as baseline; runtime definitions contain all
-  three outlined helpers. rtld/SDK/subsdk0 built; main started at 13:54:39 UTC
-  and remains building. Check actual compiler activity and the live status file.
+  three outlined helpers. Four-module build subsequently completed in E021;
+  baseline artifacts and generated inventory are preserved.
   Main generated C shrank 24.0% (3,230,233,647 -> 2,455,910,697 bytes) with the
   same 112 source units and coverage inventory; game FPS remains unmeasured.
   Separate-build launcher/profile reuse passed 27 synthetic isolation/rejection
-  checks. Candidate/control staging commands are in RUNBOOK; no real run staged.
+  checks. Candidate/control staging commands are in RUNBOOK.
+- E021: main finished at 15:02:11 UTC after 4,051.7 seconds. All four candidate
+  DLL identities match the completed build. Five baseline-hot blocks retain
+  identical guest index/side-entry spans and verified native/object mappings;
+  explicit block stack allocations fell 66,024/113,064/83,448/240/352 ->
+  112/144/144/64/56 bytes, excluding callees. Candidate ABI6/features7, generation
+  guards, fastmem and FPX handshake/runtime-on were observed. User replayed the
+  first Story level/action, reported good movement/effects and some stutter.
+  Audio, death/restart, saves and later routes remain open. Hybrid policy remains
+  JIT-capable; zero recorded transitions is not strict/no-JIT proof.
 
 ## Active task state
 
@@ -126,10 +150,10 @@ the 3.5-hour main build or export unless a source/export change requires it.
 | R00 | Complete | Pinned source built suyu/suyu-cmd; command-line host smoke exited 0; exporter RPC worked (E010) |
 | R01 | Complete for fixed exported modules | Four-module Hybrid ABI 6 source/manifest exported successfully; late-loaded/generated code remains unverified |
 | R02 | Complete | Four DLLs/hash evidence; matching host handshakes; advancing AOT counts; rendered title (E013) |
-| R03 | In progress; first Story combat recorded | E017 slowdowns reproduced with zero observed fallbacks; input/audio/save checks pending |
+| R03 | In progress; candidate first Story action played | E021 movement/effects reported good, some stutter; audio/save/death/restart checks pending |
 | R04 | Pending R03 | Iterative coverage/translation fixes with focused tests |
 | R05 | Pending validated routes | Strict-static zero-fallback tests, then separate no-JIT verification |
-| R06 | FP32 outlining validated and published; candidate building | E020: finish isolated four-module build, verify identities, then matched user-led combat |
+| R06 | FP32 candidate built and exercised; controlled profiling next | E021: smaller actual hot blocks and initial improved impression; capture candidate CPU work with E017 host/E016 profile |
 | R07 | Pending R05 | Reproducible recomp package and endurance checks |
 | R08 | Pending R05 routes | Expand later-level/mode coverage; track full playthrough separately |
 
@@ -161,7 +185,7 @@ A/B and logging/cache tuning are no longer next actions.
    a new isolated run with UntilExit recording and compiled-PC sampling. It
    subsequently exited; recorder completed normally. Check the active pointer
    and actual processes before relaunch; retain both profiles and saves.
-   E017 is the latest closed session: build/zarvot-runs/20261011-030031-b40a1ca6
+   E017 is the preserved profiled baseline: build/zarvot-runs/20261011-030031-b40a1ca6
    (UTC run ID; started on October 10 locally). Historical game PID 7872,
    lifetime recorder PID 21728 and elevated CPU recorder PID 28904 have finished.
    Native profile cpu-profiles/20261011-030437-c0fcc6ec/cpu-profile.json records
@@ -174,9 +198,13 @@ A/B and logging/cache tuning are no longer next actions.
    are in host-attribution. E019's verified main mapping is under
    generated-mapping/main-combat-v3. Use capture-bounded combat
    03:06:40-03:08:10 UTC, not an assumed hit timestamp. E020 validated and
-   exported the FP32 outlining candidate; its separate build runner started
-   at 13:47:17 UTC (PID 31028 at launch). Check actual process and build status,
-   not this historical PID alone. Do not tune general emulator settings or
+   exported the FP32 outlining candidate; its separate runner completed all four
+   modules at 15:02:11 UTC. E021's initial candidate run is closed:
+   build/zarvot-runs/20261011-151415-850d42f2 (historical PID 31416). It used the
+   rebuilt host and post-E017 profile, so it is an exploratory comparison.
+   Preserved-baseline host plus E016 profile is verified/staged separately at
+   build/zarvot-runs/20261011-152125-1090520b; no game/recorders started there.
+   Do not tune general emulator settings or
    assume that a synthetic gain is a gameplay gain.
    Collect the user's observations before marking any gameplay/audio check passed.
 6. Append evidence and update the relevant R row after each meaningful result.

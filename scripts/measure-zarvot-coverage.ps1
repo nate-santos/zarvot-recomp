@@ -3,7 +3,8 @@
 param(
     [Parameter(Mandatory)][string]$RunRoot,
     [ValidateRange(5, 600)][int]$Seconds = 30,
-    [switch]$UntilExit
+    [switch]$UntilExit,
+    [string]$ObservationPath
 )
 $ErrorActionPreference = 'Stop'
 . (Join-Path $PSScriptRoot 'zarvot-telemetry.ps1')
@@ -19,11 +20,26 @@ if ($launch.process_started_utc -and
     throw 'Run PID was reused; do not combine observations from different sessions'
 }
 $id = [DateTime]::UtcNow.ToString('yyyyMMdd-HHmmss') + '-' + [Guid]::NewGuid().ToString('N').Substring(0, 8)
-$evidence = Join-Path $RunRoot "observations/$id"
+$observationsRoot = [IO.Path]::GetFullPath((Join-Path $RunRoot 'observations'))
+if ($ObservationPath) {
+    $output = [IO.Path]::GetFullPath($ObservationPath)
+    if (-not $output.StartsWith($observationsRoot + [IO.Path]::DirectorySeparatorChar, [StringComparison]::OrdinalIgnoreCase) -or
+        [IO.Path]::GetFileName($output) -ne 'observation.json') {
+        throw 'ObservationPath must name observation.json beneath this run''s observations directory'
+    }
+    if (Test-Path -LiteralPath $output) { throw 'ObservationPath already exists; never overwrite a previous recording' }
+    $evidence = Split-Path -Parent $output
+} else {
+    $evidence = Join-Path $observationsRoot $id
+    $output = Join-Path $evidence 'observation.json'
+}
 [IO.Directory]::CreateDirectory($evidence) | Out-Null
 $samples = [Collections.Generic.List[object]]::new()
 $result = [ordered]@{
     observation_version = 2
+    run_root = $RunRoot
+    recorder_pid = $PID
+    recording_started_utc = [DateTime]::UtcNow.ToString('o')
     pid = $launch.pid
     process_started_utc = $processStart
     strict_requested = $launch.strict_requested
@@ -51,7 +67,6 @@ $result = [ordered]@{
     error = $null
     samples = $samples
 }
-$output = Join-Path $evidence 'observation.json'
 $stream = Join-Path $evidence 'samples.jsonl'
 function Save-Observation {
     $result.compiled_count_advanced = $result.complete_reports -ge 2 -and

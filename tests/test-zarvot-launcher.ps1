@@ -1,8 +1,10 @@
-# Run the real launcher with tiny synthetic files and StageOnly. Never starts a game.
+# Run the real launcher with tiny synthetic files and mocked processes. No game is started.
 $ErrorActionPreference = 'Stop'
 $root = Split-Path -Parent $PSScriptRoot
-$fixtureBase = Join-Path $root ('build\launcher-tests\' + [Guid]::NewGuid().ToString('N'))
+$fixtureBase = Join-Path $root ('build\launcher tests\' + [Guid]::NewGuid().ToString('N'))
 $global:ZarvotLaunchTestProcesses = @()
+$global:ZarvotLaunchTestRecorder = $null
+$global:ZarvotLaunchTestPollExit = $false
 $script:checks = 0
 function Get-Process {
     [CmdletBinding()]
@@ -11,7 +13,57 @@ function Get-Process {
         $global:ZarvotLaunchTestProcesses | Where-Object Id -eq $Id
     } else { $global:ZarvotLaunchTestProcesses }
 }
-function Start-Process { throw 'The staging tests must never start a process' }
+function Start-Process {
+    param($FilePath,$ArgumentList,$WorkingDirectory,$WindowStyle,$RedirectStandardOutput,$RedirectStandardError,[switch]$PassThru)
+    if (-not $global:ZarvotLaunchTestRecorder) { throw 'The staging tests must never start a process' }
+    $mock = $global:ZarvotLaunchTestRecorder
+    if ([IO.Path]::GetFileName($FilePath) -eq 'suyu-cmd.exe') {
+        $mock.game_starts++
+        $game = [pscustomobject]@{Id=234567;Path=$FilePath;StartTime=([DateTime]'2026-10-11T14:00:00Z')}
+        $global:ZarvotLaunchTestProcesses = @($game)
+        return $game
+    }
+    $mock.recorder_starts++
+    $record = Get-Content -LiteralPath (Join-Path $WorkingDirectory 'launch.json') -Raw | ConvertFrom-Json
+    if ($record.state -ne 'started' -or $record.pid -ne 234567 -or -not $record.process_started_utc -or
+        -not $record.coverage_recording_requested -or -not $record.coverage_observation_path -or
+        $WindowStyle -ne 'Hidden' -or -not $RedirectStandardOutput -or -not $RedirectStandardError -or
+        $FilePath -ne [Diagnostics.Process]::GetCurrentProcess().MainModule.FileName) {
+        throw 'Recorder was not started hidden after saving the game identity in the same shell context'
+    }
+    foreach ($quoted in @('-RunRoot "' + $WorkingDirectory + '"',
+                           '-ObservationPath "' + $record.coverage_observation_path + '"')) {
+        if (-not $ArgumentList.Contains($quoted)) { throw 'Recorder paths with spaces were not quoted' }
+    }
+    if ($ArgumentList -notmatch '-File "[^"]+measure-zarvot-coverage\.ps1"' -or $ArgumentList -notmatch ' -UntilExit$') {
+        throw 'Recorder must use a quoted helper file and lifetime recording'
+    }
+    if ($mock.mode -eq 'native_child') { return Microsoft.PowerShell.Management\Start-Process @PSBoundParameters }
+    if ($mock.mode -eq 'start_failure') { throw 'Synthetic recorder start failure' }
+    $child = [pscustomobject]@{Id=234568;StartTime=([DateTime]'2026-10-11T14:00:01Z');HasExited=($mock.mode -eq 'immediate_exit');ExitCode=9}
+    $child | Add-Member -MemberType ScriptMethod -Name Refresh -Value { }
+    if ($mock.mode -ne 'immediate_exit') {
+        $observation = [ordered]@{
+            pid=$record.pid;process_started_utc=$record.process_started_utc;recorder_pid=$child.Id
+            run_root=$WorkingDirectory;until_exit=$true;end_reason='recording';error=$null
+        }
+        switch ($mock.mode) {
+            'wrong_pid' { $observation.pid++ }
+            'wrong_start' { $observation.process_started_utc='2026-10-11T13:59:00Z' }
+            'wrong_recorder' { $observation.recorder_pid++ }
+            'wrong_root' { $observation.run_root += '-other' }
+            'recorder_error' { $observation.end_reason='error'; $observation.error='synthetic attach error' }
+        }
+        Write-Json $record.coverage_observation_path $observation
+    }
+    $child
+}
+function Stop-Process { throw 'Launcher tests must never stop a process' }
+function Start-Sleep {
+    param([int]$Seconds,[int]$Milliseconds)
+    if ($global:ZarvotLaunchTestPollExit) { $global:ZarvotLaunchTestProcesses = @(); return }
+    Microsoft.PowerShell.Utility\Start-Sleep @PSBoundParameters
+}
 function Write-Json($Path, $Value) {
     [IO.Directory]::CreateDirectory((Split-Path -Parent $Path)) | Out-Null
     [IO.File]::WriteAllText($Path, ($Value | ConvertTo-Json -Depth 10), [Text.UTF8Encoding]::new($false))
@@ -20,7 +72,7 @@ function Hash($Path) { (Get-FileHash -LiteralPath $Path -Algorithm SHA256).Hash.
 function New-Fixture {
     $base = Join-Path $fixtureBase ([Guid]::NewGuid().ToString('N').Substring(0,8))
     [IO.Directory]::CreateDirectory((Join-Path $base 'scripts')) | Out-Null
-    foreach ($name in @('start-zarvot-recomp.ps1','zarvot-profile.ps1')) {
+    foreach ($name in @('start-zarvot-recomp.ps1','zarvot-profile.ps1','measure-zarvot-coverage.ps1','zarvot-telemetry.ps1')) {
         Copy-Item -LiteralPath (Join-Path $root "scripts\$name") -Destination (Join-Path $base 'scripts')
     }
     $rom = Join-Path $base 'zarvot.fixture'
@@ -84,6 +136,8 @@ function New-Fixture {
         export_manifest_sha256=(Hash $baselineManifest); modules=$baselineBuild.modules
     })
     $global:ZarvotLaunchTestProcesses = @()
+    $global:ZarvotLaunchTestRecorder = $null
+    $global:ZarvotLaunchTestPollExit = $false
     [pscustomobject]@{Root=$base; Rom=$rom; Previous=$previous; Host=$fixtureHost; Save=$save
         CandidateManifest=$candidateManifest; BaselineManifest=$baselineManifest}
 }
@@ -214,7 +268,101 @@ try {
     $fixture = New-Fixture
     [IO.File]::AppendAllText((Join-Path $fixture.Root 'build\recomp\zarvot-fp32-outline\main\recompiled_image.dll'), ' tampered')
     Reject 'selected DLL identity' { Invoke-Fixture $fixture (Candidate-Options $fixture) } 'Compiled image identity'
-    "Launcher staging/isolation and identity rejection checks passed: $script:checks"
+    $stagingChecks = $script:checks
+    $fixture = New-Fixture
+    Reject 'coverage staging conflict' { Invoke-Fixture $fixture @{RecordCoverage=$true} } 'cannot be combined with StageOnly'
+    if (Test-Path -LiteralPath (Join-Path $fixture.Root 'build\zarvot-runs') -PathType Container) {
+        # The fixture's baseline directory predates this invocation; no new run
+        # may have been staged before the conflict was rejected.
+        if (@(Get-ChildItem -LiteralPath (Join-Path $fixture.Root 'build\zarvot-runs') -Directory).Count -ne 1) {
+            throw 'StageOnly conflict staged an extra run'
+        }
+    }
+    foreach ($mode in @('attached','start_failure','immediate_exit','wrong_pid','wrong_start','wrong_recorder','wrong_root','recorder_error')) {
+        $fixture = New-Fixture
+        $global:ZarvotLaunchTestRecorder = @{mode=$mode;game_starts=0;recorder_starts=0}
+        $result = Invoke-Fixture $fixture @{StageOnly=$false;RecordCoverage=$true}
+        $record = Get-Content -LiteralPath (Join-Path $result.RunRoot 'launch.json') -Raw | ConvertFrom-Json
+        if ($result.State -ne 'started' -or $record.state -ne 'started' -or $result.Pid -ne 234567 -or
+            $global:ZarvotLaunchTestRecorder.game_starts -ne 1 -or $global:ZarvotLaunchTestRecorder.recorder_starts -ne 1 -or
+            $record.coverage_recorder_state -ne $result.CoverageRecorderState -or
+            $record.coverage_recorder_pid -ne $result.CoverageRecorderPid -or
+            $record.coverage_recorder_error -ne $result.CoverageRecorderError -or
+            $record.coverage_observation_path -ne $result.CoverageObservation -or
+            @($global:ZarvotLaunchTestProcesses).Count -ne 1) {
+            throw "Recorder $mode lost the running game, retried, or returned inconsistent evidence"
+        }
+        if ($mode -eq 'attached') {
+            if ($result.CoverageRecorderState -ne 'attached' -or $result.CoverageRecorderError -or
+                $result.CoverageRecorderPid -ne 234568 -or -not $record.coverage_recorder_started_utc) {
+                throw 'Successful recorder attachment was not recorded'
+            }
+        } else {
+            if ($result.CoverageRecorderState -ne 'startup_failed' -or -not $result.CoverageRecorderError -or
+                ($mode -eq 'start_failure' -and $null -ne $result.CoverageRecorderPid) -or
+                ($mode -ne 'start_failure' -and $result.CoverageRecorderPid -ne 234568)) {
+                throw "Recorder $mode was not reported honestly"
+            }
+        }
+        ++$script:checks
+    }
+    # Exercise actual native argument binding with a hidden PowerShell child.
+    # Only its tiny synthetic helper runs; the game process stays mocked.
+    $fixture = New-Fixture
+    @'
+param([string]$RunRoot,[string]$ObservationPath,[switch]$UntilExit)
+$ErrorActionPreference = 'Stop'
+$launch = Get-Content -LiteralPath (Join-Path $RunRoot 'launch.json') -Raw | ConvertFrom-Json
+[IO.Directory]::CreateDirectory((Split-Path -Parent $ObservationPath)) | Out-Null
+$report = @{pid=$launch.pid;process_started_utc=$launch.process_started_utc;recorder_pid=$PID;run_root=$RunRoot;until_exit=[bool]$UntilExit;end_reason='recording';error=$null}
+[IO.File]::WriteAllText($ObservationPath,($report | ConvertTo-Json))
+Start-Sleep -Milliseconds 1500
+'@ | Set-Content -LiteralPath (Join-Path $fixture.Root 'scripts/measure-zarvot-coverage.ps1') -Encoding utf8
+    $global:ZarvotLaunchTestRecorder = @{mode='native_child';game_starts=0;recorder_starts=0}
+    $result = Invoke-Fixture $fixture @{StageOnly=$false;RecordCoverage=$true}
+    if ($result.CoverageRecorderState -ne 'attached' -or $result.CoverageRecorderError -or
+        $global:ZarvotLaunchTestRecorder.recorder_starts -ne 1) { throw "Native quoted recorder startup failed: $($result.CoverageRecorderError)" }
+    try {
+        $child = [Diagnostics.Process]::GetProcessById($result.CoverageRecorderPid)
+        if (-not $child.WaitForExit(5000)) { throw 'Synthetic recorder child did not exit within its test lifetime' }
+    } catch [ArgumentException] { } # It may already have completed normally.
+    ++$script:checks
+
+    # Run the real recorder with a synthetic process identity and one UI poll.
+    $fixture = New-Fixture
+    $game = [pscustomobject]@{Id=123456;Path=(Join-Path $fixture.Previous 'suyu-cmd.exe');StartTime=([DateTime]'2026-10-01T01:00:00Z');MainWindowTitle='Fixture | JIT transitions: 0'}
+    $game | Add-Member -MemberType ScriptMethod -Name Refresh -Value { }
+    $helper = Join-Path $fixture.Root 'scripts/measure-zarvot-coverage.ps1'
+    $observationPath = [IO.Path]::GetFullPath((Join-Path $fixture.Previous 'observations/explicit output/observation.json'))
+    $global:ZarvotLaunchTestProcesses = @($game)
+    $global:ZarvotLaunchTestPollExit = $true
+    $measured = & $helper -RunRoot $fixture.Previous -ObservationPath $observationPath -UntilExit
+    $observation = Get-Content -LiteralPath $observationPath -Raw | ConvertFrom-Json
+    if ($measured.Evidence -ne $observationPath -or $measured.EndReason -ne 'process_exited' -or
+        $observation.pid -ne 123456 -or $observation.recorder_pid -ne $PID -or
+        $observation.run_root -ne $fixture.Previous -or $observation.sample_count -ne 1 -or
+        ([DateTime]$observation.process_started_utc).ToUniversalTime().ToString('o') -ne $game.StartTime.ToUniversalTime().ToString('o')) {
+        throw 'Real recorder did not attach to the explicit observation path and synthetic identity'
+    }
+    ++$script:checks
+    $global:ZarvotLaunchTestProcesses = @($game)
+    $legacy = & $helper -RunRoot $fixture.Previous -UntilExit
+    if ($legacy.EndReason -ne 'process_exited' -or -not (Test-Path -LiteralPath $legacy.Evidence) -or
+        $legacy.Evidence -eq $observationPath) { throw 'Legacy recorder invocation changed behavior' }
+    ++$script:checks
+    $global:ZarvotLaunchTestProcesses = @($game)
+    $originalHash = Hash $observationPath
+    Reject 'existing observation' { & $helper -RunRoot $fixture.Previous -ObservationPath $observationPath -UntilExit } 'already exists'
+    if ((Hash $observationPath) -ne $originalHash) { throw 'Existing observation was modified' }
+    Reject 'foreign observation path' { & $helper -RunRoot $fixture.Previous -ObservationPath (Join-Path $fixture.Root 'observation.json') -UntilExit } 'beneath this run'
+    $game.Path = Join-Path $fixture.Previous 'other.exe'
+    Reject 'recorder foreign executable' { & $helper -RunRoot $fixture.Previous -UntilExit } 'different executable'
+    $game.Path = Join-Path $fixture.Previous 'suyu-cmd.exe'
+    $game.StartTime = $game.StartTime.AddSeconds(1)
+    Reject 'recorder reused PID' { & $helper -RunRoot $fixture.Previous -UntilExit } 'PID was reused'
+    "Launcher staging/isolation checks passed: $stagingChecks; coverage startup checks passed: $($script:checks-$stagingChecks)"
 } finally {
     Remove-Variable -Scope Global -Name ZarvotLaunchTestProcesses -ErrorAction SilentlyContinue
+    Remove-Variable -Scope Global -Name ZarvotLaunchTestRecorder -ErrorAction SilentlyContinue
+    Remove-Variable -Scope Global -Name ZarvotLaunchTestPollExit -ErrorAction SilentlyContinue
 }
