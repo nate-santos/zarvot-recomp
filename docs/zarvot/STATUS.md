@@ -1,6 +1,6 @@
 # Zarvot recomp handoff
 
-Updated: 2026-10-11. R00/R01/R02 complete. Candidate combat recorded and profiled (E023/E024).
+Updated: 2026-10-11. Combat profiled; indexed lookup improvement validated in E025.
 
 ## Objective and next action
 
@@ -8,16 +8,20 @@ Work only on the recomp: build, coverage, correctness and execution improvements
 Reuse the compatibility stack. Do not resume general emulator performance,
 settings or GPU tuning. JIT is a reference and temporary hybrid fallback.
 
-**First ready task: R06 — validate a narrow indexed-lookup miss improvement
-against E024's native evidence, then prepare its separate game candidate.** When
-the complete block index exists, out-of-range/misaligned addresses can return
-no block without searching segment tables. Preserve existing valid index hits,
-holes and the binary search when index allocation fails. Require generated
-old/new differential tests, negative controls and repeated synthetic timing
-before a game export/build. Keep ABI/layout, guards, FP and gameplay timing
-unchanged. Do not rebuild merely for symbols or request another playtest before
-there is a concrete validated candidate. FM1 load-gate experiments remain later
-leads; inherited full-helper inlining regressed and acquire ordering must survive.
+**First ready task: R06 — rebuild the exporter and export/build the separate
+zarvot-lookup-miss candidate from core 284f411686.** E025's indexed early-NULL
+change passed 1,616,528 differential lookup checks, a deliberate failing control,
+quiet synthetic timings and the complete five-variant runtime smoke suite.
+Only generated dispatch changes; valid index hits/holes and allocation-failure
+search remain intact. Existing playable modules still use core 84568fcadc and
+do not contain this change. Do not mix/relabel them as the new candidate.
+Preserve zarvot and zarvot-fp32-outline plus E017/E023 profiles. Rebuild the
+exporter before export, verify the new four-module manifest/hashes, and allow
+healthy sequential builds to finish without an arbitrary overall timeout.
+Keep ABI/layout, guards, FP and gameplay timing unchanged. Reuse the E017 host
+and E016 initial profile for a later user-led comparison once all images load
+and both recorders are verified. FM1 load-gate experiments remain later leads;
+inherited full-helper inlining regressed and acquire ordering must survive.
 
 E023 is closed: build/zarvot-runs/20261012-003140-dc25d36d (October 11 locally).
 Historical game/coverage/CPU PIDs 24476/29464/21416 all exited. CPU profile
@@ -71,7 +75,8 @@ E019 mapped most main samples through the verified index, unwind ranges and
 runtime/dispatch object bytes. Native RVAs and block labels are not guest PCs.
 These proportions locate CPU work, not the cause of low FPS or exact call time;
 title/combat are different scenes. Diagnostic overhead and inlined helpers remain.
-R03 input/audio/save correctness and exact hit timestamps remain unverified.
+E017 did not establish input/audio/save correctness or exact hit timestamps;
+E023's later input/shooting/audio observations are recorded above.
 The older possible UI count of six is uncertain; no fallback gap is corroborated.
 Check workspace
 reports/r03-active-run.json and actual processes before another launch; preserve
@@ -157,6 +162,10 @@ the 3.5-hour main build or export unless a source/export change requires it.
   normally and was mapped against verified candidate images and preserved host
   labels. Combat remains slow; target compiled lookup/load paths next. Save,
   death/restart, original music fidelity and later routes are unverified.
+- E025: core 284f411686 removes redundant segment searches for impossible probes
+  when the full block index exists. Synthetic miss timings improve; total
+  fixture lookup code shrinks 281 -> 273 bytes. All five runtime smoke variants,
+  guards/races and coverage loop pass. No game export/build or FPS result yet.
 
 ## Active task state
 
@@ -168,7 +177,7 @@ the 3.5-hour main build or export unless a source/export change requires it.
 | R03 | Opening action checked; broader behavior pending | E021 movement/effects good; E023 Bluetooth/shooting/audio fine; saves/death/restart/music fidelity pending |
 | R04 | Pending R03 | Iterative coverage/translation fixes with focused tests |
 | R05 | Pending validated routes | Strict-static zero-fallback tests, then separate no-JIT verification |
-| R06 | Candidate combat analyzed; narrow runtime prototype next | E024 maps remaining compiled lookup/load cost; differential correctness and synthetic timing before re-export/build |
+| R06 | Indexed lookup source improvement validated; game build next | E025 focused/full synthetic checks pass; rebuild exporter and create separate zarvot-lookup-miss images |
 | R07 | Pending R05 | Reproducible recomp package and endurance checks |
 | R08 | Pending R05 routes | Expand later-level/mode coverage; track full playthrough separately |
 
@@ -182,7 +191,8 @@ A/B and logging/cache tuning are no longer next actions.
 2. Recomp roadmap, README, instructions and E005/E006 are committed in 5c6156a.
    Preserve subsequent changes and check current ahead/behind state afresh.
 3. Inspect existing generated export and build artifacts at the identities in
-   RUNBOOK. Baseline source is 5949cab3ba; candidate source is 84568fcadc.
+   RUNBOOK. Baseline source is 5949cab3ba; playable FP32 source is 84568fcadc;
+   next lookup candidate source is 284f411686 (not game-built).
    The sequential runner records its PID and module completion/hash evidence in
    build/recomp/zarvot/build-status.json. Check that process and compiler activity
    before restarting; reports/r02-module-set-build.log holds raw progress.
@@ -242,7 +252,8 @@ A/B and logging/cache tuning are no longer next actions.
 - Checkout: source/; branch: zarvot-support; origin: nate-santos/zarvot-recomp;
   upstream: dougchansan/mk8-recomp. Workspace root is not a Git repository.
 - Wrapper base db36cf5; baseline suyu 5949cab3ba93233ddd1c319bfc6f010f6cfa910a;
-  candidate 84568fcadc2b8f062022180b6492d0d8975f4d34 in the Zarvot core fork.
+  playable FP32 candidate 84568fcadc2b8f062022180b6492d0d8975f4d34;
+  validated lookup source 284f411686160ceaf7ecaead936148c7de5cfe53 in the core fork.
 - Installed asset labeled v0.0.12 reports v0.0.11 / HEAD-40aeb31824-HEAD.
   Exact hashes and paths are in RUNBOOK; labels alone do not establish ABI match.
 - Host: Ryzen 7 5825U / integrated AMD Radeon, 16 GiB installed RAM.

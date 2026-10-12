@@ -47,8 +47,10 @@ recorded fallbacks; movement/effects looked good to the user, with some stutter.
 E023 repeated the route with the preserved host/pre-combat profile and verified
 recorders; Bluetooth, shooting and audio worked, performance felt about the same.
 E024 maps the closed combat trace: compiled lookup/load helpers remain measurable
-targets. Next differentially test a narrow runtime prototype before re-exporting
-or rebuilding the game. Preserve both module sets and extend behavioral checks
+targets. E025's indexed early-NULL lookup passed focused differential/timing
+checks and all runtime smoke variants. Next rebuild the exporter and make a
+separate zarvot-lookup-miss game candidate; existing playable images predate it.
+Preserve both module sets and extend behavioral checks
 and repeated native CPU comparisons. Smaller code is not itself a gameplay speedup.
 Do not wait for general emulator bottleneck classification or a fresh JIT
 benchmark before R00-R02. Do not wait for a full playthrough before fixing
@@ -118,11 +120,12 @@ Use the inherited MK8 approach after checking which mechanisms already exist:
 - Profile compiled blocks, memory helpers, guards and floating-point helpers.
   Preserve permissions, invalidation, ordering, exclusives and exact semantics;
   avoid blanket fast-math and disabling correctness guards.
-- E024 next experiment: skip the binary search for out-of-range/misaligned
+- E024/E025 experiment: skip the binary search for out-of-range/misaligned
   addresses when the complete block index exists. Keep valid hits/holes and
   allocation-failure search unchanged. Compare generated old/new lookup across
   edge/random PCs, successful/failed allocation, negative controls and repeated
-  quiet timings before a separate game candidate. Later FM1 load-gate work must
+  quiet timings before a separate game candidate. Those synthetic checks passed;
+  game build/validation remain next. Later FM1 load-gate work must
   preserve acquire ordering and avoid the inherited full-helper inlining loss.
 - Consider LTO/PGO or narrowly recovered native routines only with a demonstrated
   recomp cost and differential tests for the affected behavior.

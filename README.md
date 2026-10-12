@@ -39,9 +39,13 @@ about 8 FPS). E024 mapped the saved native trace: 66.42% of combat CPU samples
 are in compiled modules, with lookup and load helpers among the remaining costs.
 Differences in combat phase and inputs prevent a causal gameplay speedup claim.
 
-**Next: test a narrow compiled runtime improvement against the measured
-lookup/load costs before another game build.** Both module sets and recordings
-are preserved. Save/death/restart checks, original music fidelity, strict/no-JIT
+E025 removes redundant table searches when the complete block index already
+rules out an address. It passed 1.6 million lookup comparisons and the full
+runtime smoke suite. Synthetic miss lookups are faster; game benefit is untested.
+
+**Next: rebuild the exporter and create a separate Zarvot lookup candidate.**
+Both playable module sets and recordings are preserved. Save/death/restart
+checks, original music fidelity, strict/no-JIT
 execution and later routes remain open. See the [gameplay checklist](docs/zarvot/PLAYTEST.md).
 
 ## Development sequence

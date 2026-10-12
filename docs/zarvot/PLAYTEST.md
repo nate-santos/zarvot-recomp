@@ -60,7 +60,8 @@ E023 subsequently repeated opening action with the E017 host, E016 initial
 profile and verified recorders. The user confirmed Bluetooth works, shooting
 and audio were fine, and performance felt about the same. Both recorders saved
 on normal exit. E024 reviewed capture-bounded combat and mapped the native trace;
-the next work is a compiled runtime prototype, not another immediate playtest.
+E025's lookup prototype subsequently passed focused and full synthetic checks;
+its separate game export/build is next, before another playtest.
 Save/death/restart, detailed collisions and original music fidelity remain open.
 Keep the initial candidate profile and all existing saves intact.
 

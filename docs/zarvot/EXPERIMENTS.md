@@ -995,6 +995,62 @@ statements remain historical and do not override the current STATUS queue.
   work already found a regression. Graphics, audio, timing and general emulator
   tuning remain outside scope.
 
+## E025 — Indexed lookup rejects impossible probes directly (2026-10-11 local)
+
+- Task: R06. E024 places 1,873 main/SDK leaves (1.05% of all combat samples)
+  in lookup's binary-search fallback. Almost all are in the first segment search;
+  none are in the entry-search/match portion. Exact probe arguments and branch
+  outcomes were not recorded. Hypothesis: skip redundant search when a complete
+  allocated index already proves a probe is outside the module or misaligned.
+  This is a narrow recomp improvement, not a remedy for all combat stutter.
+- Emitter change: if _idx exists, retain the old valid-address indexed result
+  (including NULL holes); return NULL for an impossible address. When _idx is
+  absent, retain the entire old binary search. No new cache, data layout, ABI,
+  feature negotiation, block body, guard, FP, memory-order or timing changes.
+  Independent review verified ordered/nonoverlapping segment construction,
+  complete side-entry coverage, relative alignment, unsigned bounds and loader
+  initialization under the process lock. Rebase does not alter relative indexes.
+- Added tests/recompiler_lookup in the core fork. It extracts the real generated
+  index builder/lookup from EmitProject using immutable old/new header snapshots;
+  substitutes synthetic segment tables and distinct stub pointers only. No game
+  data or generated block execution. Eight old/new × allocated/failed × low/high
+  legs compare against an independent linear oracle over boundaries, every byte
+  around tables, side entries, holes/gaps, misalignment, wrap-around and random
+  PCs. All 1,616,528 comparisons passed; repeated setup never retries failed
+  allocation. Deliberate wrong-answer control exits1 as expected. Stub identities
+  are checked for uniqueness so linker folding cannot hide wrong pointers.
+- MSVC19.44 x64 /O2 /Ob2 /bigobj /fp:precise /MD, no LTO. Quiet ABBAABBA,
+  four timed runs per arm with equal call counts and checksums: outside-probe
+  medians 3.259 -> 1.355 ns (low range), 4.528 -> 2.232 ns (high); misaligned
+  5.209 -> 1.364 and 5.238 -> 2.243 ns. High-range valid hits/holes stayed near
+  neutral (~2.03/~2.01 ns). Low valid-hit drift is not claimed as a gain.
+  Synthetic 75%-hit/25%-outside mix: 2.185 -> 1.366 and 2.325 -> 2.068 ns.
+  These tiny synthetic tables do not model game cache footprint or probe mix.
+- Total COFF lookup code 281 -> 273 bytes in both range fixtures. The old
+  entry-only unwind range was63 bytes because MSVC outlined its fallback;
+  comparing it directly with the new273-byte entry would misreport code growth.
+  Other extracted helper sizes are unchanged. No game code-size/FPS claim.
+- Real old/new smoke exporters compared all five ABI5/FM1/GG1/FPX combinations.
+  Baseline matched the old golden hashes; file sets match, and only the two
+  dispatch C files change. Runtime definitions, generated blocks, image exports
+  and features stay byte-identical. Golden hashes intentionally updated for the
+  shared dispatch change. Smoke runner uses forward-slash CMake definitions and
+  Release compiler probes on Windows; these fix test setup, not game behavior.
+- Local evidence: build/zarvot-perf-prototypes/lookup-early-null/results.json,
+  checked3 immutable headers/generated code/compiler outputs, timing.log,
+  smoke-compare/comparison.json; workspace reports/e025-smoke.log.
+  Failed setup attempts are retained separately. Full runtime smoke execution
+  passed with exit0: coverage loop, ABI5, ABI6, ABI6GG, FPX and GGFPX, including
+  expected guard refusals and races. Test temporary files were placed under the
+  writable project build directory after sandbox temporary-directory denial.
+  No product change was needed for that setup issue.
+- Decision: keep source candidate core 284f411686160ceaf7ecaead936148c7de5cfe53.
+  Next rebuild the exporter, export/build a separate zarvot-lookup-miss target
+  and verify all four image identities before a new user-led route. The E023
+  playable images remain the earlier FP32 candidate; this change has not executed
+  in Zarvot. Preserve both existing module sets/profiles. Do not infer a game FPS
+  gain from microbenchmarks or leaf shares.
+
 ## Template for the next experiment
 
 - ID / R task / date:

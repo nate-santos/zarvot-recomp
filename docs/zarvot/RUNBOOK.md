@@ -736,3 +736,56 @@ generated/zarvot-fp32-outline and writes its own build/recomp target and status.
 The default target remains zarvot. Preserve the completed baseline DLLs/profiles;
 do not repeat their main compilation just for symbols. A healthy candidate
 build may take a long time and has no overall timeout.
+
+## E025 lookup source candidate — game build still pending
+
+Core 284f411686 adds an immediate NULL result for impossible probes when the
+complete block index exists; allocation-failure search and valid hits/holes
+remain unchanged. This is not in the current zarvot-fp32-outline images.
+Focused comparisons and the full runtime smoke suite passed. Evidence is under
+build/zarvot-perf-prototypes/lookup-early-null (results.json, checked3, timing.log,
+smoke-compare/comparison.json); full runtime log is workspace reports/e025-smoke.log.
+Five smoke export variants differ only in their two dispatch C files.
+
+From the source checkout in the configured Visual C++ environment, with Python,
+CMake and Ninja on PATH, the focused test can reproduce in a new ignored path:
+
+```powershell
+python third_party/suyu/tests/recompiler_lookup/run.py `
+  --work-dir build/zarvot-perf-prototypes/lookup-new --generator Ninja --benchmark
+```
+
+Run timing only with the game/recorders and other builds closed. The comparison
+uses local baseline commit 84568fcadc and immutable copies of both emitter
+headers; it never executes game blocks. See its README for explicit tool paths.
+The full runtime smoke runner now normalizes CMake paths and uses Release
+compiler probes on Windows. If sandbox temporary directories are inaccessible,
+place its temporary tree in ignored project storage:
+
+```powershell
+python -c "import pathlib,runpy,tempfile; p=pathlib.Path('build/test-temp').resolve(); p.mkdir(parents=True,exist_ok=True); tempfile.tempdir=str(p); runpy.run_path('third_party/suyu/tests/recompiler_smoke/run.py',run_name='__main__')"
+```
+
+Next inspect actual processes, rebuild the exporter from 284f411686 using the
+R00 tool setup, and start its isolated export profile. With the rebuilt exporter
+verified on port 9743, the new source export is:
+
+```powershell
+$env:SUYU_MCP_PORT = '9743'
+python scripts/export-recomp.py --rom ..\Zarvot.nsp `
+  --out generated\zarvot-lookup-miss\out --backend hybrid source
+python scripts/mcp-call.py get_aot_export_status
+```
+
+Require done=true/success=true, four modules, unchanged game/module inventory and
+ABI6/features7 before building. Then run:
+
+```powershell
+.\scripts\build-zarvot.ps1 -Target zarvot-lookup-miss -ParallelJobs 2
+```
+
+Keep the normal generated compile pool and no overall timeout.
+Preserve both earlier targets and profiles. Verify all new DLL hashes/load
+negotiation; use the preserved E017 host/E016 initial profile and verified
+recorders for a later user-led comparison. Synthetic miss gains do not establish
+game FPS, and the sampled search portion was only 1.05% of combat CPU leaves.
