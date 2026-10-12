@@ -191,10 +191,13 @@ edit the active config while suyu is running: shutdown may overwrite it.
 
 - Wrapper base: `db36cf53606e67977a26d6758215dfc89fa24724`.
 - Baseline emulator submodule: `5949cab3ba93233ddd1c319bfc6f010f6cfa910a` (E010).
-- Current recomp source: `84568fcadc2b8f062022180b6492d0d8975f4d34` (E020),
+- Playable FP32 source: `84568fcadc2b8f062022180b6492d0d8975f4d34` (E020),
   published to nate-santos/suyu-zarvot-recomp on zarvot-support. The parent pins
   this fork; its history includes the baseline. Do not mix current host files
   with old launch records silently; E017 retains the baseline host and DLLs.
+- Current lookup source: `284f411686160ceaf7ecaead936148c7de5cfe53` (E025).
+  E026 rebuilt its exporter and exported a separate candidate; compilation is
+  running. Existing playable images still use the earlier FP32 source.
 - Downloaded Windows release asset v0.0.12 SHA-256:
   `415e68c9aaf5374dd7f4864c8f267ce4833e13a2cbb2cc9cdf299ed06634ff2a`.
 - Installed suyu.exe SHA-256:
@@ -737,7 +740,7 @@ The default target remains zarvot. Preserve the completed baseline DLLs/profiles
 do not repeat their main compilation just for symbols. A healthy candidate
 build may take a long time and has no overall timeout.
 
-## E025 lookup source candidate — game build still pending
+## E025 lookup source candidate — source validation
 
 Core 284f411686 adds an immediate NULL result for impossible probes when the
 complete block index exists; allocation-failure search and valid hits/holes
@@ -766,7 +769,7 @@ place its temporary tree in ignored project storage:
 python -c "import pathlib,runpy,tempfile; p=pathlib.Path('build/test-temp').resolve(); p.mkdir(parents=True,exist_ok=True); tempfile.tempdir=str(p); runpy.run_path('third_party/suyu/tests/recompiler_smoke/run.py',run_name='__main__')"
 ```
 
-Next inspect actual processes, rebuild the exporter from 284f411686 using the
+For a fresh export, inspect actual processes, rebuild the exporter from 284f411686 using the
 R00 tool setup, and start its isolated export profile. With the rebuilt exporter
 verified on port 9743, the new source export is:
 
@@ -789,3 +792,32 @@ Preserve both earlier targets and profiles. Verify all new DLL hashes/load
 negotiation; use the preserved E017 host/E016 initial profile and verified
 recorders for a later user-led comparison. Synthetic miss gains do not establish
 game FPS, and the sampled search portion was only 1.05% of combat CPU leaves.
+
+## E026 lookup export and running build
+
+The rebuilt exporter completed the new export; all 186 module files were
+compared and only the four dispatch C files changed, exactly as validated in
+E025. Manifest remains 29f3a9cb... with ABI6/features7. Exporter/header identities
+are in E026 and workspace reports/e026-exporter.json. The exporter is closed.
+
+The long-path warning precedes export status and masks GameExportDialog behind
+a message box. An unavailable status in that condition does not mean success.
+E026 used local generated/lm, a verified junction pointing to generated/
+zarvot-lookup-miss, and submitted its 66-character absolute out path directly
+through trigger_ui_action/aot_test_export. export-recomp.py uses Path.resolve,
+which expands that junction and restores the warning; do not retry it blindly.
+The generated projects use relative sources and were verified byte-for-byte.
+
+The existing hidden sequential runner started at 01:24:22 UTC, recorded PID11980.
+Before any resume, inspect actual desktop process identity, status and compiler
+activity. Logs are workspace reports/e026-module-build.log and stderr.log;
+completion metadata is reports/e026-module-runner.json and
+build/recomp/zarvot-lookup-miss/build-status.json. Let healthy compilation finish.
+Only after it exits, an incremental resume uses the normal build-zarvot command
+above. No clean rebuild, extra parallel compile or second runner is needed.
+
+User requested readiness for a future session. Once all images verify, use
+start-zarvot-recomp.ps1 -StageOnly with the preserved E017 host/E016 initial
+profile and -AllowSameGameProfileReuse. Do not start gameplay during preparation.
+StageOnly records no compiled execution or gameplay verdict; a later ordinary
+launch makes another isolated copy and needs both recorders verified.

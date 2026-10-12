@@ -43,7 +43,10 @@ E025 removes redundant table searches when the complete block index already
 rules out an address. It passed 1.6 million lookup comparisons and the full
 runtime smoke suite. Synthetic miss lookups are faster; game benefit is untested.
 
-**Next: rebuild the exporter and create a separate Zarvot lookup candidate.**
+**E026: the separate lookup candidate exported successfully and is compiling.**
+All 186 generated module files were compared; only the four dispatch C files
+contain the validated change. Wait for the existing build, then verify and stage
+it for a future playtest. Game performance remains untested for this change.
 Both playable module sets and recordings are preserved. Save/death/restart
 checks, original music fidelity, strict/no-JIT
 execution and later routes remain open. See the [gameplay checklist](docs/zarvot/PLAYTEST.md).

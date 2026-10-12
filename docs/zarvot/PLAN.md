@@ -48,8 +48,10 @@ E023 repeated the route with the preserved host/pre-combat profile and verified
 recorders; Bluetooth, shooting and audio worked, performance felt about the same.
 E024 maps the closed combat trace: compiled lookup/load helpers remain measurable
 targets. E025's indexed early-NULL lookup passed focused differential/timing
-checks and all runtime smoke variants. Next rebuild the exporter and make a
-separate zarvot-lookup-miss game candidate; existing playable images predate it.
+checks and all runtime smoke variants. E026 rebuilt the exporter and verified
+the separate zarvot-lookup-miss export; its sequential module build is running.
+Wait for that runner, verify all four images and stage for the requested future
+session. Existing playable images predate the lookup change.
 Preserve both module sets and extend behavioral checks
 and repeated native CPU comparisons. Smaller code is not itself a gameplay speedup.
 Do not wait for general emulator bottleneck classification or a fresh JIT

@@ -1051,6 +1051,44 @@ statements remain historical and do not override the current STATUS queue.
   in Zarvot. Preserve both existing module sets/profiles. Do not infer a game FPS
   gain from microbenchmarks or leaf shares.
 
+## E026 — Rebuild lookup candidate for a future test (2026-10-11 local)
+
+- Task: R06. User requested the rebuild for a future session. No gameplay or
+  performance test was started. Preserve zarvot, zarvot-fp32-outline and every
+  test profile. New target: zarvot-lookup-miss, core
+  284f411686160ceaf7ecaead936148c7de5cfe53; E025 validation remains applicable.
+- Incremental Release/MSVC19.44 exporter build succeeded. Exporter SHA-256
+  302272a980623ef64c8960d5d52ab481c57806e9d96da1577ec20d534dcd72df;
+  emitter SHA-256 6b128794061a1d37aa3f735baa8c72a438848844b7a8361fdd1aff761ecb4ead.
+  Existing version label is stale; source/header/binary hashes identify this
+  build. Preserved E017 runtime will remain the comparison host.
+- Initial requests stopped at the long-output-path warning before writing game
+  output. Hidden exporter windows were not exposed by computer-use. Restarted
+  only the exact recorded idle exporter and passed a verified 66-character
+  junction alias directly to the RPC action. The normal driver resolves aliases
+  back to the long path; bypassed only that path normalization. No product,
+  safety setting or source changes. Alias generated/lm points inside generated/
+  to zarvot-lookup-miss. Export completed with done/success true and running false;
+  owned exporter closed before module compilation.
+- ABI6/features7, four-module inventory and coverage manifest match the FP32
+  candidate byte-for-byte (SHA-256
+  29f3a9cb0aeec129475a94835cf165dfc48578b7a3e8a372e37d6dfac99cdb47).
+  Compared all 186 module project/source files: 182 unchanged; exactly the four
+  dispatch C files differ by the validated early-NULL replacement. Runtime,
+  block bodies, image exports and CMake settings are identical. Generated data
+  and detailed per-file identities remain local.
+- Sequential jobs2 build started at 2026-10-12T01:24:22 UTC (October11 local),
+  runner PID11980. Generated compile pool remains1; no overall timeout. rtld
+  completed; SDK is compiling. Main and subsdk0 are pending at this checkpoint.
+  Local evidence: workspace reports/e026-{exporter-build.log,exporter.json,
+  export-status.json,export-verification.json,generated-comparison.json,
+  build-start.json,module-runner.json,module-build.log,module-build.stderr.log};
+  build/recomp/zarvot-lookup-miss/build-status.json.
+- Next: let this owned build finish, verify all four DLL hashes/load metadata,
+  stage with E017 host/E016 initial profile without launching gameplay, and
+  update this entry with final identities. No new game execution, correctness
+  or FPS result yet. Future user-led comparison still needs verified recorders.
+
 ## Template for the next experiment
 
 - ID / R task / date:

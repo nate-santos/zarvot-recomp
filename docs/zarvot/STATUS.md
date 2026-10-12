@@ -1,6 +1,6 @@
 # Zarvot recomp handoff
 
-Updated: 2026-10-11. Combat profiled; indexed lookup improvement validated in E025.
+Updated: 2026-10-11. E026 exported the lookup candidate; separate build running.
 
 ## Objective and next action
 
@@ -8,15 +8,26 @@ Work only on the recomp: build, coverage, correctness and execution improvements
 Reuse the compatibility stack. Do not resume general emulator performance,
 settings or GPU tuning. JIT is a reference and temporary hybrid fallback.
 
-**First ready task: R06 — rebuild the exporter and export/build the separate
-zarvot-lookup-miss candidate from core 284f411686.** E025's indexed early-NULL
+**First ready task: R06 — let the existing zarvot-lookup-miss build finish,
+then verify/stage it for a future session.** E026 rebuilt the exporter from
+core 284f411686 and completed the separate export. All 186 module files were
+compared with the FP32 candidate: 182 are identical and only the four dispatch
+C files contain exactly E025's validated lookup change. Manifest/coverage,
+ABI6/features7 and game/module inventory are unchanged. The sequential runner
+started at 2026-10-12T01:24:22 UTC (October 11 locally), recorded PID 11980;
+check build/recomp/zarvot-lookup-miss/build-status.json, workspace
+reports/e026-module-runner.json, logs and actual desktop compiler processes.
+Do not start a duplicate or infer completion from a quiet compiler. The user
+requested a rebuild for later testing; stage without starting gameplay.
+
+E025's indexed early-NULL
 change passed 1,616,528 differential lookup checks, a deliberate failing control,
 quiet synthetic timings and the complete five-variant runtime smoke suite.
 Only generated dispatch changes; valid index hits/holes and allocation-failure
 search remain intact. Existing playable modules still use core 84568fcadc and
 do not contain this change. Do not mix/relabel them as the new candidate.
-Preserve zarvot and zarvot-fp32-outline plus E017/E023 profiles. Rebuild the
-exporter before export, verify the new four-module manifest/hashes, and allow
+Preserve zarvot and zarvot-fp32-outline plus E017/E023 profiles. Verify the new
+four-module DLL hashes and load metadata after compilation, and allow
 healthy sequential builds to finish without an arbitrary overall timeout.
 Keep ABI/layout, guards, FP and gameplay timing unchanged. Reuse the E017 host
 and E016 initial profile for a later user-led comparison once all images load
@@ -177,7 +188,7 @@ the 3.5-hour main build or export unless a source/export change requires it.
 | R03 | Opening action checked; broader behavior pending | E021 movement/effects good; E023 Bluetooth/shooting/audio fine; saves/death/restart/music fidelity pending |
 | R04 | Pending R03 | Iterative coverage/translation fixes with focused tests |
 | R05 | Pending validated routes | Strict-static zero-fallback tests, then separate no-JIT verification |
-| R06 | Indexed lookup source improvement validated; game build next | E025 focused/full synthetic checks pass; rebuild exporter and create separate zarvot-lookup-miss images |
+| R06 | Indexed lookup candidate exported; build running | E025 checks pass; E026 verifies only four dispatch changes; wait for existing zarvot-lookup-miss runner, verify/stage images |
 | R07 | Pending R05 | Reproducible recomp package and endurance checks |
 | R08 | Pending R05 routes | Expand later-level/mode coverage; track full playthrough separately |
 
@@ -192,7 +203,7 @@ A/B and logging/cache tuning are no longer next actions.
    Preserve subsequent changes and check current ahead/behind state afresh.
 3. Inspect existing generated export and build artifacts at the identities in
    RUNBOOK. Baseline source is 5949cab3ba; playable FP32 source is 84568fcadc;
-   next lookup candidate source is 284f411686 (not game-built).
+   lookup candidate source is 284f411686 (exported; build running in E026).
    The sequential runner records its PID and module completion/hash evidence in
    build/recomp/zarvot/build-status.json. Check that process and compiler activity
    before restarting; reports/r02-module-set-build.log holds raw progress.
