@@ -1197,6 +1197,105 @@ statements remain historical and do not override the current STATUS queue.
   broader correctness claim before reviewing that evidence. Do not make
   another source change or repeat compilation while this comparison is pending.
 
+### E028 closure and user observations
+
+- User finished opening Story combat and exited normally. Feedback: a bit
+  better/smoother, uncertain; slowdown during action about ten seconds before
+  exit; everything else worked correctly in response to the explicit movement,
+  shooting and audio check. These are scoped user observations, not save,
+  restart/death, detailed collision or original music-fidelity validation.
+- Actual desktop game/coverage/CPU recorder processes are all absent. Exact
+  traced game exit: 12:40:26.2931938 UTC. Game exit code unavailable, not assumed
+  0. Coverage ended process_exited without error: 342 polls, 336 complete;
+  compiled blocks 53,114,023 -> 25,874,802,028. Zero UI/file transitions,
+  lookup misses, unhandled opcodes, import traps, disagreements or regressions.
+- CPU recorder finalized process_exited at 12:41:08.2668748 UTC, saving
+  3,853,516,800-byte cpu.etl with no recording/cleanup error. The later recorder
+  finish includes trace save; it is not the game-exit timestamp. Active pointers
+  now record closed. Workspace reports/e028-finalization.json retains final
+  metadata and user feedback. All profiles and the unused E026 stage survive.
+- Decision: review the closed recording in E029 before another source change;
+  zero observed transitions is still hybrid-route evidence, not strict/no-JIT.
+
+## E029 — Verify smoother combat and the late slowdown (2026-10-12 local)
+
+- Tasks: R03/R06. User asked to verify the impression of smoother action and
+  inspect roughly ten seconds before exit. No new runtime/emitter change, game/export
+  rebuild, launch, automated input or settings tuning. E028 core/image/host
+  identities remain E026's lookup candidate with E017 host/E016 initial profile.
+- Converted only the complete saved trace. Full export
+  cpu-profiles/20261012-122901-7eff4fae/analysis/20261012-124156-79f95169:
+  exact PID/path/start verified, 1 ms sampling, zero lost events, 1,374,658 game
+  samples. Session 12:29:01.1719187–12:40:47.2931024 UTC; process exit comes from
+  the exact game process's EndTime, not the session end or recorder completion.
+  Conversion took about 161.5 seconds; cached window exports took seconds.
+- Captures 19–22 visually show blue jar-arena projectiles/Chomp, red boss combat
+  and effects, with rising score/decreasing boss health. Capture 17 still shows
+  the title; long title time is excluded from combat. Capture 23 shows the
+  Saturday Morning, 10:32 AM Story transition. Thirty-second captures cannot
+  locate the precise hit, transition start or continuous identical work.
+- Combat window: 12:38:16.073978–12:39:46.2549309 UTC, 90.1809529 seconds;
+  ETL-relative 554.9020593–645.0830122. Native export
+  analysis/20261012-124536-70c0b664. 91 PERF polls: min 9.492, median 10.994,
+  max 18.990 FPS; 22 below 10, 84 below 15. UI has 45 polls, median 11, min 9.5,
+  max 18.5; one below 10. E023's capture 8–11 comparison remains 90 PERF polls,
+  median 7.9945, min 6.479, max 12.986, 79 below 10; UI 45, median 8, 35 below 10.
+  Strict below 10 counts are sensitive to readings such as 9.995 versus rounded
+  UI 10.0; retain the separate data sources rather than merging their counts.
+- Phase neighborhoods (+/-5 seconds, 10 PERF polls each) also have higher
+  medians in this run: blue arena 12.2425 vs 7.494, red boss 10.493 vs 8.7435,
+  depleted boss 10.4955 vs 7.7445. These overlapping neighborhoods are not
+  independent repeats. Results support the user's smoother impression in this
+  run; unmatched action/input/phase mix, warm-up/cache history and laptop load
+  prevent a causal or repeatable FPS-gain claim from the lookup change.
+- Late dip: log elapsed 670–678 seconds maps to 12:40:07.731122–12:40:15.731122
+  UTC. Eight interval polls are 7.497, 0, 0.500, 3.996, 6.994, 3.998, 1, 8.995 FPS;
+  median 3.997. The sampled dip occurs roughly 11–18 seconds before actual exit,
+  consistent with the user's approximate report. The exact final ten seconds
+  contain eight PERF polls at 36.972–38.477 FPS, median 37.7245; UI five polls,
+  median 37.5 with the first lagging reading 27. The scene had transitioned.
+  Do not average this recovery into a combat metric. Interval frametime fields
+  include NaN when no frame completed; they are not a p99/per-frame trace.
+- Byte-verified main/SDK mapping uses this target's own runtime/dispatch objects,
+  game image/manifest hashes, loaded image/IP/time identities and index/unwind
+  checks. All metadata-only: no guest blocks invoked. Combat main 103,926
+  samples (60.07% of all), SDK 14,191 (8.20%); compiled total 118,399 (68.44%),
+  host 22,393 (12.94%), unknown 23,844 (13.78%). Main/SDK assignments cover 96.40%/
+  97.44% of their samples. Outputs: generated-mapping/{main,sdk}-combat-v1.
+- Across main/SDK: lookup 10,353 leaves (5.98%), load32/load64 12,511 (7.23%),
+  outlined exact FP32 helpers 6,460 (3.73%). Linked lookup branches verified
+  against the dispatch object: 8,549 index-only load/return samples, 1,713 shared
+  index/bounds checks, 91 shared zero-return and zero in the index-absent-only
+  binary-search ranges. E024 had 1,873 search leaves (1.05% of all). This supports
+  removal of the intended sampled search work, not zero search calls or a
+  causal total-speedup estimate; shared branches, sampling skid and phase mix
+  remain limits. Reaggregation corrects E024's combined FP32 count 6,264 -> 6,268
+  by including four SDK multiply-helper samples; rounded 3.50% is unchanged.
+- The late-dip native export analysis/20261012-124544-ba55e024 has 13,734 samples:
+  compiled 10,219 (74.41%), host 1,552 (11.30%), unknown 1,425 (10.38%). Main/SDK
+  mapping covers 97.31%/97.19%. Lookup 706 leaves (5.14%), load32/load64 1,034
+  (7.53%), outlined FP32 942 (6.86%); zero samples in the lookup search ranges.
+  Pre-dip and recovered-transition exports are analysis/20261012-124541-f719804e
+  and 20261012-124547-e2c4bc64. Higher compiled share does not identify the
+  critical path or the cause of this stall. No JIT-gap evidence emerged.
+- Local reproducible review: build/e028-review-run.py, build/e029-native-review.py;
+  run analysis/e028-interval-review/{summary.json,*perf.csv}; CPU profile
+  helper-leaf-analysis/{summary.json,*lookup-disasm.txt} and
+  generated-mapping/{main,sdk}-dip-v1. Workspace reports/e028-native-windows.json,
+  e028-native-maps.json and e029-native-review.log. Capture write-time/log-origin
+  anchors agree within 0.84 ms across both runs. Raw game data/addresses remain
+  local; only these sanitized findings and handoff are committed.
+- Decision: retain the validated lookup candidate and all rollback module sets.
+  It removes measured redundant work and has scoped user behavior confirmation;
+  broad performance remains slow, and causal FPS improvement is unproven.
+  Next examine mapped dip blocks and narrowly prototype FM1 load-gate/code-layout
+  alternatives using focused semantic/negative-control/timing checks. Preserve
+  acquire ordering, permissions, page crossing, invalidation, exclusives, exact
+  FP and original timing. Full-helper inlining previously regressed; avoid a
+  blanket inline/cache change. No new large build/playtest before prototype
+  evidence warrants another recomp candidate. Save/death/restart, original
+  music fidelity, later routes and strict/no-JIT checks remain separate/open.
+
 ## Template for the next experiment
 
 - ID / R task / date:

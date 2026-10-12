@@ -1,6 +1,6 @@
 # Zarvot recomp handoff
 
-Updated: 2026-10-12. Lookup candidate recorded combat test in progress (E028).
+Updated: 2026-10-12. Lookup candidate combat closed and analyzed (E028/E029).
 
 ## Objective and next action
 
@@ -8,23 +8,36 @@ Work only on the recomp: build, coverage, correctness and execution improvements
 Reuse the compatibility stack. Do not resume general emulator performance,
 settings or GPU tuning. JIT is a reference and temporary hybrid fallback.
 
-**First ready task: R03/R06 — finish and analyze the active E028 user-led opening
-Story combat comparison. No rebuild or duplicate launch.** The user connected
-Stadia before launch and confirmed readiness. Active run is
-build/zarvot-runs/20261012-122856-ec4dadc0: game PID 4312, coverage PID 1692 and
-owned elevated CPU recorder PID 31848 were verified against the exact game
-path/start identity. Both recorders are recording; the user has been invited to
-play and exit normally. CPU profile is cpu-profiles/20261012-122901-7eff4fae;
-coverage observation is observations/launch-1ff88e83acf64f6c899ba13150e7f624.
-Check workspace reports/e028-active-run.json and actual desktop processes before
-acting. The CPU recorder has a 900-second cap; coverage continues until exit.
-Do not stop the game or analyze a live trace. After exit, verify final recorder
-states/errors, bound combat using captures, and compare the verified lookup
-candidate with E023. Collect the user's behavior/stutter report independently.
-At 12:33:20 UTC, 126 complete reports advance compiled counts
-53,114,023 -> 10,755,802,960 with zero UI/file fallbacks, import traps,
-disagreements or regressions. This is an interim execution checkpoint, not a
-combat performance or correctness verdict.
+**First ready task: R06 — examine the mapped late-dip blocks and prototype a
+narrow FM1 load-gate/code-layout improvement with focused differential and
+timing checks. No large rebuild or new playtest needed yet.** Keep acquire
+ordering, bounds/page/permission checks, guards and exact FP behavior. Existing
+full-helper inlining regressed; do not repeat it as a default optimization.
+Require meaningful synthetic evidence before changing the exporter or making
+another separate game candidate. The measured load32/load64 leaf share is a
+target to investigate, not a removable fraction of frame time.
+
+E028 is closed: build/zarvot-runs/20261012-122856-ec4dadc0, historical game/
+coverage/CPU PIDs 4312/1692/31848 all exited. Exact-process trace exit was
+12:40:26.2931938 UTC; CPU profile cpu-profiles/20261012-122901-7eff4fae saved
+3,853,516,800 bytes with no recording/cleanup error. 336 complete coverage
+reports advance compiled blocks 53,114,023 -> 25,874,802,028; zero UI/file
+fallbacks, import traps, disagreements or regressions. User reported a bit
+smoother, with movement/shooting/audio working, but a late action slowdown.
+Workspace reports/e028-active-run.json and r03-active-run.json now record closed.
+
+E029 confirms the late slowdown: eight PERF polls at 0–8.995 FPS, median 3.997,
+roughly 11–18 seconds before exit. The final ten seconds recovered to median
+37.7245 FPS; the last capture shows the Saturday Morning Story transition.
+The capture-bounded 90.18-second combat window has median 10.994 FPS versus
+E023's 7.9945, supporting the user's impression in this run. Scenes/inputs,
+cache/warm-up history and laptop load differ; no causal FPS gain or frame
+percentiles. Native combat has 173,001 samples, 68.44% in compiled modules.
+Lookup is 5.98%, load32/load64 7.23%, outlined FP32 3.73%; main/SDK are 96.40%/
+97.44% mapped. Byte-verified lookup search ranges contain no samples in combat
+or the late dip, versus 1,873 old search samples. This supports the intended
+lookup change, not zero search calls or complete coverage. Late-dip compiled
+share is 74.41%; no exact hit/cause is established. See E029 for evidence paths.
 
 E026 completed
 all four modules from core 284f411686. Main took 69.7 minutes; all recorded DLL
@@ -82,7 +95,8 @@ UTC: 178,841 CPU samples, 66.42% in compiled modules, main 57.86%, SDK 8.25%,
 host 12.57%, unknown 15.98%. Main mapping assigns 96.58% to indexed blocks,
 byte-matched helpers or run-slice export. Across main/SDK, block lookup accounts
 for 12,288 leaf samples (6.87% of all), load32/load64 11,874 (6.64%), and the
-three outlined exact FP32 helpers 6,264 (3.50%). Host RunThread is 1.87% and
+three outlined exact FP32 helpers 6,268 (3.50%; reaggregation corrected in E029).
+Host RunThread is 1.87% and
 direct exclusive callbacks 0.29%; no dominant host recomp helper emerged.
 Leaf shares locate work, not exact call time or the cause of stutter.
 
@@ -212,10 +226,15 @@ the 3.5-hour main build or export unless a source/export change requires it.
 - E026/E027: four lookup-candidate modules completed and verified; unused future
   stage preserved. Separate boot/title check loads/negotiates every image and
   advances compiled counts with zero observed fallbacks. Both owned test
-  processes are closed. New candidate combat performance/correctness is pending.
+  processes are closed. Subsequent combat evidence is recorded in E028/E029.
 - E028: separate lookup-candidate comparison launched with the preserved E017
   host and E016 initial profile. Exact-process coverage and elevated CPU
-  recording verified before inviting play. User-led action/final evidence pending.
+  recording verified before inviting play; both finalized on normal exit. User
+  reported smoother combat and correct movement/shooting/audio; late dip remains.
+- E029: exact-process/capture-bounded analysis confirms higher combat interval
+  readings in this run and the late 0–9 FPS dip. Lookup binary-search leaves
+  disappeared from the samples; memory helpers remain a recomp investigation
+  target. No controlled causal speedup or full-game correctness claim.
 
 ## Active task state
 
@@ -224,10 +243,10 @@ the 3.5-hour main build or export unless a source/export change requires it.
 | R00 | Complete | Pinned source built suyu/suyu-cmd; command-line host smoke exited 0; exporter RPC worked (E010) |
 | R01 | Complete for fixed exported modules | Four-module Hybrid ABI 6 source/manifest exported successfully; late-loaded/generated code remains unverified |
 | R02 | Complete | Four DLLs/hash evidence; matching host handshakes; advancing AOT counts; rendered title (E013) |
-| R03 | Opening action checked; broader behavior pending | E021 movement/effects good; E023 Bluetooth/shooting/audio fine; saves/death/restart/music fidelity pending |
+| R03 | Opening action checked; broader behavior pending | E028 movement/shooting/audio correct by user report; Bluetooth works; saves/death/restart/music fidelity pending |
 | R04 | Pending R03 | Iterative coverage/translation fixes with focused tests |
 | R05 | Pending validated routes | Strict-static zero-fallback tests, then separate no-JIT verification |
-| R06 | Lookup candidate combat recording active (E028) | E025-E027 readiness passes; finalize owned recordings after normal exit, then compare capture-bounded combat with E023 before another emitter change |
+| R06 | Lookup candidate measured; next focused prototype ready | E028/E029 closed combat: median 11 vs prior 8 FPS, causal gain unproven; examine dip blocks and FM1 load gate with focused checks before another export/build |
 | R07 | Pending R05 | Reproducible recomp package and endurance checks |
 | R08 | Pending R05 routes | Expand later-level/mode coverage; track full playthrough separately |
 
@@ -245,7 +264,7 @@ A/B and logging/cache tuning are no longer next actions.
    lookup candidate source is 284f411686 (built/staged E026, compiled boot E027).
    Its build/recomp/zarvot-lookup-miss/build-status.json is complete. Do not
    rebuild it or confuse it with the earlier FP32 target.
-   E028 is now the active user-led comparison, not E027 or the unused stage.
+   E028 is now closed and analyzed in E029; its profile/evidence are preserved.
    Inspect reports/e028-active-run.json and actual processes before any launch.
    The sequential runner records its PID and module completion/hash evidence in
    build/recomp/zarvot/build-status.json. Check that process and compiler activity

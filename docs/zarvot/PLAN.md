@@ -51,11 +51,15 @@ targets. E025's indexed early-NULL lookup passed focused differential/timing
 checks and all runtime smoke variants. E026 completed/verified all four separate
 zarvot-lookup-miss images and staged an unused future profile. E027's independent
 boot/title check loaded every image and advanced compiled counts with zero
-observed fallbacks; game/recorder are closed. E028 is a separate user-led opening
-Story combat comparison now in progress, with both coverage and owned CPU
-recording verified before inviting play. Next finalize on normal exit, collect
-the user's observations and compare capture-bounded work with E023 before
-another emitter change. No rebuild is needed. Preserve all three module sets,
+observed fallbacks; game/recorder are closed. E028 completed opening Story combat
+with verified recorders; the user reported smoother action and correct movement,
+shooting and audio, with a late slowdown. E029 confirms combat median 11 versus
+prior 8 FPS and a late 0–9 FPS dip before the Story transition. Inputs/scene mix,
+warm-up/cache history and laptop load prevent a causal speedup claim. The new
+lookup has no sampled binary-search leaves; load32/load64 remain 7.23% of combat
+CPU samples. Next examine mapped dip blocks and narrowly prototype FM1 load-gate
+or code-layout changes with semantic/timing checks before another export/build.
+No rebuild is needed now. Preserve all three module sets,
 extend behavioral checks and repeat native CPU comparisons. Smaller code is not
 itself a gameplay speedup.
 Do not wait for general emulator bottleneck classification or a fresh JIT
@@ -131,9 +135,9 @@ Use the inherited MK8 approach after checking which mechanisms already exist:
   allocation-failure search unchanged. Compare generated old/new lookup across
   edge/random PCs, successful/failed allocation, negative controls and repeated
   quiet timings before a separate game candidate. Those synthetic checks passed;
-  E026's game build and E027's compiled boot check also passed; E028's recorded
-  combat comparison is active and must be reviewed before another change.
-  Later FM1 load-gate work must
+  E026's game build and E027's compiled boot check also passed; E028/E029's
+  recorded combat comparison supports the intended removal of sampled search
+  work, with no causal game-speedup claim. Next FM1 load-gate prototypes must
   preserve acquire ordering and avoid the inherited full-helper inlining loss.
 - Consider LTO/PGO or narrowly recovered native routines only with a demonstrated
   recomp cost and differential tests for the affected behavior.

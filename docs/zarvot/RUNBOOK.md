@@ -848,3 +848,44 @@ verify the owned CPU recorder before inviting play. This creates a new profile;
 do not relaunch the completed boot check or alter the unused stage. Compare the
 named combat route and helper samples; no FPS gain or broader correctness has
 been established for the lookup candidate. Keep strict/no-JIT checks separate.
+
+## E028 closed combat recording and E029 review
+
+E028 completed the launch above in build/zarvot-runs/20261012-122856-ec4dadc0.
+Game and both recorders exited; active pointers now record closed. CPU profile
+cpu-profiles/20261012-122901-7eff4fae finalized a 3,853,516,800-byte cpu.etl with
+no recording/cleanup error. Coverage has 336 complete reports, advancing compiled
+blocks to 25,874,802,028 with zero observed UI/file fallbacks or import traps.
+User reported somewhat smoother action and correct movement/shooting/audio,
+with a late slowdown. Preserve that profile, all builds and the unused stage.
+
+The full exact-process native export is analysis/20261012-124156-79f95169 under
+that CPU profile; 1 ms sampling, zero lost events. Exact traced game exit was
+12:40:26.2931938 UTC. Neither trace-session end nor recorder finish is game exit.
+Captures 19–22 bound combat at 12:38:16.073978–12:39:46.2549309 UTC. To reproduce
+its cached CPU window from the workspace root:
+
+```powershell
+$cpuProfile = '.\source\build\zarvot-runs\20261012-122856-ec4dadc0\cpu-profiles\20261012-122901-7eff4fae\cpu-profile.json'
+.\source\scripts\analyze-zarvot-cpu.ps1 -ProfilePath $cpuProfile `
+  -StartSeconds 554.9020593 -EndSeconds 645.0830122
+# Late dip, before the Story transition:
+.\source\scripts\analyze-zarvot-cpu.ps1 -ProfilePath $cpuProfile `
+  -StartSeconds 666.5592033 -EndSeconds 674.5592033
+```
+
+Existing exports are analysis/20261012-124536-70c0b664 (combat) and
+20261012-124544-ba55e024 (dip). Main/SDK mappings are generated-mapping/
+{main,sdk}-combat-v1 and {main,sdk}-dip-v1. They use only the matching
+build/recomp/zarvot-lookup-miss objects; never supply baseline/FP32 objects.
+Local review scripts are build/e028-review-run.py and build/e029-native-review.py;
+workspace reports/e028-native-windows.json records the other two native windows.
+
+Combat interval median is 10.994 FPS versus E023's 7.9945, with unmatched phase/
+input/cache/warm-up/load limitations. Eight late polls reach 0–8.995 FPS roughly
+11–18 seconds before exit, followed by recovery before exit. Capture 23 shows
+the Saturday Morning Story transition. The final ten seconds have recovered
+PERF median 37.7245; they are not a combat comparison. See E029 for separate UI
+metrics, native helper shares and their limits. No frame-percentile or causal
+game-speedup claim. Next work is a focused recomp prototype, not another playtest
+or general emulator tuning.

@@ -7,12 +7,12 @@ remain separate. A visible title and zero fallbacks establish only that route.
 | Check | Current state | Required observation |
 |---|---|---|
 | P00: boot/title | Complete for E013 smoke scope | Four matching images; advancing AOT counts; visible title |
-| P01: menus / Story entry | Opening Story action reached again in E023; Stadia Bluetooth works; broader menu checks pending | Buttons respond; menus/text render; opening Story loads |
-| P02: opening movement / shooting | E021 movement/effects good; E023 shooting fine, performance felt about the same; detailed collision checks pending | Movement and shots behave correctly; no stuck input or visual corruption |
+| P01: menus / Story entry | Opening Story action reached again in E028; Stadia Bluetooth works; broader menu checks pending | Buttons respond; menus/text render; opening Story loads |
+| P02: opening movement / shooting | E028 user reported correct movement/shooting; somewhat smoother action with a late dip; detailed collision checks pending | Movement and shots behave correctly; no stuck input or visual corruption |
 | P03: pause / restart / death | Pause menu rendered (E015); resume/restart/death pending | Pause/resume and restart/death flow behave correctly |
 | P04: next scene / level | Different scene rendered (E015); transition correctness pending | Transition/load completes with correct visuals/input |
 | P05: save / exit / relaunch | Untested in recomp | Reuse the same test profile; expected progress persists |
-| P06: music / effects | E023 user reported audio fine during opening action; original fidelity and later transitions unverified | Audible/stable audio, pitch/loops/transitions; original-hardware fidelity remains separate |
+| P06: music / effects | E028 user reported audio correct during opening action; original fidelity and later transitions unverified | Audible/stable audio, pitch/loops/transitions; original-hardware fidelity remains separate |
 | P07: later levels / modes / full game | Untested | Name each route and its evidence; track separately under R08 |
 
 E014 opened the user playtest; E015 records combat performance issues. The user
@@ -64,15 +64,19 @@ E025's lookup prototype subsequently passed focused and full synthetic checks.
 E026 completed the separate zarvot-lookup-miss build and staged an unused profile;
 E027 verified compiled boot/title with advancing counts and zero observed
 fallbacks, then closed normally. No gameplay input was sent in that check.
-E028 now uses this target and the preserved E017 host/E016 initial profile in
+E028 used this target and the preserved E017 host/E016 initial profile in
 build/zarvot-runs/20261012-122856-ec4dadc0. The user connected Stadia before
 launch; coverage PID 1692 and owned CPU recorder PID 31848 were verified
 recording for game PID 4312 before inviting opening Story action. The user
-handles inputs and normal exit. Inspect actual processes and the active pointer
-before acting; do not launch another session. After exit, finalize recordings,
-collect the behavior/stutter report and bound combat using captures.
-No rebuild is needed. The new candidate has no final combat performance or
-gameplay verdict yet; retain the earlier module sets.
+handled inputs and normal exit. Game/recorders are now closed; both recordings
+finalized without errors. User reported a bit smoother, with movement/shooting/
+audio correct and a slowdown shortly before exit. E029 confirms median 11 FPS
+over capture-bounded combat versus prior 8, plus a 0–9 FPS dip roughly 11–18 seconds
+before exit and recovery in the final ten seconds. The last capture shows a
+Story transition. Timing/scene/input/cache differences prevent a causal speedup
+or exact enemy-hit attribution. Inspect actual processes and the active pointer
+before any future launch. No rebuild or new playtest is needed for the next
+focused recomp prototype; retain all existing evidence and earlier module sets.
 Save/death/restart, detailed collisions and original music fidelity remain open.
 Keep the initial candidate profile and all existing saves intact.
 
