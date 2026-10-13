@@ -1660,6 +1660,51 @@ statements remain historical and do not override the current STATUS queue.
   opening Story combat with the same host/profile and verified recorders. No
   new game speed, combat behavior, route coverage or strict/no-JIT verdict yet.
 
+### E035 completion (2026-10-12 local)
+
+- Sequential modules completed at 2026-10-13 02:46:48 UTC: rtld 7.7 s,
+  SDK 303.9 s, subsdk0 170.1 s, main 4,284.6 s (71.4 minutes). Main is
+  806,155,264 bytes, SHA-256 c2edd5e0685920e201078f29c3342a1a9460a389735f0096707f118010a205c1;
+  SDK 103,778,816 bytes, subsdk0 67,304,960, rtld 150,016. Complete hashes and
+  module times are in build/recomp/zarvot-fp32-stores/build-status.json.
+- Automatic checks passed every image hash/size, ABI6/features7, required
+  exports and 4,280 lookup/rebase probes without guest execution. Runner state
+  ready_for_boot_check, no stderr. Unused future stage
+  build/zarvot-runs/20261013-024651-78375b5b uses E017 host/E016 initial profile.
+  Runner/compiler are closed. Do not recompile this completed set.
+
+## E036 — Result-store candidate compiled boot (2026-10-12 local / October 13 UTC)
+
+- Tasks: R02/R06. E035 images from core 60fb490b2e, preserved E017 host
+  SHA 43ae6250... and a fresh copy of E016 initial profile. Run
+  build/zarvot-runs/20261013-032709-e94c9ef1, game PID 6132, attached coverage
+  recorder 21400. No controller input, settings change or CPU recording.
+- All four images loaded. ABI6/features7, instruction/generation guards,
+  fastmem and FPX1 negotiation/runtime-on verified. 225 complete reports advance
+  compiled blocks 56,074,824 -> 20,755,617,787 with zero JIT transitions, lookup
+  misses, unhandled opcodes, unresolved import traps, UI/file disagreements
+  or counter regressions. Hybrid remains JIT-capable.
+- Captures progress through startup scenes; capture 11 visually verifies the
+  complete Press Any Button title. First normal close request returned true but
+  the process stayed alive beyond the 15-second wait; later captures continued.
+  Second identity-verified normal close exited successfully. No forced cleanup.
+  Coverage reports process_exited without error; game/recorder are closed.
+  reports/e036-boot-{start,close,close-final}.json, launch/observations/log/captures
+  preserve raw evidence. Boot display is not a gameplay/audio fidelity check.
+- Metadata-only object verification matches both current compiled hot-block
+  objects against E034's candidate at every nonrelocation byte: 2,256 bytes each,
+  versus E032's 2,292. No extracted game block executed. Private script
+  build/e036-native-check.py and reports/e036-native-block-verification.json.
+  This confirms the source change survives the actual game compilation, not FPS.
+- User explicitly chose preparing combat for a later session. Preserve the
+  unused E035 stage and all earlier images/profiles. The next controlled test
+  uses this exact module set, E017 host/E016 initial profile, connected controller
+  and verified coverage/owned CPU recording before inviting first Story combat.
+- Decision: completed candidate is ready for later user-led measurement. Keep
+  it fixed until that comparison. Review the smaller compare-operand lead only
+  in an isolated offline E037 prototype; do not spend another full game build
+  or claim a gameplay gain from synthetic timings/boot counters.
+
 ## Template for the next experiment
 
 - ID / R task / date:

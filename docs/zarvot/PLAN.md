@@ -74,9 +74,11 @@ rendered the title with advancing compiled counts and zero observed fallbacks.
 Combat remains untested. E034 independently validates direct scalar FP32 add/sub
 result storage: unchanged arithmetic/gates, expanded alias/control checks,
 smaller blocks and repeatable synthetic improvement. E035 verified the separate
-zarvot-fp32-stores export from core 60fb490b2e and started sequential compilation;
-inspect its actual build/runner state and verify its complete images
-and compiled boot before future user-led combat. Preserve every earlier module set,
+zarvot-fp32-stores export from core 60fb490b2e, completed all four modules and
+passed metadata checks. E036 verified actual compiled title and zero observed
+fallbacks; the user chose combat testing for a later session. Keep this candidate
+fixed for that measurement before another full game build. E037 may examine the
+smaller compare-input-copy lead offline in isolated snapshots. Preserve every earlier module set,
 extend behavioral checks and repeat native CPU comparisons. Smaller code is not
 itself a gameplay speedup.
 Do not wait for general emulator bottleneck classification or a fresh JIT

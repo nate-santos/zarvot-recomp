@@ -1,6 +1,6 @@
 # Zarvot recomp handoff
 
-Updated: 2026-10-12 local. Operand boot verified; result-store candidate build active (E032–E035).
+Updated: 2026-10-12 local. Result-store build and compiled title verified (E035/E036); combat deferred by user.
 
 ## Objective and next action
 
@@ -8,8 +8,13 @@ Work only on the recomp: build, coverage, correctness and execution improvements
 Reuse the compatibility stack. Do not resume general emulator performance,
 settings or GPU tuning. JIT is a reference and temporary hybrid fallback.
 
-**First ready task: R06 — inspect the active zarvot-fp32-stores build from core
-60fb490b2e; let healthy compilation finish, then verify images and compiled boot.**
+**First ready task: R06 — finish the isolated compare-input experiment (E037),
+keeping core 60fb490b2e and the completed zarvot-fp32-stores game build fixed.**
+The user chose combat testing for a later session. The next user-led check is
+opening Story combat with this completed candidate, E017 host/E016 initial
+profile and both verified recorders. Measure the accumulated multiply/add
+improvements before paying for another full game build. Offline compare-copy
+work is a small independent lead, not a reason to replace the prepared candidate.
 E034 removes scalar FP32 FADD/FSUB's partial-write 128-bit result temporary,
 storing the truncated result and clearing upper destination bits directly.
 Input snapshots, FPX gates, exact helpers, FPCR/FPSR, guards and ABI are unchanged;
@@ -24,15 +29,25 @@ matching exporter and verified the new separate export: 82 of 186 module files
 identical, 104 changed only at 64,882 validated scalar add/sub result-store sites.
 Manifest/coverage, ABI6/features7 and all runtime/dispatch/guard definitions
 remain unchanged. Exporter is closed; game and recorders are closed.
-Detached runner started 2026-10-13 01:27:24 UTC, recorded PID 13836, target
-zarvot-fp32-stores. Check workspace reports/e035-{build-start,module-runner}.json,
-module-build.log, module-build.stderr.log, build/recomp/zarvot-fp32-stores/
-build-status.json and actual processes before resuming or starting any build.
-The runner builds modules sequentially with jobs 2/normal one-compile pool and
-no overall timeout, then verifies image hashes/ABI/features/indexes and stages
-with E017 host/E016 initial profile. ready_for_boot_check is not actual boot.
-Keep E032 as the separate control and preserve every earlier module set/profile.
-No new playtest is needed while the build/preparation continues.
+E035 is complete: main took 71.4 minutes, all modules finished at 02:46:48 UTC,
+and all image hashes/ABI6/features7/4,280 lookup/rebase checks passed. Main is
+806,155,264 bytes, SHA c2edd5e0...; full identities in build-status.json and E035.
+Runner 13836 is closed, state ready_for_boot_check; its unused stage is
+build/zarvot-runs/20261013-024651-78375b5b. Do not rebuild or resume this completed
+target. A new launch creates another copy; StageOnly is not a resumable run.
+
+E036 independently proved compiled boot/title at
+build/zarvot-runs/20261013-032709-e94c9ef1 using E017 host/E016 initial profile.
+All four images, guards, fastmem and FPX1 loaded/enabled. 225 complete reports
+advance compiled counts 56,074,824 -> 20,755,617,787 with zero UI/file fallbacks,
+import traps, disagreements or regressions. Capture 11 shows the full Press Any
+Button title. Normal second close request exited game/coverage PIDs 6132/21400;
+first request did not exit within 15 seconds. No forced termination, controller
+input, CPU recording or settings change. Metadata-only inspection also matches
+both actual built hot-block objects to E034's validated 2,256-byte prototypes.
+No combat FPS/behavior or strict/no-JIT claim. Keep E032 as the separate control
+and preserve every earlier module/profile set. All game/coverage processes are
+closed. E037 uses ignored snapshots; inspect actual processes before timing.
 
 E032's zarvot-fp32-operands build is complete, all four images verified, and
 E033 proved compiled boot/title with E017 host/E016 initial profile. Main took

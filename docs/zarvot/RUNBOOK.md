@@ -993,3 +993,27 @@ separate compiled boot check. Resume a genuinely failed/closed compile
 incrementally with build-zarvot.ps1 -Target zarvot-fp32-stores -ParallelJobs 2.
 The user reported disabling Smart App Control after Windows load blocks; the
 fresh E034 metadata generator subsequently ran and its full comparison passed.
+
+E035 has now completed every module and readiness check; E036 also verified
+actual compiled title with zero observed fallbacks. Both boot/recorder processes
+are closed. Preserve the unused E035 stage at
+build/zarvot-runs/20261013-024651-78375b5b and the complete stores image set.
+Do not resume this completed build. The user chose combat testing for later.
+
+When the user is ready and the controller is connected, launch from source/:
+
+```powershell
+.\scripts\start-zarvot-recomp.ps1 -Target zarvot-fp32-stores `
+  -HostRoot .\build\zarvot-runs\20261011-030031-b40a1ca6 `
+  -ProfileFromRun .\build\zarvot-runs\20261006-035803-2d087b29 `
+  -AllowSameGameProfileReuse -Capture -RecordCoverage -Visible
+```
+
+Verify coverage attachment, start measure-zarvot-cpu.ps1 for that returned
+RunRoot using the existing owned/elevated recorder workflow, and verify its
+recording state before inviting play. Keep the same first Story action route
+and original settings. Record the combat window separately from title/loading
+and final exit transitions; compare native samples and interval FPS honestly.
+E036 boot run's advanced profile is not the initial comparison profile.
+Keep core 60fb490b2e/game images fixed for this test; any E037 compare-input
+prototype stays isolated until correctness/timing review and combat measurement.

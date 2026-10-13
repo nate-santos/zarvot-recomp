@@ -70,7 +70,9 @@ FP32 add/sub result-storage improvement: over 100 million FP comparisons,
 950,272 whole-context alias checks and repeated synthetic timings pass. Those
 native-path blocks use about 57–62% less time small / 73–74% less large against
 the operand candidate, with no game FPS claim. Core 60fb490b2e is published;
-E035 verified the separate export and started its sequential module build.
+E035 completed all four modules and image checks. E036 rendered the complete
+title with advancing compiled counts and zero observed fallbacks. The candidate
+is prepared for a later user-led combat comparison; its game FPS is unmeasured.
 All earlier module sets and recordings are preserved. Save/death/restart
 checks, original music fidelity, strict/no-JIT
 execution and later routes remain open. See the [gameplay checklist](docs/zarvot/PLAYTEST.md).
