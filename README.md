@@ -63,10 +63,14 @@ math blocks and validated a narrow scalar FP32 multiply input-load improvement.
 Over 100 million FP comparisons and 720,896 full-context alias checks passed.
 Repeated synthetic native-path work uses about 59–60% less time in a small block
 and 38–39% less in a large block; these are not game FPS gains. Core 343402cf54
-is published; E032 verified the separate export and started its module build.
-Image verification/staging will follow automatically; boot/gameplay are pending. The playable
-lookup build remains unchanged until that candidate is verified.
-All three module sets and recordings are preserved. Save/death/restart
+is published; E032 completed all four modules and image checks. E033 loaded them
+and rendered the full title with advancing compiled counts and zero observed
+fallbacks. Its combat comparison is pending. E034 validates a separate scalar
+FP32 add/sub result-storage improvement: over 100 million FP comparisons,
+950,272 whole-context alias checks and repeated synthetic timings pass. Those
+native-path blocks use about 57–62% less time small / 73–74% less large against
+the operand candidate, with no game FPS claim. Core 60fb490b2e is retained for
+a separate export/build. All earlier module sets and recordings are preserved. Save/death/restart
 checks, original music fidelity, strict/no-JIT
 execution and later routes remain open. See the [gameplay checklist](docs/zarvot/PLAYTEST.md).
 

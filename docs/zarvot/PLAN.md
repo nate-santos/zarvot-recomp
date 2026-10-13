@@ -66,10 +66,15 @@ prototype. E031 located most of those block samples in operand preparation and
 validated width-matched scalar FP32 FMUL/FNMUL input copies. Exact FPX gates and
 fallbacks remain unchanged. Broad FP/alias/control checks pass and repeated
 synthetic timings improve; game FPS is unmeasured. A separate zarvot-fp32-operands
-export/build is warranted from core 343402cf54. E032 verified that export and
-started its sequential module build with automatic image checks/staging;
-inspect actual build/runner state, then verify identities and compiled
-boot before a future user-led combat test. Preserve all three earlier module sets,
+export/build is warranted from core 343402cf54. E032 completed all four modules
+and metadata checks; a postbuild Windows load refusal cleared on later verification
+without a rebuild or security-policy change. E033 loaded the full candidate and
+rendered the title with advancing compiled counts and zero observed fallbacks.
+Combat remains untested. E034 independently validates direct scalar FP32 add/sub
+result storage: unchanged arithmetic/gates, expanded alias/control checks,
+smaller blocks and repeatable synthetic improvement. Core 60fb490b2e is ready
+for a separate zarvot-fp32-stores export/build (E035); verify its complete images
+and compiled boot before future user-led combat. Preserve every earlier module set,
 extend behavioral checks and repeat native CPU comparisons. Smaller code is not
 itself a gameplay speedup.
 Do not wait for general emulator bottleneck classification or a fresh JIT
@@ -155,6 +160,12 @@ Use the inherited MK8 approach after checking which mechanisms already exist:
   operand copies as a focused target. Width-matched scalar FMUL/FNMUL loads pass
   FP/alias/control checks with unchanged gates/exact helpers and smaller blocks;
   repeated synthetic gains justify a separate build, not a gameplay speedup claim.
+  E034 follows the separately attributed add result-copy work: scalar FPX1
+  FADD/FSUB can store a truncated result and clear the upper register directly.
+  Keep input snapshots and exact arithmetic/gates; leave vector/pairwise,
+  binary64 and ABI5 output unchanged. Its differential/alias/control checks,
+  old-object byte match and repeated equivalent-work timings justify a separate
+  game candidate. Compare-operand transport remains a later independent lead.
 - Consider LTO/PGO or narrowly recovered native routines only with a demonstrated
   recomp cost and differential tests for the affected behavior.
 

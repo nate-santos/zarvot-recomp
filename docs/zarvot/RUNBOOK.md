@@ -943,24 +943,39 @@ third_party/suyu/tests/recompiler_fpx/run.py with --source third_party/suyu,
 Debug PDB-manager failure. A passing x64 soft-reference test is not hardware
 golden or full-game validation.
 
-The next separate target is zarvot-fp32-operands. Inspect E032 exporter/build
-state and processes before restarting; preserve lookup/outline/baseline images.
-Rebuild the matching exporter, export through a short verified alias as in E026,
-and compare source/manifest/coverage before the sequential module build. Keep
-the normal one-compile pool and no overall timeout. Verify all image identities
-and compiled boot, then stage with E017 host/E016 initial profile for later
-user-led combat. No input or new CPU recording is needed for build preparation.
-
 E032's export is complete and verified: 107 of 186 files change only at 65,738
 scalar multiply operand-load sites; manifest/coverage and all runtime/dispatch
-definitions remain identical. The exporter is closed. The detached build runner
-started at 22:47:10 UTC, recorded PID 6092. Inspect actual process state plus
-reports/e032-{build-start,module-runner}.json and module-build logs in the
-workspace, and build/recomp/zarvot-fp32-operands/build-status.json. Do not start a
-second build. The local runner automatically verifies images then stages with
-E017 host/E016 initial profile; ready_for_boot_check still requires a separate
-compiled boot check. All output stays local and earlier targets remain intact.
-If it actually fails and no compiler/runner remains, inspect/fix the cause and
-resume the existing module trees with build-zarvot.ps1 -Target
-zarvot-fp32-operands -ParallelJobs 2. Keep healthy compilation running without an
-arbitrary timeout; no new export is needed for an incremental compile resume.
+definitions remain identical. All four modules finished and passed later image
+checks; E033 verified actual compiled title with zero observed fallbacks. Main
+took 65.6 minutes. reports/e032-module-runner.json still records the historical
+postbuild Smart App Control refusal: it does not mean compilation failed. Read
+build/recomp/zarvot-fp32-operands/build-status.json and later
+reports/e032-image-verification.json together. Do not rebuild this completed set.
+No Windows security-policy change was needed. E033 boot run
+build/zarvot-runs/20261013-010816-df834671 and its recorder are closed.
+
+For a future user-led operand comparison, connect the controller first and run
+start-zarvot-recomp.ps1 -Target zarvot-fp32-operands -HostRoot the preserved E017
+run -ProfileFromRun the E016 initial run -AllowSameGameProfileReuse -Capture
+-RecordCoverage -Visible. This creates a new isolated copy. Verify attachment
+and the separately owned CPU recorder before inviting combat. Do not reuse a
+boot run's advanced profile as the initial comparison profile.
+
+## E034 scalar FP32 result-storage candidate
+
+Core 60fb490b2e removes scalar FPX1 FADD/FSUB S's partial-write result temporary.
+The exact arithmetic, input snapshots, native gates and full-register clearing
+semantics are retained. E034's expanded FPX suite, source/object comparisons and
+three synthetic timing passes succeeded; no game performance claim.
+Reproduce with tests/recomp_fp_outline_benchmark.md and baseline 343402cf54.
+Local evidence is build/zarvot-perf-prototypes/fp-add-store-e034-{final,fpx,
+native-verified}. Keep game excerpts and native addresses private.
+
+E035 prepares separate target zarvot-fp32-stores. Rebuild the matching exporter,
+export through a fresh short alias, compare complete source/manifest/coverage,
+then build all four modules sequentially with the normal one-compile pool and
+no overall timeout. Preserve the verified operand/lookup/outline/baseline sets.
+Inspect E035's current reports and actual processes before restarting. A
+complete build needs independent image checks and compiled boot; a ready stage
+alone is not execution evidence. Use E017 host/E016 initial profile again.
+No gameplay input or new CPU recording is needed for preparation.

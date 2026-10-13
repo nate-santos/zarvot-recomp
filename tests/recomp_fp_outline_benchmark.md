@@ -78,3 +78,11 @@ exact helper definitions remain identical. Reproduce with:
 saved primary timing and AnalyzeOnly checks retain ABBAABBA. Keep each repeat
 log separately; compare equal call counts/checksums and report spread. These
 synthetic blocks do not include game-side entry/guard dispatch or memory calls.
+
+E034 compares scalar FP32 add/sub result storage against
+`343402cf54b64ede2b931101ae33d2c29976672a` using the same command and quiet
+repeat procedure. Both revisions already use width-matched multiply inputs and
+the same exact helpers. The candidate stores the truncated scalar result and
+zeros upper destination bits directly, avoiding the 128-bit result temporary.
+Full-context tests include upper register bits; the expanded FPX alias suite
+remains required. Synthetic elapsed-time gains do not predict combat FPS.

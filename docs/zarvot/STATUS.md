@@ -1,6 +1,6 @@
 # Zarvot recomp handoff
 
-Updated: 2026-10-12. FP32 operand candidate exported; module build active (E032).
+Updated: 2026-10-12 local. Operand candidate boot verified; scalar result-store improvement validated (E032–E034).
 
 ## Objective and next action
 
@@ -8,21 +8,42 @@ Work only on the recomp: build, coverage, correctness and execution improvements
 Reuse the compatibility stack. Do not resume general emulator performance,
 settings or GPU tuning. JIT is a reference and temporary hybrid fallback.
 
-**First ready task: R06 — inspect the active zarvot-fp32-operands build from core
-343402cf54; let healthy compilation finish, then verify compiled boot.**
-E032 rebuilt the matching exporter and completed/verified the separate export.
-Of 186 module files, 79 are identical and 107 differ only at 65,738 validated
-scalar multiply input-load sites. Manifest/coverage, ABI6/features7 and all
-runtime/dispatch/guard definitions are unchanged. Exporter is closed.
-Detached sequential runner started at 22:47:10 UTC, recorded PID 6092. Inspect
-workspace reports/e032-{build-start,module-runner}.json, module-build.log and
-module-build.stderr.log, build/recomp/zarvot-fp32-operands/build-status.json,
-and actual processes before resuming or starting another build. It has no
-overall timeout and retains the generated one-compile memory pool. After all
-four images finish, the same runner checks hashes/metadata/indexes and stages
-with E017 host/E016 initial profile; ready_for_boot_check is not boot or gameplay
-proof. No game or recorder is running. Preserve all earlier module sets/profiles.
-No new playtest or recording is needed for preparation. E031 attributed the two
+**First ready task: R06 — prepare the separate zarvot-fp32-stores candidate from
+core 60fb490b2e, then verify its build and compiled boot.**
+E034 removes scalar FP32 FADD/FSUB's partial-write 128-bit result temporary,
+storing the truncated result and clearing upper destination bits directly.
+Input snapshots, FPX gates, exact helpers, FPCR/FPSR, guards and ABI are unchanged;
+ABI5, binary64, vector and pairwise translations are byte-identical. Broad FP,
+alias, negative/shadow/environment checks and 65,536 old/new synthetic block
+comparisons pass. Three timing passes (one reversed) show native-path ratios
+0.385–0.430 small / 0.260–0.274 large against core 343402cf54; exact/inhibited
+groups are near unchanged or mildly faster. No game FPS gain is established.
+Both inspected dip blocks shrink 2,292 -> 2,256 native bytes; baseline objects
+match the completed operand build. E035 matching exporter rebuild is underway;
+check reports/e035-exporter-build.log and actual processes before restarting.
+Next export/compare the new target, build sequentially with the normal pool,
+verify image identity and compiled boot, retaining E032 as the separate control.
+
+E032's zarvot-fp32-operands build is complete, all four images verified, and
+E033 proved compiled boot/title with E017 host/E016 initial profile. Main took
+65.6 minutes and is 806,530,048 bytes, SHA 6a5c588e...; all four ABI6/features7
+images pass 4,280 index/rebase checks. The detached runner's historical failed
+state is a postbuild Windows Smart App Control load refusal, not compilation
+failure. A later elevated verification passed without rebuilding or changing
+security policy; the real runtime subsequently loaded every image. Preserve
+that failure log and reports/e032-image-verification.json rather than rewriting
+history or restarting this completed build.
+E033 closed boot run build/zarvot-runs/20261013-010816-df834671 normally. Its 74
+complete reports advance compiled counts 49,822,121 -> 8,062,879,947 with zero
+UI/file fallbacks, import traps, disagreements or regressions. Full Press Any
+Button title rendered; no input/CPU recording. Historical game/coverage PIDs
+8200/16904 are closed. No combat test of this operand candidate yet; hybrid is
+still JIT-capable. Future launches use a new copy of E017 host/E016 initial
+profile with -Target zarvot-fp32-operands, -Capture and -RecordCoverage. No
+extra unused E032 stage was created by its failed runner. Preserve all earlier
+module sets/profiles. No fresh playtest is needed for offline preparation.
+
+E031 attributed the two
 busy dip blocks: 751/1,283 block samples fall in multiply operand preparation,
 with only one on native multiply arithmetic/moves. Partial 32-bit writes into
 zeroed 64-bit stack locals followed by 64-bit reloads suggest avoidable transport

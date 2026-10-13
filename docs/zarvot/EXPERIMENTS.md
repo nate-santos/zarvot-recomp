@@ -1510,6 +1510,110 @@ statements remain historical and do not override the current STATUS queue.
   No new coverage gap, FPS improvement, gameplay/FP fidelity or strict/no-JIT
   claim follows from this export/build-in-progress.
 
+### E032 completion (continued 2026-10-12 local)
+
+- All four images finished at 23:59:44 UTC: rtld 6.0 s, SDK 268.6 s,
+  subsdk0 140.8 s, main 3,937.7 s (65.6 minutes). Main is 806,530,048 bytes,
+  SHA-256 6a5c588e24dc765553d2bf9404794fb538570c9452e81526dda4b30bd45a3c40.
+  Complete build-status.json retains the other sizes/hashes and pinned manifest.
+- The wrapper failed after compilation: Windows Smart App Control refused
+  Python's first main DLL load (WinError 4551; CodeIntegrity 3077/3118).
+  No automatic stage was created. Kept stderr/runner state and completed images.
+  A later elevated readiness retry passed all four loads, ABI6/features7,
+  required exports and 4,280 index/rebase checks; no guest blocks invoked.
+  No rebuild or Windows security-policy change. The precise reason the later
+  load succeeded is unestablished. reports/e032-image-verification.json is the
+  successful later evidence; the historical runner still honestly records failure.
+- Decision: images are ready for an independent compiled boot check (E033).
+  Compilation/metadata alone establish no gameplay or speed result.
+
+## E033 — Operand candidate compiled boot (2026-10-12 local / October 13 UTC)
+
+- Tasks: R02/R06. Exact E032 four-module set, target zarvot-fp32-operands,
+  preserved E017 host SHA 43ae6250... and copied E016 initial test profile.
+  Local run build/zarvot-runs/20261013-010816-df834671; game PID 8200,
+  coverage recorder 16904, attachment verified at startup. No controller input,
+  CPU recording or settings change. Previous profiles/images remain intact.
+- All four images loaded. ABI6/features7, instruction guard-v2, generation
+  guard, fastmem and FPX1 negotiation/runtime-on confirmed. 74 complete UI/file
+  reports advance compiled blocks 49,822,121 -> 8,062,879,947 with zero JIT
+  transitions, lookup misses, unhandled opcodes, unresolved import traps,
+  counter regressions or UI/file disagreements. Hybrid still permits JIT.
+- Capture 4 shows the complete Press Any Button title after startup transitions.
+  Normally closed only the identity-verified owned window; recorder reports
+  process_exited without error and both processes are gone. The first close
+  attempt safely rejected a JSON datetime/string comparison before any action;
+  normalized timestamp equality then verified the same process and closed it.
+  Workspace reports/e033-boot-{start,close}.json plus launch/observation/log/
+  captures retain raw evidence. No extra unused stage from the E032 wrapper.
+- Decision: preserve this candidate for later user-led combat testing. Boot is
+  real compiled execution evidence, not a combat FPS, audio/input/save fidelity,
+  full-game coverage or strict/no-JIT verdict. Continue offline R06 separately.
+
+## E034 — Remove scalar FP32 add/sub result copies (2026-10-12 local)
+
+- Task: R06. E031 separately attributed 229/1,283 leaves in the two inspected
+  dip blocks to add temporary/output-copy work. Old generated scalar FADD S
+  initializes a 128-bit stack result, writes its low 32 bits, reloads 128 bits
+  and copies to the guest register. Avoidable transport cost is a hypothesis;
+  leaf samples are not hardware stall counters or exact time/call counts.
+- Change: only FPX1 scalar FADD/FSUB S stores (uint32_t)_v directly to the low
+  uint64_t destination and zeros its upper uint64_t. Keep both input snapshots
+  before writes, exact helpers, gates, FPCR/FPSR and arithmetic unchanged.
+  ABI5, binary64, vector/pairwise forms, runtime headers, dispatch, guards,
+  acquire ordering, side entries and ABI/layout retain identical emission.
+  Core 60fb490b2e329f9ccb13e3548d85b3f1dc0ac37b committed/pushed to the user fork;
+  emitter SHA a7bf1d6aa694f0d7facd050d5d326eba8bb9da0125ef57a064490d30ad482f96.
+- Same MSVC 19.44.35229.0 x64 /O2 /Ob2 /bigobj /fp:precise /MD, no LTO or
+  fast-math. FPX suite passes 100,587,904 value/FPSR comparisons and 950,272
+  full-context alias checks. Scalar FADD/FSUB now each covers distinct registers,
+  either destination alias, equal sources and all equal, with poisoned upper
+  bits/unrelated state. Native 121,934 / exact 1,607,323 probe hits.
+  Negative nokeep/nomid/MXCSR controls detect 393,543/25,068/1,023,976 mismatches;
+  inhibit 3,560,000 cases pass; shadow keeps 2,610,513 with zero mismatch;
+  environment repair passes 30,320,000. No hardware golden/exhaustive 2^32 sweep.
+- Source isolation uses preserved, verified core-343402 E031 fixture output:
+  only FADD S/FSUB S functions change in FPX/control/shadow op tables. ABI5
+  op table, all headers, exact helpers, hardware stub and shadow runtime match
+  byte for byte. All 22 original alias forms are mapped across the expanded
+  fixture: ABI5 identical, only its three add/sub forms differ under FPX.
+  Seven additional add/sub cases are covered by the full-context suite.
+- Generic 16/122-op old/new benchmark passes 65,536 whole-context comparisons
+  over 32 FPCR modes, four initial FPSR states, edge/random inputs, and detects
+  the deliberate wrong-result control. Three quiet passes, ABBAABBA / BAABBAAB /
+  ABBAABBA, verify equivalent call counts/checksums. Candidate/baseline ratios:
+
+  | Dataset | 16-op range | 122-op range |
+  |---|---|---|
+  | FPX open, moderate finite | 0.385–0.430 | 0.260–0.274 |
+  | IXC initially clear | 0.949–0.953 | 0.961–0.965 |
+  | Native inhibited | 0.960–0.964 | 0.996–0.998 |
+
+- Synthetic fixture includes output/FPSR resets, excluding guest memory,
+  entry/guard dispatch and gameplay. Native entry extents 2,025 -> 1,972 and
+  13,385 -> 12,932 bytes. Metadata-only compilation of both private dip-block
+  excerpts byte-matches every nonrelocation baseline instruction against the
+  completed E032 main object, then changes just four add statements each;
+  extents 2,292 -> 2,256 bytes. Assembly removes all four partial-stack-result/
+  wide-reload sequences. No extracted guest block executed. No game FPS claim.
+- Local evidence: fp-add-store-e034-{final,fpx,native-verified} under
+  build/zarvot-perf-prototypes holds immutable headers/fixtures, objects/asm,
+  validation/controls, three timing logs, checksums/hashes, repeat-summary.json,
+  native-comparison.json and isolation.json. Private build/e034-* scripts and
+  workspace reports/e034-* logs reproduce the work. First two local native
+  excerpt-generator attempts failed statement-boundary/scan checks; corrected
+  before the verified run, preserving failed directories. A fresh baseline
+  fixture generator hit Windows application control; used the already verified
+  E031 baseline outputs instead, without changing security policy. Product
+  validation and the separately generated synthetic benchmark passed.
+- Decision: retain the narrow source improvement. E035 rebuilds the matching
+  exporter and prepares separate zarvot-fp32-stores source/images, comparing
+  complete export/manifest and compiling sequentially with the normal pool.
+  Verify hashes/metadata and actual compiled boot before future user-led combat.
+  Preserve E032 operand images as the one-change control; no additional user
+  input is required for this preparation. Compare-operand extraction remains
+  a later independent lead, not part of this change.
+
 ## Template for the next experiment
 
 - ID / R task / date:
