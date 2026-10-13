@@ -36,6 +36,8 @@ timing_root=root
 if args.timing_evidence:
     timing_root=args.timing_evidence.resolve()
     prior=verify_saved(timing_root)
+    assert prior.get('timing_mode')!='referenced','Reference the original fresh timing result, not a referenced summary'
+    assert all((timing_root/f'timing{i}.log').is_file() for i in (1,2,3)),'Referenced evidence must contain all three original timing logs'
     assert prior['timings'],'Referenced evidence has no timings'
     # Moving the fixture does not justify timing again. Reuse only identical
     # synthetic inputs and compiler listings; keep the original result separate.

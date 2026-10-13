@@ -1768,6 +1768,12 @@ statements remain historical and do not override the current STATUS queue.
   generator/runner/both-header/generated-C identity, compiler and flag checks;
   no unnecessary retiming. Explicit CRLF snapshots reproduce original Windows
   header hashes rather than assuming LF normalization is identical evidence.
+  Fresh promoted-default also passes validation-only and saved audit without
+  timings. Handoff review found that referencing an already referenced result
+  could silently omit timing rows; analyzer now rejects chained references and
+  requires all three original logs. A targeted replay at
+  fp-compare-e037-reference-guard rejects that case, accepts the original timing,
+  preserves all 18 groups/six ranges and passes saved audit. No retiming/rebuild.
   Raw machine paths and generated outputs stay
   ignored. The completed E035/E036 candidate and earlier profiles are preserved.
 - Decision: keep the promising prototype outside product source for now. First

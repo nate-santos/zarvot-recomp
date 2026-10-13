@@ -59,7 +59,8 @@ their visibility depends on the caller's Windows process permissions.
 To avoid timing again when only moving the fixture, an earlier completed result
 may be referenced explicitly. Its artifact hashes are audited, and generator,
 runner, both snapshot headers, generated C/headers/metadata, compiler version and
-flags must match. Earlier logs and timings remain in their original directory:
+flags must match. Reference the original fresh result; chained references are
+rejected. Earlier logs and timings remain in their original directory:
 
 ```powershell
 .\scripts\measure-recomp-fp-compare.ps1 -TimingEvidence build/zarvot-perf-prototypes/<prior-result>
