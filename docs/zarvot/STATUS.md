@@ -1,6 +1,6 @@
 # Zarvot recomp handoff
 
-Updated: 2026-10-12 local. Operand candidate boot verified; scalar result-store improvement validated (E032–E034).
+Updated: 2026-10-12 local. Operand boot verified; result-store candidate build active (E032–E035).
 
 ## Objective and next action
 
@@ -8,8 +8,8 @@ Work only on the recomp: build, coverage, correctness and execution improvements
 Reuse the compatibility stack. Do not resume general emulator performance,
 settings or GPU tuning. JIT is a reference and temporary hybrid fallback.
 
-**First ready task: R06 — prepare the separate zarvot-fp32-stores candidate from
-core 60fb490b2e, then verify its build and compiled boot.**
+**First ready task: R06 — inspect the active zarvot-fp32-stores build from core
+60fb490b2e; let healthy compilation finish, then verify images and compiled boot.**
 E034 removes scalar FP32 FADD/FSUB's partial-write 128-bit result temporary,
 storing the truncated result and clearing upper destination bits directly.
 Input snapshots, FPX gates, exact helpers, FPCR/FPSR, guards and ABI are unchanged;
@@ -19,18 +19,29 @@ comparisons pass. Three timing passes (one reversed) show native-path ratios
 0.385–0.430 small / 0.260–0.274 large against core 343402cf54; exact/inhibited
 groups are near unchanged or mildly faster. No game FPS gain is established.
 Both inspected dip blocks shrink 2,292 -> 2,256 native bytes; baseline objects
-match the completed operand build. E035 matching exporter rebuild is underway;
-check reports/e035-exporter-build.log and actual processes before restarting.
-Next export/compare the new target, build sequentially with the normal pool,
-verify image identity and compiled boot, retaining E032 as the separate control.
+match the completed operand build. Core is committed/pushed. E035 rebuilt the
+matching exporter and verified the new separate export: 82 of 186 module files
+identical, 104 changed only at 64,882 validated scalar add/sub result-store sites.
+Manifest/coverage, ABI6/features7 and all runtime/dispatch/guard definitions
+remain unchanged. Exporter is closed; game and recorders are closed.
+Detached runner started 2026-10-13 01:27:24 UTC, recorded PID 13836, target
+zarvot-fp32-stores. Check workspace reports/e035-{build-start,module-runner}.json,
+module-build.log, module-build.stderr.log, build/recomp/zarvot-fp32-stores/
+build-status.json and actual processes before resuming or starting any build.
+The runner builds modules sequentially with jobs 2/normal one-compile pool and
+no overall timeout, then verifies image hashes/ABI/features/indexes and stages
+with E017 host/E016 initial profile. ready_for_boot_check is not actual boot.
+Keep E032 as the separate control and preserve every earlier module set/profile.
+No new playtest is needed while the build/preparation continues.
 
 E032's zarvot-fp32-operands build is complete, all four images verified, and
 E033 proved compiled boot/title with E017 host/E016 initial profile. Main took
 65.6 minutes and is 806,530,048 bytes, SHA 6a5c588e...; all four ABI6/features7
 images pass 4,280 index/rebase checks. The detached runner's historical failed
 state is a postbuild Windows Smart App Control load refusal, not compilation
-failure. A later elevated verification passed without rebuilding or changing
-security policy; the real runtime subsequently loaded every image. Preserve
+failure. A later elevated verification passed without rebuilding and the real
+runtime loaded every image. The user subsequently reported turning Smart App
+Control off; do not assume the refusal resolved with that policy enabled. Preserve
 that failure log and reports/e032-image-verification.json rather than rewriting
 history or restarting this completed build.
 E033 closed boot run build/zarvot-runs/20261013-010816-df834671 normally. Its 74

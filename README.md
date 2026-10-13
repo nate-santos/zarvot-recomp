@@ -69,8 +69,9 @@ fallbacks. Its combat comparison is pending. E034 validates a separate scalar
 FP32 add/sub result-storage improvement: over 100 million FP comparisons,
 950,272 whole-context alias checks and repeated synthetic timings pass. Those
 native-path blocks use about 57–62% less time small / 73–74% less large against
-the operand candidate, with no game FPS claim. Core 60fb490b2e is retained for
-a separate export/build. All earlier module sets and recordings are preserved. Save/death/restart
+the operand candidate, with no game FPS claim. Core 60fb490b2e is published;
+E035 verified the separate export and started its sequential module build.
+All earlier module sets and recordings are preserved. Save/death/restart
 checks, original music fidelity, strict/no-JIT
 execution and later routes remain open. See the [gameplay checklist](docs/zarvot/PLAYTEST.md).
 

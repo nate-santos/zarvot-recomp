@@ -1521,8 +1521,10 @@ statements remain historical and do not override the current STATUS queue.
   No automatic stage was created. Kept stderr/runner state and completed images.
   A later elevated readiness retry passed all four loads, ABI6/features7,
   required exports and 4,280 index/rebase checks; no guest blocks invoked.
-  No rebuild or Windows security-policy change. The precise reason the later
-  load succeeded is unestablished. reports/e032-image-verification.json is the
+  No rebuild. The user subsequently reported disabling Smart App Control;
+  exact timing relative to this retry is unknown, so success does not establish
+  resolution with the policy enabled. The agent changed no Windows security
+  settings. reports/e032-image-verification.json is the
   successful later evidence; the historical runner still honestly records failure.
 - Decision: images are ready for an independent compiled boot check (E033).
   Compilation/metadata alone establish no gameplay or speed result.
@@ -1606,6 +1608,9 @@ statements remain historical and do not override the current STATUS queue.
   fixture generator hit Windows application control; used the already verified
   E031 baseline outputs instead, without changing security policy. Product
   validation and the separately generated synthetic benchmark passed.
+  After the user reported disabling Smart App Control, the same fresh generator
+  ran successfully. Full same-fixture comparison also passes: ten scalar
+  add/sub alias functions change, with all other aliases and ABI5 files identical.
 - Decision: retain the narrow source improvement. E035 rebuilds the matching
   exporter and prepares separate zarvot-fp32-stores source/images, comparing
   complete export/manifest and compiling sequentially with the normal pool.
@@ -1613,6 +1618,47 @@ statements remain historical and do not override the current STATUS queue.
   Preserve E032 operand images as the one-change control; no additional user
   input is required for this preparation. Compare-operand extraction remains
   a later independent lead, not part of this change.
+
+## E035 — Separate scalar result-store export/build (2026-10-12 local / October 13 UTC)
+
+- Tasks: R01/R02/R06 continuation of E034. Matching exporter rebuilt from
+  core 60fb490b2e329f9ccb13e3548d85b3f1dc0ac37b in 0.7 minutes. Exporter EXE
+  SHA-256 e64c703b72be77cb4a4c6100426db50694418ffa50feda6bb2848f1d18a80eeb;
+  emitter a7bf1d6a... as E034. E017 comparison host and all previous images/
+  profiles remain unchanged. reports/e035-exporter-build.log and exporter.json
+  retain full identities. No gameplay input or CPU recording.
+- Exported separate generated/zarvot-fp32-stores through verified short junction
+  generated/fs, explicit hybrid and translate_all. Completion done/success=true,
+  empty fallback_modules. Full 186-file hash/source comparison against E032:
+  82 identical, 104 changed only at exactly 64,882 scalar add/sub result-copy
+  sites (main 63,351; SDK 1,466; subsdk0 65; rtld zero). Each complete arithmetic/
+  FPX/exact statement is preserved. All other source, runtime/header, dispatch,
+  guards, CMake and instruction/side-entry inventories are byte-identical.
+  Manifest SHA-256 29f3a9cb0aeec129475a94835cf165dfc48578b7a3e8a372e37d6dfac99cdb47,
+  ABI6/features7. Coverage unchanged does not mean identical codegen.
+  Local e035-compare-export.py and reports/e035-export-{status,verification}.json
+  plus export-compare.log retain proof. Closed only the identity-verified completed
+  hidden exporter PID 2848 after verification; no player session touched.
+- User reported turning off Windows Smart App Control after seeing its block.
+  Agent made no Windows security change. The previously blocked E034 baseline
+  metadata generator then executed, and a complete same-fixture old/new emission
+  comparison passed. Do not claim the earlier refusal resolved with policy on.
+- Detached build started 2026-10-13 01:27:24 UTC, recorded runner PID 13836,
+  target zarvot-fp32-stores. Sequential rtld/SDK/subsdk0/main, jobs 2, normal
+  memory-aware one-compile pool, no overall timeout. Runner pins core/emitter
+  and verified export count, records hashes/module progress, then checks all
+  four image interfaces/index/rebase probes and stages with E017 host/E016
+  initial profile. It does not automatically boot, play or record CPU.
+- Live evidence: build/recomp/zarvot-fp32-stores/build-status.json, workspace
+  reports/e035-{build-start,module-runner}.json, module-build.log and
+  module-build.stderr.log. Private build/e035-build-runner.ps1 and
+  e035-verify-images.py. Inspect real processes/activity before diagnosing a
+  quiet compiler or restarting. Preserve objects on a real failure and resume
+  incrementally; never duplicate the active build.
+- Decision: let healthy compilation finish, then verify complete image identity
+  and compiled boot. Preserve E032 as the one-change control for later user-led
+  opening Story combat with the same host/profile and verified recorders. No
+  new game speed, combat behavior, route coverage or strict/no-JIT verdict yet.
 
 ## Template for the next experiment
 

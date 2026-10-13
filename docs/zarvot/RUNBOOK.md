@@ -951,7 +951,8 @@ took 65.6 minutes. reports/e032-module-runner.json still records the historical
 postbuild Smart App Control refusal: it does not mean compilation failed. Read
 build/recomp/zarvot-fp32-operands/build-status.json and later
 reports/e032-image-verification.json together. Do not rebuild this completed set.
-No Windows security-policy change was needed. E033 boot run
+The user subsequently reported disabling Smart App Control; the later success
+does not prove loading works with that policy enabled. E033 boot run
 build/zarvot-runs/20261013-010816-df834671 and its recorder are closed.
 
 For a future user-led operand comparison, connect the controller first and run
@@ -979,3 +980,16 @@ Inspect E035's current reports and actual processes before restarting. A
 complete build needs independent image checks and compiled boot; a ready stage
 alone is not execution evidence. Use E017 host/E016 initial profile again.
 No gameplay input or new CPU recording is needed for preparation.
+
+E035's export is now verified: 104/186 files change only at 64,882 scalar result
+stores. Manifest/coverage and runtime/dispatch/guard definitions are unchanged.
+The exporter is closed. Detached runner started 2026-10-13 01:27:24 UTC,
+recorded PID 13836. Inspect workspace reports/e035-{build-start,module-runner}.json,
+module-build.log, module-build.stderr.log and build/recomp/zarvot-fp32-stores/
+build-status.json plus actual process identity/activity. Do not duplicate a live
+build. The local runner verifies images and stages only after all four complete;
+inspect reports/e035-image-verification.json and its stage output before a
+separate compiled boot check. Resume a genuinely failed/closed compile
+incrementally with build-zarvot.ps1 -Target zarvot-fp32-stores -ParallelJobs 2.
+The user reported disabling Smart App Control after Windows load blocks; the
+fresh E034 metadata generator subsequently ran and its full comparison passed.

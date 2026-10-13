@@ -67,13 +67,15 @@ validated width-matched scalar FP32 FMUL/FNMUL input copies. Exact FPX gates and
 fallbacks remain unchanged. Broad FP/alias/control checks pass and repeated
 synthetic timings improve; game FPS is unmeasured. A separate zarvot-fp32-operands
 export/build is warranted from core 343402cf54. E032 completed all four modules
-and metadata checks; a postbuild Windows load refusal cleared on later verification
-without a rebuild or security-policy change. E033 loaded the full candidate and
+and metadata checks; later verification passed after a Windows load refusal,
+without a rebuild. The user subsequently reported disabling Smart App Control.
+E033 loaded the full candidate and
 rendered the title with advancing compiled counts and zero observed fallbacks.
 Combat remains untested. E034 independently validates direct scalar FP32 add/sub
 result storage: unchanged arithmetic/gates, expanded alias/control checks,
-smaller blocks and repeatable synthetic improvement. Core 60fb490b2e is ready
-for a separate zarvot-fp32-stores export/build (E035); verify its complete images
+smaller blocks and repeatable synthetic improvement. E035 verified the separate
+zarvot-fp32-stores export from core 60fb490b2e and started sequential compilation;
+inspect its actual build/runner state and verify its complete images
 and compiled boot before future user-led combat. Preserve every earlier module set,
 extend behavioral checks and repeat native CPU comparisons. Smaller code is not
 itself a gameplay speedup.
