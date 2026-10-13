@@ -6,7 +6,7 @@ remain separate. A visible title and zero fallbacks establish only that route.
 
 | Check | Current state | Required observation |
 |---|---|---|
-| P00: boot/title | Complete for E013 smoke scope | Four matching images; advancing AOT counts; visible title |
+| P00: boot/title | E036 also verifies the completed scalar-result candidate; no gameplay verdict | Four matching images; advancing AOT counts; visible title |
 | P01: menus / Story entry | Opening Story action reached again in E028; Stadia Bluetooth works; broader menu checks pending | Buttons respond; menus/text render; opening Story loads |
 | P02: opening movement / shooting | E028 user reported correct movement/shooting; somewhat smoother action with a late dip; detailed collision checks pending | Movement and shots behave correctly; no stuck input or visual corruption |
 | P03: pause / restart / death | Pause menu rendered (E015); resume/restart/death pending | Pause/resume and restart/death flow behave correctly |
@@ -43,6 +43,19 @@ then have the user verify that expected progress persists. Copy hashes alone
 do not establish save correctness.
 
 ## Next named route: first Story level / opening combat
+
+The prepared next target is **zarvot-fp32-stores**, core 60fb490b2e, main DLL
+SHA c2edd5e0.... E035 completed all images/readiness checks; E036 verified full
+compiled title with zero observed fallbacks. The user chose testing for a later
+session. Keep this module set fixed to measure the accumulated multiply-input
+and add/sub-result-copy improvements. The E037 compare-input prototype remains
+outside product source and must not be mixed into this comparison.
+
+Use the preserved E017 host and E016 initial profile again; the exact launch
+command is in RUNBOOK's E034/E035 section. Connect Stadia before launch and
+verify coverage plus owned CPU recording before inviting play. Preserve the
+unused E035 stage and earlier module/profile sets. P01–P07 observations below
+belong to earlier candidates and require appropriate rechecks for this build.
 
 E017 recorded this route: the user played the first action sequence and reported
 many slowdowns/bad frame rates. Captures show the Story menu, opening jar arena

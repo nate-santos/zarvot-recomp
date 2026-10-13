@@ -1017,3 +1017,20 @@ and final exit transitions; compare native samples and interval FPS honestly.
 E036 boot run's advanced profile is not the initial comparison profile.
 Keep core 60fb490b2e/game images fixed for this test; any E037 compare-input
 prototype stays isolated until correctness/timing review and combat measurement.
+
+## E037 isolated compare-input experiment
+
+The reusable fixture keeps the prepared product core/game build unchanged.
+From source/, validate the pinned baseline against its isolated copy prototype:
+
+```powershell
+.\scripts\measure-recomp-fp-compare.ps1
+```
+
+Optional -Benchmark adds three quiet synthetic timing passes; -AnalyzeOnly
+audits an explicit saved WorkDir. See tests/recomp_fp_compare/README.md for
+timing-evidence reuse, exact snapshot/fixture identity and coverage limits.
+E037 original evidence is fp-compare-e037-20261013-isolated; the fresh promoted
+validation/audit is fp-compare-e037-promoted-checked under
+build/zarvot-perf-prototypes. Both passed. Do not edit product source or start
+another full game build for this prototype before the deferred combat comparison.

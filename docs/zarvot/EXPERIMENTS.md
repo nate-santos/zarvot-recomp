@@ -1705,6 +1705,77 @@ statements remain historical and do not override the current STATUS queue.
   in an isolated offline E037 prototype; do not spend another full game build
   or claim a gameplay gain from synthetic timings/boot counters.
 
+## E037 — Isolated scalar FP32 compare-input prototype (2026-10-12 local)
+
+- Task: R06, offline while combat is deferred. E031's 72 compare input-copy
+  leaves (~0.52% of all old late-dip samples) contain 20 wide reloads, 44 adjacent
+  zero stores and eight pointer-setup leaves. Samples support inspecting this
+  small lead; they are not call counts, exact durations, hardware stall counters
+  or an upper bound on future FPS. No new game recording or settings work.
+- Product remains core 60fb490b2e/emitter a7bf1d6a..., prepared E035 images
+  unchanged. Only an ignored snapshot changes EmitFPCompareFlags's input prefix
+  under g_emit_fpx && !dbl: copy present operands into uint32_t, then unsigned
+  widen into the existing uint64_t comparison body. Zero forms explicitly set
+  _b=0 without an absent/uninitialized read. Preserve integer compare semantics,
+  FZ/IDC, NaN/IOC, sticky FPSR, NZCV and conditional suppression; no host FP compare.
+  Candidate snapshot SHA-256 c9187b1937c02c0e8a43f8aa8cf7786f86a467046376b8bee534d3313c225b62.
+- Real Translate() generates 654 scalar forms: ten register FCMP/FCMPE,
+  four zero forms, 512 condition/literal/signalling combinations, and 128
+  conditional alias/V31 forms. 26,852,352 whole-context comparisons pass against
+  both unchanged baseline and an independent monotonic-integer ordering oracle.
+  Cross all 16 incoming NZCV values, 32 FPCR modes and four initial FPSR states,
+  edge NaN/subnormal/infinity/signed-zero/finite pairs, a 20x20 edge grid and
+  deterministic raw random samples, with poisoned upper bits/unrelated state.
+  Fourteen hard-coded flag/FPSR cases pass. An intentionally omitted FCMPE IOC
+  result is detected with expected exit 1. No architecture hardware golden or
+  exhaustive bit-pattern sweep; one random stream, direct operation matrix does
+  not use V0 as a normal source (timed blocks cover it differentially).
+- Emission isolation verifies all 703 changed prefixes: 654 operation functions,
+  48 benchmark compares and one negative-control function. Operation metadata,
+  ABI5/binary64/vector output and all runtime/header/exact/shadow definitions
+  are byte-identical. The remaining scalar comparison body is unchanged.
+  Both parent and independent read-only reviews found no result-invalidating
+  defect. AL/NV and all other conditions cross the oracle matrix, while separate
+  hard-coded conditional convention cases cover EQ only.
+- MSVC 19.44.35229.0 x64 /O2 /Ob2 /bigobj /fp:precise /MD, no LTO. Three
+  synthetic blocks each perform 16 comparisons and consume every flags result
+  into an accumulator, preventing dead overwritten compares. Separate ordinary,
+  zero and conditional forms, finite and exceptional/FZ datasets. Three quiet
+  passes ABBAABBA / BAABBAAB / ABBAABBA verify equal calls/endpoint full-context
+  checksums. Candidate/baseline elapsed-time ranges across both datasets:
+
+  | 16-compare block | Ratio range | Entry unwind extent old -> prototype |
+  |---|---|---|
+  | Register | 0.227–0.232 | 6,040 -> 5,546 bytes |
+  | Zero | 0.256–0.265 | 3,731 -> 3,421 bytes |
+  | Conditional | 0.335–0.367 | 6,805 -> 6,368 bytes |
+
+- Assembly retains all 16 flag-consumption steps and removes the operand
+  zero/partial-stack-store/wide-reload sequences. Timing includes flag
+  accumulation and context resets; no guest memory, dispatch/guards, actual game
+  block or per-frame behavior. These are synthetic block ratios, not a gameplay
+  speedup or measured store-forwarding latency. No extracted guest block executed.
+- Local evidence: build/zarvot-perf-prototypes/fp-compare-e037-20261013-isolated
+  holds immutable headers, generator/runner, generated C, objects/asm, validation/
+  negative/isolation logs, three timing logs, six quiet snapshots and summary.json.
+  Summary recomputes all raw ratios, call/checksum/order assertions and artifact
+  hashes, and confirms the product emitter is still unchanged. Generic reusable
+  tooling is tests/recomp_fp_compare and scripts/measure-recomp-fp-compare.ps1:
+  pinned snapshots, validation by default, optional timing, saved-hash audit
+  and explicit timing-evidence reuse. Fresh fp-compare-e037-promoted-checked
+  repeats all 26,852,352 checks/14 explicit cases/negative/isolation assertions
+  and passes AnalyzeOnly. Original timing is referenced only after exact
+  generator/runner/both-header/generated-C identity, compiler and flag checks;
+  no unnecessary retiming. Explicit CRLF snapshots reproduce original Windows
+  header hashes rather than assuming LF normalization is identical evidence.
+  Raw machine paths and generated outputs stay
+  ignored. The completed E035/E036 candidate and earlier profiles are preserved.
+- Decision: keep the promising prototype outside product source for now. First
+  measure the accumulated multiply/add improvements in the user's deferred
+  Story combat test using the fixed prepared build. Review E037 for later narrow
+  adoption rather than starting another costly full game build now. No new game
+  FPS, coverage, behavior, strict/no-JIT or full-game correctness claim.
+
 ## Template for the next experiment
 
 - ID / R task / date:

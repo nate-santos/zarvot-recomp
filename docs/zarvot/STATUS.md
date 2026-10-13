@@ -8,8 +8,8 @@ Work only on the recomp: build, coverage, correctness and execution improvements
 Reuse the compatibility stack. Do not resume general emulator performance,
 settings or GPU tuning. JIT is a reference and temporary hybrid fallback.
 
-**First ready task: R06 — finish the isolated compare-input experiment (E037),
-keeping core 60fb490b2e and the completed zarvot-fp32-stores game build fixed.**
+**Next action: R03/R06 — when the user returns, measure opening Story combat
+with the verified zarvot-fp32-stores candidate; keep core 60fb490b2e fixed.**
 The user chose combat testing for a later session. The next user-led check is
 opening Story combat with this completed candidate, E017 host/E016 initial
 profile and both verified recorders. Measure the accumulated multiply/add
@@ -47,7 +47,21 @@ input, CPU recording or settings change. Metadata-only inspection also matches
 both actual built hot-block objects to E034's validated 2,256-byte prototypes.
 No combat FPS/behavior or strict/no-JIT claim. Keep E032 as the separate control
 and preserve every earlier module/profile set. All game/coverage processes are
-closed. E037 uses ignored snapshots; inspect actual processes before timing.
+closed. E037's isolated compare-input prototype passes 26,852,352 whole-context
+checks, 14 explicit flag/FPSR cases, a detected compare-specific negative control
+and emission isolation. Three quiet 16-compare timing passes (one reversed) show
+candidate/baseline ranges 0.227–0.232 register, 0.256–0.265 zero, 0.335–0.367
+conditional across finite/exceptional datasets. These include accumulator/reset
+work and predict no game FPS. The lead accounted for 72 old dip leaves (~0.52%
+of all old dip samples), much smaller than the prior copy work. Core/runtime/
+export/game images remain unchanged; candidate exists only in ignored snapshots.
+Retain the reproducible experiment and inspect its evidence before eventual
+adoption, after the deferred combat comparison. No additional full game build.
+Reusable tooling is tests/recomp_fp_compare and scripts/measure-recomp-fp-compare.ps1
+(validation by default, optional timing and AnalyzeOnly). A fresh promoted run
+fp-compare-e037-promoted-checked repeats all checks and audits the original
+timings only after exact generator/runner/header/generated-C identity checks.
+Both runs stay under build/zarvot-perf-prototypes; product core remains clean.
 
 E032's zarvot-fp32-operands build is complete, all four images verified, and
 E033 proved compiled boot/title with E017 host/E016 initial profile. Main took

@@ -77,8 +77,9 @@ smaller blocks and repeatable synthetic improvement. E035 verified the separate
 zarvot-fp32-stores export from core 60fb490b2e, completed all four modules and
 passed metadata checks. E036 verified actual compiled title and zero observed
 fallbacks; the user chose combat testing for a later session. Keep this candidate
-fixed for that measurement before another full game build. E037 may examine the
-smaller compare-input-copy lead offline in isolated snapshots. Preserve every earlier module set,
+fixed for that measurement before another full game build. E037's smaller
+compare-input-copy prototype passes isolated correctness/timing review, but
+remains outside product source until that measurement. Preserve every earlier module set,
 extend behavioral checks and repeat native CPU comparisons. Smaller code is not
 itself a gameplay speedup.
 Do not wait for general emulator bottleneck classification or a fresh JIT
@@ -169,7 +170,10 @@ Use the inherited MK8 approach after checking which mechanisms already exist:
   Keep input snapshots and exact arithmetic/gates; leave vector/pairwise,
   binary64 and ABI5 output unchanged. Its differential/alias/control checks,
   old-object byte match and repeated equivalent-work timings justify a separate
-  game candidate. Compare-operand transport remains a later independent lead.
+  game candidate. E037 separately validates width-matched compare inputs in
+  isolated snapshots. Its full-context/oracle/control/emission checks and
+  synthetic flag-consuming timings pass; it is a smaller old sample lead and
+  does not justify replacing the prepared game candidate before combat testing.
 - Consider LTO/PGO or narrowly recovered native routines only with a demonstrated
   recomp cost and differential tests for the affected behavior.
 
