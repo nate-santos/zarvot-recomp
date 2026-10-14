@@ -1034,3 +1034,41 @@ E037 original evidence is fp-compare-e037-20261013-isolated; the fresh promoted
 validation/audit is fp-compare-e037-promoted-checked under
 build/zarvot-perf-prototypes. Both passed. Do not edit product source or start
 another full game build for this prototype before the deferred combat comparison.
+
+## E038 graphics/native-rendering diagnostics
+
+GRAPHICS.md describes the verified Unity/IL2CPP player, current graphics path,
+native boundary options and probe limits. The existing E017 comparison host
+already supports this diagnostic; no host/game rebuild is needed.
+
+Keep the ordinary E035/E036 comparison command unchanged. For a separate
+diagnostic session, use that same target/host/initial profile and add -StallProbe
+to start-zarvot-recomp.ps1. launch.json records stall_probe_requested. The launcher
+sets the probe explicitly to 0 for ordinary launches or 1 when requested and
+restores the calling environment, including on startup failure.
+
+After normal exit, parse the matching saved files from source/:
+
+```powershell
+& local/tools/python/Scripts/python.exe scripts/analyze-zarvot-stalls.py `
+  --log <RunRoot>/user/log/suyu_log.txt --launch <RunRoot>/launch.json
+```
+
+Output is sanitized JSON. Exit 0 means complete parsing, 1 means malformed or
+truncated STALL records with partial evidence, 2 means an input error. Old launch
+metadata without the new field stays unknown; a request alone is not observed
+enablement. Optional --probe-state records an independent caller assertion.
+No records is not a smoothness verdict. Preserve timestamps and scene boundaries.
+
+The probe records completed CPU wall-time scopes that overlap/straddle reports,
+for presentation intervals above 100 ms. Do not add scopes, derive frame-time
+percentages/call latencies, or interpret gpu_idle as hardware GPU idle. It covers
+selected direct-draw/pipeline/queue/presentation waits, not a complete GPU trace.
+Use a separate suitable hardware GPU capture if actual GPU duration is needed.
+Probe instrumentation has overhead; treat its run separately from the ordinary
+performance comparison and preserve rendering/timing/accuracy settings.
+
+E038 boot smoke at build/zarvot-runs/20261014-014755-b4a3da0f emitted 18 valid
+records, rendered the full title and closed normally. No gameplay was automated.
+Tests: tests/test-zarvot-launcher.ps1 (27 staging / 22 startup checks) and
+Python unittest discover -s tests -p test_zarvot_stalls.py (10 checks).

@@ -6,6 +6,11 @@ progressing from hybrid execution to validated strict-static/no-JIT gameplay.
 It reuses suyu's graphics, audio, OS and services. General emulator performance
 tuning is outside the project scope.
 
+The recomp's [native rendering investigation](docs/zarvot/GRAPHICS.md) now
+examines graphics API boundaries and measured translation/synchronization costs.
+Local metadata confirms Unity 2017.4.10f1/IL2CPP; host Vulkan already renders on
+the GPU. A native NVN bridge is a possible future integration, pending evidence.
+
 ## Current state
 
 Zarvot is verified AArch64. All four Hybrid ABI 6 modules (main, rtld, sdk and

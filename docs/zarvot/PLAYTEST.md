@@ -57,6 +57,12 @@ verify coverage plus owned CPU recording before inviting play. Preserve the
 unused E035 stage and earlier module/profile sets. P01–P07 observations below
 belong to earlier candidates and require appropriate rechecks for this build.
 
+E038 adds a separate graphics diagnostic using -StallProbe; keep it off for the
+ordinary CPU-performance comparison. A later diagnostic copy can record the
+same route with this flag and parse its log with analyze-zarvot-stalls.py.
+GRAPHICS.md explains the overlapping CPU scopes and why they do not measure
+hardware GPU time. Preserve the same images, host, initial profile and settings.
+
 E017 recorded this route: the user played the first action sequence and reported
 many slowdowns/bad frame rates. Captures show the Story menu, opening jar arena
 with Pew Pew prompt, combat effects/score and a Story transition. All 232 complete

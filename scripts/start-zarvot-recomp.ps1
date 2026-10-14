@@ -10,6 +10,7 @@ param(
     [switch]$Capture,
     [switch]$Visible,
     [switch]$RecordCoverage,
+    [switch]$StallProbe,
     [switch]$SamplePc,
     [ValidateRange(0, 86400)][int]$SampleAfterSeconds = 120,
     [string]$ProfileFromRun,
@@ -255,6 +256,7 @@ $launch = [ordered]@{
     pc_sample_after_seconds = if ($SamplePc) { $SampleAfterSeconds } else { $null }
     pc_sample_shift = if ($SamplePc) { 18 } else { $null }
     coverage_recording_requested = [bool]$RecordCoverage
+    stall_probe_requested = [bool]$StallProbe
     coverage_recorder_state = if ($RecordCoverage) { 'pending' } else { 'not_requested' }
     coverage_recorder_pid = $null
     coverage_recorder_started_utc = $null
@@ -273,12 +275,15 @@ Save-Launch
 if (-not $StageOnly) {
     # Clear inherited diagnostic overrides only in this process, then restore.
     $previous = @{}
-    Get-ChildItem Env: | Where-Object { $_.Name -like 'SUYU_RECOMP_*' -or $_.Name -like 'SUYU_CMD_*' } |
+    Get-ChildItem Env: | Where-Object { $_.Name -like 'SUYU_RECOMP_*' -or $_.Name -like 'SUYU_CMD_*' -or $_.Name -eq 'SUYU_STALL_PROBE' } |
         ForEach-Object { $previous[$_.Name] = $_.Value; Remove-Item -LiteralPath "Env:\$($_.Name)" }
     try {
         $env:SUYU_RECOMP_STRICT = if ($Strict) { '1' } else { '0' }
         $env:SUYU_RECOMP_COVERAGE_PATH = Join-Path $runRoot 'coverage.txt'
         $env:SUYU_CMD_PERF_SAMPLE = '1'
+        # Opt in explicitly: inherited probe state must not change a comparison.
+        # These overlapping CPU scope totals do not measure hardware GPU time.
+        $env:SUYU_STALL_PROBE = if ($StallProbe) { '1' } else { '0' }
         if ($SamplePc) {
             $env:SUYU_RECOMP_SAMPLE_PC = '1'
             $env:SUYU_RECOMP_SAMPLE_AFTER_SEC = [string]$SampleAfterSeconds
@@ -354,13 +359,14 @@ if (-not $StageOnly) {
             Save-Launch
         }
     } finally {
-        Get-ChildItem Env: | Where-Object { $_.Name -like 'SUYU_RECOMP_*' -or $_.Name -like 'SUYU_CMD_*' } |
+        Get-ChildItem Env: | Where-Object { $_.Name -like 'SUYU_RECOMP_*' -or $_.Name -like 'SUYU_CMD_*' -or $_.Name -eq 'SUYU_STALL_PROBE' } |
             ForEach-Object { Remove-Item -LiteralPath "Env:\$($_.Name)" }
         foreach ($name in $previous.Keys) { Set-Item -LiteralPath "Env:\$name" -Value $previous[$name] }
     }
 }
 [pscustomobject]@{
     RunRoot = $runRoot; Pid = $launch.pid; StrictRequested = [bool]$Strict; State = $launch.state
+    StallProbeRequested = [bool]$StallProbe
     CoverageRecorderState = $launch.coverage_recorder_state; CoverageRecorderPid = $launch.coverage_recorder_pid
     CoverageObservation = $launch.coverage_observation_path; CoverageRecorderError = $launch.coverage_recorder_error
 }

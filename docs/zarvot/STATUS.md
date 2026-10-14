@@ -1,6 +1,6 @@
 # Zarvot recomp handoff
 
-Updated: 2026-10-12 local. Result-store build and compiled title verified (E035/E036); combat deferred by user.
+Updated: 2026-10-13 local. Native graphics feasibility reviewed; opt-in diagnostics verified (E038).
 
 ## Objective and next action
 
@@ -15,6 +15,26 @@ opening Story combat with this completed candidate, E017 host/E016 initial
 profile and both verified recorders. Measure the accumulated multiply/add
 improvements before paying for another full game build. Offline compare-copy
 work is a small independent lead, not a reason to replace the prepared candidate.
+
+The user now also requested graphics/native-rendering investigation. E038
+confirms Unity 2017.4.10f1/IL2CPP from existing local metadata. Current rendering
+is AOT Unity/NVN CPU code -> Switch graphics commands -> Maxwell translation ->
+native Vulkan/host GPU. No native NVN bridge or Windows Unity project exists in
+this checkout. GRAPHICS.md records practical native boundary options and the
+measurement plan; do not assume Unity assets can be dropped into a Windows player.
+The preserved E017 host already has an opt-in scope probe. Launcher -StallProbe
+and scripts/analyze-zarvot-stalls.py are tested and a separate boot smoke
+successfully emitted/parsed 18 records. They describe overlapping CPU wall-time
+work/waits, not GPU execution or additive frame percentages. gpu_idle is the
+emulation thread waiting for commands, not hardware GPU idle.
+Keep the deferred CPU comparison probe-off (default explicitly isolates ambient
+probe state), then use a separate diagnostic run of the same combat route before
+selecting a graphics replacement. No core/emitter/game-image changes or new build.
+E038 diagnostic run build/zarvot-runs/20261014-014755-b4a3da0f is closed; 90
+complete reports advance 49,289,962 -> 9,206,631,111 compiled blocks with zero
+fallbacks/traps/disagreements/regressions, and the title rendered. No gameplay
+input or hardware GPU capture. Current graphics bottleneck/gain remains unknown.
+
 E034 removes scalar FP32 FADD/FSUB's partial-write 128-bit result temporary,
 storing the truncated result and clearing upper destination bits directly.
 Input snapshots, FPX gates, exact helpers, FPCR/FPSR, guards and ABI are unchanged;

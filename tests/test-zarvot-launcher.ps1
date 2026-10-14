@@ -18,6 +18,8 @@ function Start-Process {
     if (-not $global:ZarvotLaunchTestRecorder) { throw 'The staging tests must never start a process' }
     $mock = $global:ZarvotLaunchTestRecorder
     if ([IO.Path]::GetFileName($FilePath) -eq 'suyu-cmd.exe') {
+        $mock.stall_probe_value = $env:SUYU_STALL_PROBE
+        if ($mock.mode -eq 'game_start_failure') { throw 'Synthetic game start failure' }
         $mock.game_starts++
         $game = [pscustomobject]@{Id=234567;Path=$FilePath;StartTime=([DateTime]'2026-10-11T14:00:00Z')}
         $global:ZarvotLaunchTestProcesses = @($game)
@@ -278,6 +280,37 @@ try {
             throw 'StageOnly conflict staged an extra run'
         }
     }
+    $previousProbe = $env:SUYU_STALL_PROBE
+    try {
+        foreach ($probeCase in @(
+            @{ambient='1';requested=$false;child='0'},
+            @{ambient='0';requested=$true;child='1'},
+            @{ambient=$null;requested=$false;child='0'},
+            @{ambient=$null;requested=$true;child='1'}
+        )) {
+            $fixture = New-Fixture
+            $env:SUYU_STALL_PROBE = $probeCase.ambient
+            $global:ZarvotLaunchTestRecorder = @{mode='attached';game_starts=0;recorder_starts=0}
+            $result = Invoke-Fixture $fixture @{StageOnly=$false;StallProbe=$probeCase.requested}
+            $record = Get-Content -LiteralPath (Join-Path $result.RunRoot 'launch.json') -Raw | ConvertFrom-Json
+            if ($global:ZarvotLaunchTestRecorder.stall_probe_value -ne $probeCase.child -or
+                $record.stall_probe_requested -ne $probeCase.requested -or
+                $result.StallProbeRequested -ne $probeCase.requested -or
+                $env:SUYU_STALL_PROBE -cne $probeCase.ambient) {
+                throw 'Stall probe opt-in, ambient isolation, metadata or restoration failed'
+            }
+            ++$script:checks
+        }
+        $fixture = New-Fixture
+        $env:SUYU_STALL_PROBE = 'restore-after-failure'
+        $global:ZarvotLaunchTestRecorder = @{mode='game_start_failure';game_starts=0;recorder_starts=0}
+        Reject 'probe game-start failure' { Invoke-Fixture $fixture @{StageOnly=$false;StallProbe=$true} } 'Synthetic game start failure'
+        if ($env:SUYU_STALL_PROBE -cne 'restore-after-failure' -or
+            $global:ZarvotLaunchTestRecorder.stall_probe_value -ne '1') {
+            throw 'Stall probe environment was not restored after launch failure'
+        }
+        ++$script:checks
+    } finally { $env:SUYU_STALL_PROBE = $previousProbe }
     foreach ($mode in @('attached','start_failure','immediate_exit','wrong_pid','wrong_start','wrong_recorder','wrong_root','recorder_error')) {
         $fixture = New-Fixture
         $global:ZarvotLaunchTestRecorder = @{mode=$mode;game_starts=0;recorder_starts=0}

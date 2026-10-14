@@ -1,6 +1,6 @@
 # Zarvot recomp roadmap
 
-Updated: 2026-10-12. This supersedes the emulator optimization roadmap.
+Updated: 2026-10-13. This supersedes the emulator optimization roadmap.
 
 ## Objective
 
@@ -21,6 +21,12 @@ JIT is a behavioral reference and temporary hybrid fallback. Existing JIT
 measurements are historical evidence, not an optimization backlog or a gate on
 starting AOT work. Preserve gameplay timing, input, saves, visuals and music.
 The user handles gameplay testing; no automated play without a new request.
+
+The user's 2026-10-13 request adds R06 native-rendering integration investigation:
+identify graphics translation/synchronization costs and assess narrow native
+replacements or an NVN-to-Vulkan bridge for the eventual recomp. Preserve the
+prepared CPU-comparison candidate and rendering correctness. See GRAPHICS.md;
+Unity provenance does not itself provide a native Windows player/project.
 
 ## Milestones and acceptance
 

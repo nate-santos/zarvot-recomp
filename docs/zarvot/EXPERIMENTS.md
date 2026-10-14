@@ -1782,6 +1782,65 @@ statements remain historical and do not override the current STATUS queue.
   adoption rather than starting another costly full game build now. No new game
   FPS, coverage, behavior, strict/no-JIT or full-game correctness claim.
 
+## E038 — Unity/native graphics feasibility and diagnostics (2026-10-13 local)
+
+- Task: R06. User explicitly requested graphics pipeline/native-rendering
+  investigation. Extended the plan with GRAPHICS.md while keeping core
+  60fb490b2e, emitter a7bf1d6a..., E035 images and the deferred CPU comparison
+  fixed. No general settings/accuracy/resolution tuning or new module/host build.
+- Read-only existing metadata confirms Unity 2017.4.10f1, global-metadata.dat
+  IL2CPP magic 0xFAB11BAF/version 24, SwitchPlayer.nss and NVN initialization
+  markers. Cooked Unity assets are present; inventory found no native Windows
+  player/original Unity project. Only filenames, tiny headers and selected
+  existing read-only markers inspected; no new asset extraction or publication.
+  Unity's 2017.4 IL2CPP/build documentation confirms platform compilation and
+  target-specific asset builds; this is not a drop-in Windows Unity rebuild.
+- Source path is compiled Unity/NVN CPU -> SVC/IPC/nvdrv -> GPFIFO/Maxwell
+  commands -> shader/state translation -> native host Vulkan/GPU. Current import
+  resolution targets guest modules; there is no implemented high-level native
+  NVN graphics bridge. A bridge needs verified ABI/object/resource/shader maps,
+  fences, lifetimes and CPU/GPU coherence. A small native command-generation
+  replacement is an incremental candidate if measured. Unity rehosting is a
+  much larger reconstruction effort. No graphics speedup/bottleneck established.
+- Existing StallProbe source already covers selected direct-draw, pipeline-build,
+  scheduler, input, acquire/present and frame waits. The exact preserved E017
+  host SHA 43ae6250... contains the diagnostic. Added explicit launcher
+  -StallProbe and stall_probe_requested metadata; ordinary launches force it
+  off regardless of ambient values, then restore the caller's environment.
+  Startup-failure restoration is tested. Current test images are unchanged.
+- New analyze-zarvot-stalls.py parses exact complete records, chronology,
+  overlapping scope observations/counts, absent/unknown/requested/asserted/
+  observed enablement and contradictions. Sanitized JSON omits raw lines, paths
+  and PCs; malformed/truncated records are visible with exit 1, input errors
+  exit 2. No scopes are added into frame percentages or individual call time.
+  gpu_idle means emulation-thread input wait, not hardware GPU idle. Reports
+  appear only above a 100 ms present interval (rounded display can be 100.0).
+- Tests pass: real launcher with synthetic files/mocked game processes,
+  27 staging and 22 startup checks; 10 Python parser tests cover format/units/
+  counts, chronology regressions, overlap, rounding, truncation, overflow,
+  privacy and old metadata. Test temporary directories stay under ignored build/.
+  Read-only old E028 log has no STALL records and unknown enablement; no verdict.
+- Separate real boot smoke: build/zarvot-runs/20261014-014755-b4a3da0f,
+  same E035 module hashes/E017 host/E016 initial profile. Game PID 18080,
+  attached coverage recorder 21576, probe requested=true. Full title capture 4
+  rendered, no controller input, CPU trace or hardware GPU capture. 90 complete
+  reports advance compiled blocks 49,289,962 -> 9,206,631,111 with zero UI/file
+  fallback/trap/disagreement/regression counts. Both processes closed normally.
+- Final parser sees 18 valid records, no malformed records/config conflicts,
+  one chronological segment. Reported intervals 104.5–21,460 ms, median 275.05,
+  during startup only; these are filtered presentation observations, not combat
+  frame percentiles or the cause of previous hit-effect stutter. Runtime records
+  prove diagnostic integration works in this exact host. Scope totals overlap
+  and can straddle intervals; no hardware GPU-bound or CPU-bound verdict follows.
+- Local evidence: reports/e038-{launcher-tests,stall-parser-tests}.log,
+  e038-diagnostic-{start,close,stalls}.json plus the run's launch/coverage/log/
+  captures. Game data/generated code/raw logs remain ignored. Source additions
+  are the generic parser, synthetic tests, opt-in launcher and sanitized docs.
+- Decision: preserve the prepared CPU comparison probe-off, then separately
+  record the same combat route with the diagnostic before choosing a native
+  rendering boundary experiment. Native integration is now an investigated
+  recomp direction; no wholesale renderer/engine rewrite is justified yet.
+
 ## Template for the next experiment
 
 - ID / R task / date:
